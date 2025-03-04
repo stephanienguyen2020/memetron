@@ -24,13 +24,13 @@ Launch your own token with an AI-powered branding assistant, instant deployment,
 - **Sentiment Analysis & Predictions:** AI forecasts price trends based on historical data.
 ---
 
-# **How to Run HedgeFi**
+# **How to Run MemeTron**
 
 ## **1. Clone the Repository**
 
 ```bash
-git clone https://github.com/stephanienguyen2020/hedgefi
-cd hedgefi
+git clone https://github.com/stephanienguyen2020/memetron
+cd memetron
 ```
 
 ## **2. Set Up Environment Variables**
@@ -95,8 +95,8 @@ In a new terminal window:
 
 ```bash
 # Clone the repository (if not already done)
-git clone https://github.com/stephanienguyen2020/hedgefi
-cd hedgefi
+git clone https://github.com/stephanienguyen2020/memetron
+cd memetron
 
 # Switch to the Eliza branch
 git checkout eliza

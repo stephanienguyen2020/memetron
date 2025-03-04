@@ -92,4 +92,5 @@ bun dev
 
 ![OpenAI](https://img.shields.io/badge/GPT--4-412991?style=for-the-badge&logo=openai&logoColor=white)
 ![Twitter API](https://img.shields.io/badge/Twitter%20API-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     // Connect to the provider - use environment variable for RPC URL
     const provider = new ethers.JsonRpcProvider(
-      process.env.NEXT_PUBLIC_RPC_URL || "https://testnet.aurora.dev"
+      "https://rpc.ankr.com/electroneum_testnet/a37dd6e77e11f999c0ca58d263db0f160cd081bb788feecd4c256902084993b9"
     );
 
     // Use your agent private key from environment variables

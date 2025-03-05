@@ -36,15 +36,17 @@ contract Factory {
     event Created(address indexed token);
     event RewardClaimed(address indexed user, address indexed token, uint256 amount);
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
     constructor(uint256 _fee) {
         fee = _fee;
         owner = msg.sender;
     }
 
-    function setLiquidityPool(address _liquidityPool) external {
-        require(msg.sender == owner, "Only owner");
-        //require(address(nativeLiquidityPool) == address(0), "Already set");
-        //require(_liquidityPool != address(0), "Invalid address");
+    function setLiquidityPool(address _liquidityPool) external onlyOwner {
         nativeLiquidityPool = NativeLiquidityPool(_liquidityPool);
     }
 
@@ -52,14 +54,14 @@ contract Factory {
         string memory _name, 
         string memory _symbol,
         string memory _metadataURI
-    ) external payable{
+    ) external payable {
         require(msg.value >= fee, "Creator fee not met");
         Token token = new Token(msg.sender, _name, _symbol, _metadataURI, 1_000_000 ether);
         tokens.push(address(token));
         totalTokens++;
 
-        TokenSale memory sale = TokenSale(address(token),_name, _metadataURI, msg.sender, 0, 0, true, false);
-        tokenToSale[address(token)] = sale; // save to the blockchain
+        TokenSale memory sale = TokenSale(address(token), _name, _metadataURI, msg.sender, 0, 0, true, false);
+        tokenToSale[address(token)] = sale;
 
         emit Created(address(token));
     }
@@ -135,9 +137,7 @@ contract Factory {
         emit RewardClaimed(msg.sender, _token, reward);
     }
 
-    function withdraw(uint256 _amount) external {
-        require(msg.sender == owner, "Factory: Not owner");
-
+    function withdraw(uint256 _amount) external onlyOwner{
         (bool success, ) = payable(owner).call{value: _amount}("");
         require(success, "Factory: ETH transfer failed");
     }

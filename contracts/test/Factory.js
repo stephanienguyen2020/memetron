@@ -175,52 +175,7 @@ describe("Factory", function () {
             expect(contributions3[1]).to.equal(COST)
         })
     })
-    describe("Selling", function (){
-        // const AMOUNT = ethers.parseUnits("10000", 18) // buy 10000 tokens
-        // const COST = ethers.parseUnits("1", 18) 
-        // it("should update eth balance", async function (){
-        //     const {factory, token, creator, buyer} = await loadFixture(buyTokenFixture)
-        //     const balance = await token.balanceOf(buyer.address)
-        //     expect(balance).to.equal(AMOUNT)
-        //     const [contributors2, contributions2] = await factory.getContributors(await token.getAddress())
-        //     console.log(contributors2);
-        //     // Add this line to approve the factory to spend tokens
-        //     await token.connect(buyer).approve(await factory.getAddress(), AMOUNT/2n)
 
-        //     const sellTx = await factory.connect(buyer).sell(await token.getAddress(), AMOUNT/2n)
-        //     await sellTx.wait()
-        //     const balanceAfterSell = await token.balanceOf(buyer.address)
-        //     expect(balanceAfterSell).to.equal(AMOUNT/2n)
-
-        //     const tokenBalance = await factory.userTokenContributions(await token.getAddress(), buyer.address)
-        //     const ethBalance = await factory.userEthContributions(await token.getAddress(), buyer.address)
-        //     const [contributors, contributions] = await factory.getContributors(await token.getAddress())
-        //     console.log(contributors);
-        //     const firstContributor = contributors[0]
-        //     expect(tokenBalance).to.equal(AMOUNT)
-        //     expect(ethBalance).to.equal(COST)
-        //     expect(firstContributor).to.equal(buyer.address)
-        //     expect(contributions[0]).to.equal(COST)
-
-        // })
-
-        // it("can't sell more than you have", async function (){
-        //     const {factory, token, creator, buyer} = await loadFixture(buyTokenFixture)
-        //     const balance = await token.balanceOf(buyer.address)
-        //     await token.connect(buyer).approve(await factory.getAddress(), AMOUNT*2n)
-        //     await expect(
-        //         factory.connect(buyer).sell(await token.getAddress(), AMOUNT*2n)
-        //     ).to.be.revertedWith("Insufficient token balance");
-        // })
-
-        // it("should update user contribution", async function (){
-        //     const {factory, token, creator, buyer} = await loadFixture(buyTokenFixture)
-        //     const buyTx = await factory.connect(buyer).buy(await token.getAddress(), AMOUNT/2n, {value: COST})
-        //     await buyTx.wait()
-        //     const buyTx2 = await factory.connect(creator).buy(await token.getAddress(), AMOUNT/2n, {value: COST})
-        //     await buyTx2.wait()
-        // })
-    })
     describe("Depositing", function () {
         const AMOUNT = ethers.parseUnits("10000", 18) // buy 10000 tokens
         const COST = ethers.parseUnits("2", 18) // price
@@ -469,3 +424,208 @@ describe("NativeLiquidityPool", function () {
         });
     });
 })
+
+describe("LaunchpadAgent", function () {
+    const FEE = ethers.parseUnits("0.01", 18);
+    const AGENT_FEE_PERCENTAGE = 5; // 5%
+    const AGENT_FEE = (FEE * BigInt(AGENT_FEE_PERCENTAGE)) / 100n;
+
+    async function deployLaunchpadAgentFixture() {
+        const [deployer, agent, user1, user2] = await ethers.getSigners();
+
+        // Deploy Factory
+        const Factory = await ethers.getContractFactory("Factory");
+        const factory = await Factory.deploy(FEE);
+
+        // Deploy NativeLiquidityPool
+        const NativeLiquidityPool = await ethers.getContractFactory("NativeLiquidityPool");
+        const liquidityPool = await NativeLiquidityPool.deploy(await factory.getAddress());
+        
+        // Set the liquidity pool address
+        await factory.setLiquidityPool(await liquidityPool.getAddress());
+
+        // Deploy LaunchpadAgent
+        const LaunchpadAgent = await ethers.getContractFactory("LaunchpadAgent");
+        const launchpadAgent = await LaunchpadAgent.deploy(await factory.getAddress(), agent.address);
+
+        return { factory, liquidityPool, launchpadAgent, deployer, agent, user1, user2 };
+    }
+
+    describe("Deployment", function () {
+        it("Should set the factory address", async function () {
+            const { factory, launchpadAgent } = await loadFixture(deployLaunchpadAgentFixture);
+            expect(await launchpadAgent.factory()).to.equal(await factory.getAddress());
+        });
+
+        it("Should set the agent address", async function () {
+            const { launchpadAgent, agent } = await loadFixture(deployLaunchpadAgentFixture);
+            expect(await launchpadAgent.agentAddress()).to.equal(agent.address);
+        });
+
+        it("Should set the owner", async function () {
+            const { launchpadAgent, deployer } = await loadFixture(deployLaunchpadAgentFixture);
+            expect(await launchpadAgent.owner()).to.equal(deployer.address);
+        });
+
+        it("Should set the default agent fee percentage", async function () {
+            const { launchpadAgent } = await loadFixture(deployLaunchpadAgentFixture);
+            expect(await launchpadAgent.agentFeePercentage()).to.equal(5);
+        });
+    });
+
+    describe("Twitter Handle Registration", function () {
+        it("Should register twitter handle", async function () {
+            const { launchpadAgent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const twitterHandle = "user1_twitter";
+            
+            await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
+            expect(await launchpadAgent.twitterToAddress(twitterHandle)).to.equal(user1.address);
+        });
+
+        it("Should not register empty twitter handle", async function () {
+            const { launchpadAgent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            await expect(
+                launchpadAgent.connect(user1).registerTwitterHandle("")
+            ).to.be.revertedWith("Invalid twitter handle");
+        });
+    });
+
+    describe("Token Credits", function () {
+        it("Should allow users to buy token credits", async function () {
+            const { launchpadAgent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const creditAmount = ethers.parseEther("1");
+            
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: creditAmount });
+            expect(await launchpadAgent.getUserTokenCredits(user1.address)).to.equal(creditAmount);
+        });
+
+        it("Should not allow buying zero credits", async function () {
+            const { launchpadAgent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            await expect(
+                launchpadAgent.connect(user1).buyTokenCredits({ value: 0 })
+            ).to.be.revertedWith("Must send some ether");
+        });
+
+        it("Should allow users to withdraw credits", async function () {
+            const { launchpadAgent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const creditAmount = ethers.parseEther("1");
+            
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: creditAmount });
+            await launchpadAgent.connect(user1).withdrawCredits(creditAmount);
+            expect(await launchpadAgent.getUserTokenCredits(user1.address)).to.equal(0);
+        });
+    });
+
+    describe("Token Creation", function () {
+        it("Should allow agent to create token for registered user", async function () {
+            const { launchpadAgent, factory, agent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const twitterHandle = "user1_twitter";
+            const totalCost = FEE + AGENT_FEE;
+            
+            // Register user and buy credits
+            await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: totalCost });
+            
+            // Create token
+            await launchpadAgent.connect(agent).createTokenForUser(
+                twitterHandle,
+                "Test Token",
+                "TEST",
+                "ipfs://metadata"
+            );
+
+            // Verify token creation
+            expect(await factory.totalTokens()).to.equal(1);
+            const tokenAddress = await factory.tokens(0);
+            const token = await ethers.getContractAt("Token", tokenAddress);
+            expect(await token.name()).to.equal("Test Token");
+        });
+
+        it("Should not allow non-agent to create token", async function () {
+            const { launchpadAgent, user1, user2 } = await loadFixture(deployLaunchpadAgentFixture);
+            const twitterHandle = "user1_twitter";
+            
+            await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
+            await expect(
+                launchpadAgent.connect(user2).createTokenForUser(
+                    twitterHandle,
+                    "Test Token",
+                    "TEST",
+                    "ipfs://metadata"
+                )
+            ).to.be.revertedWith("Only agent can call this function");
+        });
+
+        it("Should not create token for unregistered twitter handle", async function () {
+            const { launchpadAgent, agent } = await loadFixture(deployLaunchpadAgentFixture);
+            await expect(
+                launchpadAgent.connect(agent).createTokenForUser(
+                    "nonexistent_handle",
+                    "Test Token",
+                    "TEST",
+                    "ipfs://metadata"
+                )
+            ).to.be.revertedWith("Twitter handle not registered");
+        });
+
+        it("Should not create token if user has insufficient credits", async function () {
+            const { launchpadAgent, agent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const twitterHandle = "user1_twitter";
+            
+            await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
+            await expect(
+                launchpadAgent.connect(agent).createTokenForUser(
+                    twitterHandle,
+                    "Test Token",
+                    "TEST",
+                    "ipfs://metadata"
+                )
+            ).to.be.revertedWith("Insufficient token credits");
+        });
+    });
+
+    describe("Agent Fee Management", function () {
+        it("Should allow owner to set agent fee percentage", async function () {
+            const { launchpadAgent, deployer } = await loadFixture(deployLaunchpadAgentFixture);
+            await launchpadAgent.connect(deployer).setAgentFeePercentage(10);
+            expect(await launchpadAgent.agentFeePercentage()).to.equal(10);
+        });
+
+        it("Should not allow setting fee percentage above 20%", async function () {
+            const { launchpadAgent, deployer } = await loadFixture(deployLaunchpadAgentFixture);
+            await expect(
+                launchpadAgent.connect(deployer).setAgentFeePercentage(21)
+            ).to.be.revertedWith("Fee cannot exceed 20%");
+        });
+
+        it("Should allow agent to withdraw fees", async function () {
+            const { launchpadAgent, agent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const twitterHandle = "user1_twitter";
+            const totalCost = FEE + AGENT_FEE;
+            
+            // Setup and create token
+            await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: totalCost });
+            await launchpadAgent.connect(agent).createTokenForUser(
+                twitterHandle,
+                "Test Token",
+                "TEST",
+                "ipfs://metadata"
+            );
+
+            // Check agent fee balance
+            expect(await launchpadAgent.getAgentBalance()).to.equal(AGENT_FEE);
+
+            // Withdraw fees
+            await launchpadAgent.connect(agent).withdrawAgentFees();
+            expect(await launchpadAgent.getAgentBalance()).to.equal(0);
+        });
+
+        it("Should not allow non-agent to withdraw fees", async function () {
+            const { launchpadAgent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            await expect(
+                launchpadAgent.connect(user1).withdrawAgentFees()
+            ).to.be.revertedWith("Only agent can call this function");
+        });
+    });
+});

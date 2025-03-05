@@ -5,6 +5,52 @@ import BettingABI from "@/abi/Betting.json";
 // Contract address from the BettingService
 const contractAddress = "0x930aE314a7285B7Cac2E5c7b1c59319837816D48";
 
+async function generateImage(prompt: string): Promise<string> {
+  try {
+    const url = "https://api.nebulablock.com/api/v1/images/generation";
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NEBULA_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model_name: "stabilityai/stable-diffusion-xl-base-1.0",
+        prompt: prompt,
+        num_steps: 25,
+        guidance_scale: 9,
+        negative_prompt: null,
+        width: 1024,
+        height: 1024,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to generate image");
+
+    const { data } = await response.json();
+    const imageBase64 = data.image_file;
+
+    // Convert base64 to binary
+    const byteCharacters = atob(imageBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    // Create a Blob from the binary data
+    const blob = new Blob([byteArray], { type: "image/png" });
+
+    // Here you would typically upload this blob to your storage service
+    // For now, we'll return a data URL as a placeholder
+    const dataUrl = `data:image/png;base64,${imageBase64}`;
+    return dataUrl;
+  } catch (error) {
+    console.error("Error generating image:", error);
+    return "/placeholder.svg";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Parse the request body
@@ -34,6 +80,13 @@ export async function POST(req: NextRequest) {
         { error: "Missing required parameters" },
         { status: 400 }
       );
+    }
+
+    // Generate image if no imageURL is provided
+    let finalImageURL = imageURL;
+    if (!imageURL) {
+      const prompt = `${title} - ${description}`;
+      finalImageURL = await generateImage(prompt);
     }
 
     // Connect to the provider - use environment variable for RPC URL
@@ -79,7 +132,7 @@ export async function POST(req: NextRequest) {
       endDate,
       amount,
       initialPoolAmount,
-      imageURL || "/placeholder.svg" // Default image if not provided
+      finalImageURL || "/placeholder.svg"
     );
 
     const receipt = await tx.wait();
@@ -89,16 +142,29 @@ export async function POST(req: NextRequest) {
     const betId = receipt.logs[0]?.topics[1]; // Assuming the first log contains the bet ID
     const redirectUrl = `${baseURL}/bets/place-bet?id=${betId}`;
 
-    // Return success response with transaction details
+    // Return success response with transaction details and generated image
     return NextResponse.json({
       success: true,
       message: "Bet created successfully",
       transactionHash: receipt.hash,
       betId: betId,
       redirectUrl: redirectUrl,
+      imageURL: finalImageURL,
     });
   } catch (error: any) {
     console.error("Error creating bet:", error);
+
+    // Check for image generation error
+    if (error.message && error.message.includes("Failed to generate image")) {
+      return NextResponse.json(
+        {
+          error: "Image generation failed",
+          message:
+            "Failed to generate image for the bet. Using placeholder image instead.",
+        },
+        { status: 500 }
+      );
+    }
 
     // Check for onlyAgent error
     if (

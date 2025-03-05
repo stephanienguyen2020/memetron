@@ -32,6 +32,36 @@ const auroraTestnet = {
   testnet: true,
 };
 
+const electroneumTestnet = {
+  id: 5201420,
+  name: "Electroneum Testnet",
+  network: "electroneum-testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "ETN",
+    symbol: "ETN",
+  },
+  rpcUrls: {
+    public: {
+      http: [
+        "https://rpc.ankr.com/electroneum_testnet/a37dd6e77e11f999c0ca58d263db0f160cd081bb788feecd4c256902084993b9",
+      ],
+    },
+    default: {
+      http: [
+        "https://rpc.ankr.com/electroneum_testnet/a37dd6e77e11f999c0ca58d263db0f160cd081bb788feecd4c256902084993b9",
+      ],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Electroneum Explorer",
+      url: "https://blockexplorer.thesecurityteam.rocks/",
+    },
+  },
+  testnet: true,
+};
+
 // Configure custom Sonic Blaze Testnet
 const sonicBlazeTestnet = {
   id: 57054,
@@ -57,10 +87,11 @@ const sonicBlazeTestnet = {
 
 // Create wagmi config
 const config = createConfig({
-  chains: [auroraTestnet, sonicBlazeTestnet],
+  chains: [auroraTestnet, sonicBlazeTestnet, electroneumTestnet],
   transports: {
     [auroraTestnet.id]: http(),
     [sonicBlazeTestnet.id]: http(),
+    [electroneumTestnet.id]: http(),
   },
 });
 

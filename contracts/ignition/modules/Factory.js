@@ -6,7 +6,7 @@ const { ethers } = require("hardhat");
 
 const FEE = ethers.parseUnits("0.01", 18)
 
-module.exports = buildModule("FactoryModule", async (m) => {
+module.exports = buildModule("FactoryModule", (m) => {
     // Get the agent wallet from private key
     const AGENT_PRIVATE_KEY = process.env.AGENT_PRIVATE_KEY;
     if (!AGENT_PRIVATE_KEY) {

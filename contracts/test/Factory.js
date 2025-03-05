@@ -527,7 +527,7 @@ describe("LaunchpadAgent", function () {
             await launchpadAgent.connect(user1).buyTokenCredits({ value: totalCost });
             
             // Create token
-            await launchpadAgent.connect(agent).createTokenForUser(
+            await launchpadAgent.connect(agent).createTokenForUserViaTwitter(
                 twitterHandle,
                 "Test Token",
                 "TEST",
@@ -547,7 +547,7 @@ describe("LaunchpadAgent", function () {
             
             await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
             await expect(
-                launchpadAgent.connect(user2).createTokenForUser(
+                launchpadAgent.connect(user2).createTokenForUserViaTwitter(
                     twitterHandle,
                     "Test Token",
                     "TEST",
@@ -559,7 +559,7 @@ describe("LaunchpadAgent", function () {
         it("Should not create token for unregistered twitter handle", async function () {
             const { launchpadAgent, agent } = await loadFixture(deployLaunchpadAgentFixture);
             await expect(
-                launchpadAgent.connect(agent).createTokenForUser(
+                launchpadAgent.connect(agent).createTokenForUserViaTwitter(
                     "nonexistent_handle",
                     "Test Token",
                     "TEST",
@@ -574,13 +574,105 @@ describe("LaunchpadAgent", function () {
             
             await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
             await expect(
-                launchpadAgent.connect(agent).createTokenForUser(
+                launchpadAgent.connect(agent).createTokenForUserViaTwitter(
                     twitterHandle,
                     "Test Token",
                     "TEST",
                     "ipfs://metadata"
                 )
             ).to.be.revertedWith("Insufficient token credits");
+        });
+    });
+
+    describe("Token Creation via Address", function () {
+        it("Should allow agent to create token for user via address", async function () {
+            const { launchpadAgent, factory, agent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const totalCost = FEE + AGENT_FEE;
+            
+            // Buy credits first
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: totalCost });
+            
+            // Create token using address
+            await launchpadAgent.connect(agent).createTokenForUserViaAddress(
+                user1.address,
+                "Test Token",
+                "TEST",
+                "ipfs://metadata"
+            );
+
+            // Verify token creation
+            expect(await factory.totalTokens()).to.equal(1);
+            const tokenAddress = await factory.tokens(0);
+            const token = await ethers.getContractAt("Token", tokenAddress);
+            expect(await token.name()).to.equal("Test Token");
+        });
+
+        it("Should not allow non-agent to create token via address", async function () {
+            const { launchpadAgent, user1, user2 } = await loadFixture(deployLaunchpadAgentFixture);
+            const totalCost = FEE + AGENT_FEE;
+            
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: totalCost });
+            
+            await expect(
+                launchpadAgent.connect(user2).createTokenForUserViaAddress(
+                    user1.address,
+                    "Test Token",
+                    "TEST",
+                    "ipfs://metadata"
+                )
+            ).to.be.revertedWith("Only agent can call this function");
+        });
+
+        it("Should not create token via address if user has insufficient credits", async function () {
+            const { launchpadAgent, agent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const insufficientAmount = FEE / 2n;
+            
+            // Buy insufficient credits
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: insufficientAmount });
+            
+            await expect(
+                launchpadAgent.connect(agent).createTokenForUserViaAddress(
+                    user1.address,
+                    "Test Token",
+                    "TEST",
+                    "ipfs://metadata"
+                )
+            ).to.be.revertedWith("Insufficient token credits");
+        });
+
+        it("Should deduct correct amount of credits when creating token via address", async function () {
+            const { launchpadAgent, agent, user1 } = await loadFixture(deployLaunchpadAgentFixture);
+            const totalCost = FEE + AGENT_FEE;
+            const extraAmount = ethers.parseUnits("0.1", 18);
+            const initialCredits = totalCost + extraAmount;
+            
+            // Buy more credits than needed
+            await launchpadAgent.connect(user1).buyTokenCredits({ value: initialCredits });
+            
+            // Create token
+            await launchpadAgent.connect(agent).createTokenForUserViaAddress(
+                user1.address,
+                "Test Token",
+                "TEST",
+                "ipfs://metadata"
+            );
+
+            // Check remaining credits
+            const remainingCredits = await launchpadAgent.getUserTokenCredits(user1.address);
+            expect(remainingCredits).to.equal(extraAmount);
+        });
+
+        it("Should not create token for zero address", async function () {
+            const { launchpadAgent, agent } = await loadFixture(deployLaunchpadAgentFixture);
+            
+            await expect(
+                launchpadAgent.connect(agent).createTokenForUserViaAddress(
+                    ethers.ZeroAddress,
+                    "Test Token",
+                    "TEST",
+                    "ipfs://metadata"
+                )
+            ).to.be.revertedWith("Twitter handle not registered");
         });
     });
 
@@ -606,7 +698,7 @@ describe("LaunchpadAgent", function () {
             // Setup and create token
             await launchpadAgent.connect(user1).registerTwitterHandle(twitterHandle);
             await launchpadAgent.connect(user1).buyTokenCredits({ value: totalCost });
-            await launchpadAgent.connect(agent).createTokenForUser(
+            await launchpadAgent.connect(agent).createTokenForUserViaTwitter(
                 twitterHandle,
                 "Test Token",
                 "TEST",

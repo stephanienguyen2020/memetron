@@ -344,18 +344,7 @@ export function AssetTable({ searchQuery }: AssetTableProps) {
                     <Button
                       variant="default"
                       size="sm"
-                      className="bg-gradient-to-r from-sky-400 to-blue-500"
-                      onClick={() => {
-                        setSelectedAsset(asset);
-                        setIsTradeModalOpen(true);
-                      }}
-                    >
-                      Trade
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="bg-gradient-to-r from-cyan-400 to-teal-400"
+                      className="bg-gradient-to-r from-green-400 to-[#00ff00]"
                       onClick={() => handleAutoShill(asset)}
                     >
                       Auto Shill

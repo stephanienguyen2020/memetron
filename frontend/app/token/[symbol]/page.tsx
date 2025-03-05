@@ -377,7 +377,7 @@ export default function TokenDetailPage() {
       navigator
         .share({
           title: `${token?.name} (${token?.symbol})`,
-          text: `Check out ${token?.name} on HedgeFi!`,
+          text: `Check out ${token?.name} on MemeTron!`,
           url: window.location.href,
         })
         .catch((err) => {

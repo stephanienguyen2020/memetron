@@ -65,7 +65,7 @@ export function Chatbot() {
     {
       role: "assistant",
       content:
-        "Hi! I'm your HedgeFi assistant. I can help you analyze meme coins, spot trends, and identify potential rugs. What would you like to know?",
+        "Hi! I'm your MemeTron assistant. I can help you analyze meme coins, spot trends, and identify potential rugs. What would you like to know?",
       timestamp: getCurrentTime(),
     },
   ]);
@@ -204,7 +204,7 @@ export function Chatbot() {
                 <div className="flex items-center justify-between p-3 bg-black/20 backdrop-blur-sm border-b border-white/10">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="h-5 w-5 text-blue-500" />
-                    <span className="font-medium">HedgeFi Assistant</span>
+                    <span className="font-medium">MemeTron Assistant</span>
                   </div>
                   <Button
                     variant="ghost"

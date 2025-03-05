@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import CoinSwap from "@/app/coins/components/CoinSwap";
 import { AppLayout } from "@/app/components/app-layout";
 import { getTokens } from "@/services/memecoin-launchpad";
@@ -86,32 +85,25 @@ export default function QuickSwapPage() {
 
   return (
     <AppLayout>
-      <div className="container py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto"
-        >
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-center">
-              Quick <span className="text-blue-500">Swap</span>
-            </h1>
-          </div>
+      <div className="container py-8 max-w-2xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2 text-center">
+            Quick <span className="text-green-400">Swap</span>
+          </h1>
+        </div>
 
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-          ) : (
-            <CoinSwap
-              symbol="ETH"
-              isAuthenticated={isAuthenticated}
-              handleTradeAction={handleTradeAction}
-              marketplaceTokens={marketplaceTokens}
-            />
-          )}
-        </motion.div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <CoinSwap
+            symbol="ETH"
+            isAuthenticated={isAuthenticated}
+            handleTradeAction={handleTradeAction}
+            marketplaceTokens={marketplaceTokens}
+          />
+        )}
       </div>
     </AppLayout>
   );

@@ -66,7 +66,7 @@ export default function SettingsPage() {
               </span>
             </h1>
             <p className="text-muted-foreground max-w-2xl">
-              Customize your HedgeFi experience, manage integrations, and
+              Customize your MemeTron experience, manage integrations, and
               configure security preferences.
             </p>
 

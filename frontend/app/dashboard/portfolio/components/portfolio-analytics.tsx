@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
 const assetAllocation = [
   { name: "Layer 1", value: 45, color: "#3b82f6" },
@@ -9,33 +15,35 @@ const assetAllocation = [
   { name: "DeFi", value: 15, color: "#eab308" },
   { name: "NFTs", value: 10, color: "#ec4899" },
   { name: "Stablecoins", value: 5, color: "#64748b" },
-]
+];
 
 const riskMetrics = [
   { metric: "Portfolio Beta", value: "1.2" },
   { metric: "Sharpe Ratio", value: "2.1" },
   { metric: "Volatility", value: "32.5%" },
   { metric: "Max Drawdown", value: "-25.3%" },
-]
+];
 
 export function PortfolioAnalytics() {
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-4">
       <Card className="border-white/10 bg-black/60 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle>Asset Allocation</CardTitle>
-          <CardDescription>Distribution of your portfolio by category</CardDescription>
+        <CardHeader className="p-4 pb-2">
+          <CardTitle className="text-lg">Asset Allocation</CardTitle>
+          <CardDescription className="text-xs">
+            Distribution by category
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
+        <CardContent className="p-2">
+          <div className="h-[180px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={assetAllocation}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={40}
+                  outerRadius={60}
                   paddingAngle={5}
                   dataKey="value"
                 >
@@ -43,7 +51,13 @@ export function PortfolioAnalytics() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Legend />
+                <Legend
+                  layout="vertical"
+                  align="right"
+                  verticalAlign="middle"
+                  iconSize={8}
+                  fontSize={10}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -51,15 +65,22 @@ export function PortfolioAnalytics() {
       </Card>
 
       <Card className="border-white/10 bg-black/60 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle>Risk Metrics</CardTitle>
-          <CardDescription>Key portfolio risk indicators</CardDescription>
+        <CardHeader className="p-4 pb-2">
+          <CardTitle className="text-lg">Risk Metrics</CardTitle>
+          <CardDescription className="text-xs">
+            Key risk indicators
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
+        <CardContent className="p-4 pt-2">
+          <div className="grid gap-2">
             {riskMetrics.map((metric) => (
-              <div key={metric.metric} className="flex items-center justify-between p-4 rounded-lg bg-black/40">
-                <span className="text-muted-foreground">{metric.metric}</span>
+              <div
+                key={metric.metric}
+                className="flex items-center justify-between p-2 rounded-lg bg-black/40"
+              >
+                <span className="text-sm text-muted-foreground">
+                  {metric.metric}
+                </span>
                 <span className="font-mono font-bold">{metric.value}</span>
               </div>
             ))}
@@ -67,6 +88,5 @@ export function PortfolioAnalytics() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

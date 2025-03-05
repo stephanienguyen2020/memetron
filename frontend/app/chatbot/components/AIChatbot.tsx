@@ -485,7 +485,7 @@ function AIChatbotContent() {
               </span>
             </h1>
             <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-              I'm your HedgeFi AI assistant. I can help you analyze meme coins,
+              I'm your MemeTron AI assistant. I can help you analyze meme coins,
               track whale activity, and spot potential opportunities.
             </p>
           </motion.div>

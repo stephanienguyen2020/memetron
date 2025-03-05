@@ -614,27 +614,6 @@ const CoinSwap = ({
         <CardContent className="p-6">
           {!showSuccess ? (
             <>
-              <div className="flex justify-between items-center mb-6">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full bg-[#2A2B2E] text-gray-400 hover:text-green-400"
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                  <Settings2 className="h-5 w-5" />
-                </Button>
-
-                <h2 className="text-xl font-bold text-white">Exchange</h2>
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full bg-[#2A2B2E] text-gray-400 hover:text-green-400"
-                >
-                  <Share2 className="h-5 w-5" />
-                </Button>
-              </div>
-
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3 mb-4 text-sm text-blue-400 flex items-start">
                 <Info className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                 <div>
@@ -699,17 +678,6 @@ const CoinSwap = ({
                   >
                     <Zap className="h-4 w-4" />
                     Instant
-                  </button>
-                  <button
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium ${
-                      orderType === "limit"
-                        ? "bg-[#353538] text-white"
-                        : "text-gray-400 hover:text-gray-300"
-                    }`}
-                    onClick={() => setOrderType("limit")}
-                  >
-                    <Clock className="h-4 w-4" />
-                    Limit
                   </button>
                 </div>
               </div>
@@ -1193,7 +1161,7 @@ const CoinSwap = ({
 
                 {/* Swap Button */}
                 <Button
-                  className="w-full h-14 text-lg font-medium mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                  className="w-full h-14 text-lg font-medium mt-4 bg-green-400 hover:bg-green-500 text-white rounded-xl"
                   onClick={
                     !isAuthenticated
                       ? () => {
@@ -1348,7 +1316,7 @@ const CoinSwap = ({
                   </Button>
 
                   <Button
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    className="flex-1 bg-green-400 hover:bg-green-500 text-white"
                     onClick={() => setShowSuccess(false)}
                   >
                     New Swap

@@ -3,25 +3,32 @@ MemeTron is an **AI-driven platform** for meme coin trading, research, and creat
 ## 🚀 Features
 
 ### **Seamless Wallet Integration**
+
 Connect wallets easily with secure authentication—no private key management required.
 
 ### **Dashboard & Portfolio Tracking**
+
 Monitor holdings in real-time, track profits/losses, and get AI-driven price predictions.
 
 ### **🛠 Betting Marketplace**
+
 Bet on meme coin trends directly via Twitter by tagging **@MemeTron**. Smart contracts ensure secure escrow and instant payouts.
 
 ### **🚀 Meme Coin Launch Pad**
+
 Launch your own token with an AI-powered branding assistant, instant deployment, and on-chain security.
-   - Utilizes a custom bonding curve that dynamically adjusts token prices based on market supply and demand.
-   - Once a meme token reaches its funding goal, liquidity creation is triggered through the Native Liquidity Pool. Early contributors receive rewards, allowing them to mint additional tokens on Aurora.
-   - A Marketplace where users can create, buy, and trade all launched meme tokens.
+
+- Utilizes a custom bonding curve that dynamically adjusts token prices based on market supply and demand.
+- Once a meme token reaches its funding goal, liquidity creation is triggered through the Native Liquidity Pool. Early contributors receive rewards, allowing them to mint additional tokens on Electroneum.
+- A Marketplace where users can create, buy, and trade all launched meme tokens.
 
 ### **📊 AI Research & Trading Tools**
+
 - **Market Insights:** Track trends, social engagement, and whale movements.
 - **Swap Agent:** Find the best liquidity pools and trade efficiently.
 - **News Agent:** Get real-time alerts on market-moving events.
 - **Sentiment Analysis & Predictions:** AI forecasts price trends based on historical data.
+
 ---
 
 # **How to Run MemeTron**
@@ -147,8 +154,6 @@ If you encounter any issues:
 
 ![Solidity](https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white)
 ![Hardhat](https://img.shields.io/badge/Hardhat-FFD700?style=for-the-badge&logo=hardhat&logoColor=black)
-![NEAR](https://img.shields.io/badge/NEAR-000000?style=for-the-badge&logo=near&logoColor=white)
-![Aurora](https://img.shields.io/badge/Aurora-85FF8A?style=for-the-badge&logo=aurora&logoColor=black)
 ![NebulaBlock](https://img.shields.io/badge/NebulaBlock-6F4BB2?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PC9zdmc+&logoColor=white)
 
 ### 📦 Storage & IPFS

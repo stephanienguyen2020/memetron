@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
@@ -19,8 +19,8 @@ export default function Hero() {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8">
-            HedgeFi empowers you to create powerful Discord bots easily and quickly, without writing a single line of
-            code.
+            MemeTron empowers you to create powerful Discord bots easily and
+            quickly, without writing a single line of code.
           </p>
           <a
             href="#get-started"
@@ -31,6 +31,5 @@ export default function Hero() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
-

@@ -20,32 +20,21 @@ export default function DashboardPage() {
   const { isAuthenticated } = useWallet();
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
-  // Update wallet address when connection status changes
-  useEffect(() => {
-    if (isConnected && address) {
-      setWalletAddress(address);
-    } else {
-      // Try to get from localStorage as fallback
-      const savedAddress = localStorage.getItem("userAddress");
-      setWalletAddress(savedAddress);
-    }
-  }, [isConnected, address]);
-
   return (
     <AppLayout>
-      <div className="px-4 pr-[400px]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 max-w-5xl mx-auto mt-6">
-          <h1 className="text-4xl font-bold">
+      <div className="px-4 pr-[390px] max-w-full overflow-x-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 max-w-5xl mx-auto mt-6">
+          <h1 className="text-3xl md:text-4xl font-bold">
             Portfolio{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
               Snapshot
             </span>
           </h1>
 
           {/* Connected Wallet Display */}
           {walletAddress && (
-            <div className="flex items-center gap-2 mt-2 md:mt-0 p-3 rounded-md bg-sky-500/10 border border-sky-500/20">
-              <Wallet className="h-4 w-4 text-sky-500" />
+            <div className="flex items-center gap-2 mt-2 md:mt-0 p-3 rounded-md bg-green-500/10 border border-green-500/20">
+              <Wallet className="h-4 w-4 text-green-500" />
               <span className="text-sm font-medium">Connected:</span>
               <span className="text-sm text-muted-foreground">
                 {walletAddress.substring(0, 6)}...
@@ -55,61 +44,44 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6 max-w-5xl mx-auto"
-        >
+        <div className="space-y-4 max-w-5xl mx-auto">
           {/* Portfolio Overview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8"
-          >
+          <div className="mb-4">
             <PortfolioOverview />
-          </motion.div>
-
-          {/* Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8"
-          >
-            <PortfolioChart />
-          </motion.div>
-
-          {/* Portfolio Analytics */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-8"
-          >
-            <PortfolioAnalytics />
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <BetsSection />
-            <LaunchedTokens />
           </div>
-        </motion.div>
+
+          {/* Main Content Grid - Adjusted for better responsiveness */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+            {/* Chart - Takes 8/12 width on large screens and has more height */}
+            <div className="lg:col-span-8 bg-gray-900/50 rounded-xl border border-green-500/10 overflow-hidden min-h-[500px]">
+              <PortfolioChart />
+            </div>
+
+            {/* Analytics - Takes 4/12 width on large screens */}
+            <div className="lg:col-span-4 bg-gray-900/50 rounded-xl border border-green-500/10 overflow-hidden">
+              <PortfolioAnalytics />
+            </div>
+          </div>
+
+          {/* Bottom Grid - Responsive layout that stacks on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gray-900/50 rounded-xl p-4 border border-green-500/10 h-full">
+              <BetsSection />
+            </div>
+            <div className="bg-gray-900/50 rounded-xl p-4 border border-green-500/10 h-full">
+              <LaunchedTokens />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Fixed Right Sidebar */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="fixed top-[64px] right-0 w-[380px] h-[calc(100vh-64px)] overflow-y-auto bg-gray-900/50 backdrop-blur-sm border-l border-green-500/10"
-      >
+      {/* Fixed Right Sidebar - Adjusted width */}
+      <div className="fixed top-[64px] right-0 w-[370px] h-[calc(100vh-64px)] overflow-y-auto bg-gray-900/50 backdrop-blur-sm border-l border-green-500/10">
         <div className="p-4 space-y-6">
           <MemeNews />
           <AboutMemes />
         </div>
-      </motion.div>
+      </div>
     </AppLayout>
   );
 }

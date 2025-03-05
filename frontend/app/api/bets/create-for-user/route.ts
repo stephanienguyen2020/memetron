@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import BettingABI from "@/abi/Betting.json";
 
 // Contract address from the BettingService
-const contractAddress = "0x930aE314a7285B7Cac2E5c7b1c59319837816D48";
+const contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
 
 async function generateImage(prompt: string): Promise<string> {
   try {

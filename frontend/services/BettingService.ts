@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { useWalletClient } from "wagmi";
 import BettingABI from "@/abi/Betting.json";
-const contractAddress = "0x930aE314a7285B7Cac2E5c7b1c59319837816D48";
+const contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
 
 export const useBettingService = () => {
   const { data: walletClient } = useWalletClient();

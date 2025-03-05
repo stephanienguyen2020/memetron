@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { NewsItem } from "@/app/types/news";
-import {fetchNewsItems} from "@/app/lib/news"
+import { fetchNewsItems } from "@/app/lib/news";
 
 export function MemeNews() {
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -45,7 +45,7 @@ export function MemeNews() {
     <div className="mt-6 space-y-6">
       <h1 className="text-4xl font-bold">
         Meme{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
           Highlights
         </span>
       </h1>
@@ -58,7 +58,8 @@ export function MemeNews() {
         ) : news.length === 0 ? (
           <div className="py-4 text-center">No news articles available</div>
         ) : (
-          news.map((item, index) => (
+          // Limit to maximum 4 news items
+          news.slice(0, 4).map((item, index) => (
             <div
               key={index}
               className="flex gap-3 p-3 transition-colors rounded-lg cursor-pointer hover:bg-white/5"
@@ -73,7 +74,7 @@ export function MemeNews() {
                   </span>
                 </div>
                 <h3 className="mb-1 text-sm font-medium">{item.title}</h3>
-                <p className="text-xs text-blue-400">{item.author}</p>
+                <p className="text-xs text-green-400">{item.author}</p>
               </div>
               <div className="relative flex-shrink-0 w-16 h-16 overflow-hidden rounded-md">
                 <Image

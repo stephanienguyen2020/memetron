@@ -42,7 +42,7 @@ export default function ChatbotWindow({ onClose }: ChatbotWindowProps) {
           <div className="w-2 h-2 rounded-full bg-yellow-500" />
           <div className="w-2 h-2 rounded-full bg-green-500" />
         </div>
-        <div className="text-sm font-medium">HedgeFi Assistant</div>
+        <div className="text-sm font-medium">MemeTron Assistant</div>
         <div className="flex items-center space-x-1">
           <Button
             variant="ghost"

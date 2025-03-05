@@ -160,7 +160,7 @@ export function WalletSettings() {
       <div>
         <h3 className="text-lg font-medium">Wallet Settings</h3>
         <p className="text-sm text-muted-foreground">
-          Manage your bet credits and wallet connection for HedgeFi.
+          Manage your bet credits and wallet connection for MemeTron.
         </p>
       </div>
 

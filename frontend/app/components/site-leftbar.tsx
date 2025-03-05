@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useWallet } from "../providers/WalletProvider";
 import {
   ChevronDown,
   ChevronRight,
@@ -21,6 +22,12 @@ import {
   Clock,
   Bookmark,
   Plus,
+  Zap,
+  BarChart2,
+  TrendingUp,
+  Copy,
+  ExternalLink,
+  LogOut,
 } from "lucide-react";
 
 interface NavItemProps {
@@ -66,19 +73,23 @@ const NavItem = ({
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
         isActive
-          ? "bg-gradient-to-r from-sky-500/20 to-blue-500/10 text-white"
-          : "hover:bg-white/5 text-gray-300 hover:text-white"
+          ? "bg-black/40 border-l-2 border-green-500 text-green-400 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
+          : "hover:bg-black/30 text-gray-300 hover:text-green-400 hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
       }`}
     >
       <div className="flex items-center flex-1" onClick={handleMainClick}>
-        <span className="text-blue-400 mr-3">{icon}</span>
+        <span
+          className={`${isActive ? "text-green-500" : "text-green-700"} mr-3`}
+        >
+          {icon}
+        </span>
         <span>{label}</span>
       </div>
       {hasSubItems && (
         <span
-          className="text-gray-500 hover:text-gray-300 p-1 rounded-full hover:bg-white/10"
+          className="text-gray-500 hover:text-green-400 p-1 rounded-full hover:bg-black/40"
           onClick={handleToggleClick}
         >
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -98,13 +109,13 @@ const SubNavItem = ({ label, href, isActive = false }: SubNavItemProps) => {
   return (
     <Link
       href={href}
-      className={`flex items-center pl-11 pr-4 py-2 rounded-lg transition-colors ${
+      className={`flex items-center pl-11 pr-4 py-2 rounded-lg transition-all ${
         isActive
-          ? "bg-white/10 text-white"
-          : "hover:bg-white/5 text-gray-400 hover:text-white"
+          ? "bg-black/40 text-green-400 shadow-[0_0_8px_rgba(0,255,0,0.15)]"
+          : "hover:bg-black/30 text-gray-400 hover:text-green-400 hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
       }`}
     >
-      {label}
+      <span>{label}</span>
     </Link>
   );
 };
@@ -119,7 +130,7 @@ const ChatHistoryItem = ({ title, date, href }: ChatHistoryItemProps) => {
   return (
     <Link
       href={href}
-      className="flex flex-col gap-1 pl-11 pr-4 py-2 rounded-lg hover:bg-white/5 transition-colors"
+      className="flex flex-col gap-1 pl-11 pr-4 py-2 rounded-lg hover:bg-black/30 transition-all hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
     >
       <span className="text-sm text-gray-300 truncate">{title}</span>
       <span className="text-xs text-gray-500 flex items-center gap-1">
@@ -137,12 +148,13 @@ export function SiteLeftbar() {
     "dashboard",
   ]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isConnected } = useWallet();
 
   // Check authentication status
   useEffect(() => {
     const checkAuth = () => {
       const savedAuth = localStorage.getItem("isAuthenticated");
-      setIsAuthenticated(savedAuth === "true");
+      setIsAuthenticated(isConnected || savedAuth === "true");
     };
 
     // Check on initial load
@@ -154,7 +166,7 @@ export function SiteLeftbar() {
     return () => {
       window.removeEventListener("storage", checkAuth);
     };
-  }, []);
+  }, [isConnected]);
 
   // Determine active section and expanded sections based on current path
   useEffect(() => {
@@ -221,7 +233,14 @@ export function SiteLeftbar() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-900/50 backdrop-blur-sm border-r border-green-500/10 py-4">
+    <div className="h-full overflow-y-auto bg-black/80 backdrop-blur-sm border-r border-green-500/20 py-4">
+      <div className="px-4 pt-5 mb-6">
+        <div className="text-green-500 text-xs uppercase tracking-wider mb-2 opacity-70">
+          MEMETRON TERMINAL
+        </div>
+        <div className="h-0.5 bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+
       <nav className="space-y-1 px-2 pb-20">
         {/* Dashboard Section */}
         <NavItem
@@ -299,13 +318,13 @@ export function SiteLeftbar() {
                 <div className="px-4 py-2">
                   <div className="relative">
                     <Search
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-700"
                       size={16}
                     />
                     <input
                       type="text"
                       placeholder="Search conversations..."
-                      className="w-full bg-gray-800/50 border border-gray-700 rounded-lg py-2 pl-9 pr-3 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full bg-black/50 border border-green-900/50 rounded-lg py-2 pl-9 pr-3 text-sm text-green-300 placeholder-green-800 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
                 </div>
@@ -314,7 +333,7 @@ export function SiteLeftbar() {
                 <div className="px-4 py-2">
                   <Link href={`/chatbot?new=true&t=${Date.now()}`}>
                     <Button
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+                      className="w-full bg-black hover:bg-black/80 text-green-500 border border-green-500/50 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)] transition-all flex items-center justify-center gap-2"
                       size="sm"
                     >
                       <Plus size={16} />
@@ -326,7 +345,7 @@ export function SiteLeftbar() {
                 {/* Chat History */}
                 <div className="mt-2">
                   <div className="flex items-center justify-between px-4 py-2">
-                    <span className="text-xs font-medium text-gray-500 uppercase">
+                    <span className="text-xs font-medium text-green-700 uppercase">
                       Recent Chats
                     </span>
                   </div>
@@ -342,7 +361,7 @@ export function SiteLeftbar() {
                     {chatHistory.length > 5 && (
                       <Link
                         href="/chatbot/history"
-                        className="flex items-center justify-center py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                        className="flex items-center justify-center py-2 text-sm text-green-600 hover:text-green-400 transition-colors"
                       >
                         View more
                       </Link>
@@ -353,6 +372,7 @@ export function SiteLeftbar() {
             </motion.div>
           )}
         </AnimatePresence>
+
         {/* Watchlist */}
         <NavItem
           icon={<Bookmark size={20} />}
@@ -361,6 +381,7 @@ export function SiteLeftbar() {
           isActive={activeSection === "watchlist"}
           onToggle={() => setActiveSection("watchlist")}
         />
+
         {/* Settings */}
         <NavItem
           icon={<Settings size={20} />}
@@ -369,6 +390,29 @@ export function SiteLeftbar() {
           isActive={activeSection === "settings"}
           onToggle={() => setActiveSection("settings")}
         />
+
+        <div className="mt-6 px-4">
+          <div className="h-0.5 bg-gradient-to-r from-green-500/50 to-transparent mb-4"></div>
+          <div className="text-xs text-green-700 mb-2">SYSTEM STATUS</div>
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className="text-gray-400">Network</span>
+            <span className="text-green-400 flex items-center">
+              <Zap size={12} className="mr-1" />
+              Online
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className="text-gray-400">Market</span>
+            <span className="text-green-400 flex items-center">
+              <TrendingUp size={12} className="mr-1" />
+              Active
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-400">Latency</span>
+            <span className="text-green-400">23ms</span>
+          </div>
+        </div>
       </nav>
     </div>
   );

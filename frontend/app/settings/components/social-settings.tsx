@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Twitter, MessageCircle, Check, AlertTriangle } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Twitter, MessageCircle, Check, AlertTriangle } from "lucide-react";
 
 export function SocialSettings() {
   return (
@@ -17,9 +23,14 @@ export function SocialSettings() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <CardTitle>Twitter Integration</CardTitle>
-              <CardDescription>Connect your Twitter account for automated engagement</CardDescription>
+              <CardDescription>
+                Connect your Twitter account for automated engagement
+              </CardDescription>
             </div>
-            <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+            <Badge
+              variant="outline"
+              className="bg-blue-500/10 text-blue-500 border-blue-500/20"
+            >
               <Check className="mr-1 h-3 w-3" />
               Connected
             </Badge>
@@ -30,7 +41,9 @@ export function SocialSettings() {
             <Twitter className="h-8 w-8 text-blue-400" />
             <div className="flex-1">
               <p className="font-medium">@cryptoninja</p>
-              <p className="text-sm text-muted-foreground">Connected since Feb 10, 2025</p>
+              <p className="text-sm text-muted-foreground">
+                Connected since Feb 10, 2025
+              </p>
             </div>
             <Button variant="outline">Disconnect</Button>
           </div>
@@ -39,14 +52,18 @@ export function SocialSettings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>Auto-Tweet Permissions</Label>
-                <p className="text-sm text-muted-foreground">Allow AI to post tweets on your behalf</p>
+                <p className="text-sm text-muted-foreground">
+                  Allow AI to post tweets on your behalf
+                </p>
               </div>
               <Switch defaultChecked />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>Engagement Tracking</Label>
-                <p className="text-sm text-muted-foreground">Track likes, retweets, and replies</p>
+                <p className="text-sm text-muted-foreground">
+                  Track likes, retweets, and replies
+                </p>
               </div>
               <Switch defaultChecked />
             </div>
@@ -58,14 +75,18 @@ export function SocialSettings() {
       <Card className="border-white/10 bg-black/60 backdrop-blur-xl">
         <CardHeader>
           <CardTitle>Telegram Integration</CardTitle>
-          <CardDescription>Connect Telegram for instant notifications and updates</CardDescription>
+          <CardDescription>
+            Connect Telegram for instant notifications and updates
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4 p-4 rounded-lg bg-black/40 border border-white/10">
             <MessageCircle className="h-8 w-8 text-blue-500" />
             <div className="flex-1">
-              <p className="font-medium">HedgeFi Bot</p>
-              <p className="text-sm text-muted-foreground">Receive alerts and manage your portfolio via Telegram</p>
+              <p className="font-medium">MemeTron Bot</p>
+              <p className="text-sm text-muted-foreground">
+                Receive alerts and manage your portfolio via Telegram
+              </p>
             </div>
             <Button>Connect</Button>
           </div>
@@ -73,7 +94,8 @@ export function SocialSettings() {
           <div className="flex items-center gap-2 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
             <AlertTriangle className="h-5 w-5 text-yellow-500" />
             <p className="text-sm text-yellow-500">
-              Start a chat with @HedgeFiBot on Telegram and use the command /connect to link your account.
+              Start a chat with @MemeTronBot on Telegram and use the command
+              /connect to link your account.
             </p>
           </div>
         </CardContent>
@@ -83,7 +105,9 @@ export function SocialSettings() {
       <Card className="border-white/10 bg-black/60 backdrop-blur-xl">
         <CardHeader>
           <CardTitle>Discord Webhook</CardTitle>
-          <CardDescription>Set up Discord notifications for your server</CardDescription>
+          <CardDescription>
+            Set up Discord notifications for your server
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
@@ -99,21 +123,27 @@ export function SocialSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Price Alerts</Label>
-                  <p className="text-sm text-muted-foreground">Send price movements to Discord</p>
+                  <p className="text-sm text-muted-foreground">
+                    Send price movements to Discord
+                  </p>
                 </div>
                 <Switch />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Trading Signals</Label>
-                  <p className="text-sm text-muted-foreground">Notify when AI detects trading opportunities</p>
+                  <p className="text-sm text-muted-foreground">
+                    Notify when AI detects trading opportunities
+                  </p>
                 </div>
                 <Switch />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Portfolio Updates</Label>
-                  <p className="text-sm text-muted-foreground">Daily portfolio performance summary</p>
+                  <p className="text-sm text-muted-foreground">
+                    Daily portfolio performance summary
+                  </p>
                 </div>
                 <Switch />
               </div>
@@ -122,6 +152,5 @@ export function SocialSettings() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

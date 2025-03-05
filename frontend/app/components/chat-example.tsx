@@ -1,12 +1,12 @@
-import { ChatMessage } from "./ChatMessage"
+import { ChatMessage } from "./ChatMessage";
 
 export function ChatExample() {
   return (
     <div className="flex flex-col gap-6">
       <ChatMessage
         isBot={true}
-        text="Hello! I'm HedgeFi, your AI assistant for meme coin predictions. How can I help you today?"
-        name="HedgeFi"
+        text="Hello! I'm MemeTron, your AI assistant for meme coin predictions. How can I help you today?"
+        name="MemeTron"
         timestamp="2:30 PM"
         avatar="/hedgefi-bot.png"
       />
@@ -26,11 +26,10 @@ export function ChatExample() {
 3. A new coin $WSM (Wall Street Memes) is launching soon
 
 Would you like me to provide more detailed analysis on any of these?`}
-        name="HedgeFi"
+        name="MemeTron"
         timestamp="2:31 PM"
         avatar="/hedgefi-bot.png"
       />
     </div>
-  )
+  );
 }
-

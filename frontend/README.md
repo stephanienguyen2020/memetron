@@ -1,12 +1,12 @@
-# HedgeFi
+# MemeTron
 
-In a world where meme coins can make millionaires overnight or vanish into thin air, HedgeFi is here to give traders the edge they need. HedgeFi is an **AI-driven platform** designed to help users research, analyze, and even launch their own meme coins with ease. Whether you're looking to predict price trends, create your own token, or place bets on market movements, HedgeFi is your all-in-one solution.
+In a world where meme coins can make millionaires overnight or vanish into thin air, MemeTron is here to give traders the edge they need. MemeTron is an **AI-driven platform** designed to help users research, analyze, and even launch their own meme coins with ease. Whether you're looking to predict price trends, create your own token, or place bets on market movements, MemeTron is your all-in-one solution.
 
 ## 🚀 Features
 
 ### **Seamless Wallet Integration**
 
-HedgeFi makes it easy to get started. Users can connect their wallets seamlessly, eliminating the need for complicated private key management while maintaining complete security. Our authentication system ensures your session remains active without compromising your assets.
+MemeTron makes it easy to get started. Users can connect their wallets seamlessly, eliminating the need for complicated private key management while maintaining complete security. Our authentication system ensures your session remains active without compromising your assets.
 
 ### **Comprehensive Dashboard**
 
@@ -14,15 +14,15 @@ Once connected, users land on their **dashboard**, which provides a **complete s
 
 ### **🛠 Betting Marketplace**
 
-The **Betting Marketplace** on HedgeFi introduces a new way to engage with market speculation. Users can place bets on meme coin trends, price movements, and major events, all directly through Twitter. Simply **tag @HedgeFi in a tweet** with your bet, and our system will automatically process and secure the funds using **smart contracts**. This ensures that all bets are **fair, transparent, and securely held in escrow** until the outcome is determined. Once the event concludes, **payouts are executed automatically**. This marketplace transforms market speculation into an interactive and secure betting system, **backed by on-chain verification**.
+The **Betting Marketplace** on MemeTron introduces a new way to engage with market speculation. Users can place bets on meme coin trends, price movements, and major events, all directly through Twitter. Simply **tag @MemeTron in a tweet** with your bet, and our system will automatically process and secure the funds using **smart contracts**. This ensures that all bets are **fair, transparent, and securely held in escrow** until the outcome is determined. Once the event concludes, **payouts are executed automatically**. This marketplace transforms market speculation into an interactive and secure betting system, **backed by on-chain verification**.
 
 ### **🚀 Meme Coin Launch Pad**
 
-For those looking to **create their own meme coins**, HedgeFi's **Launch Pad** provides a **user-friendly interface** that makes the process **accessible to anyone, regardless of technical expertise**. Users can configure their **token's details**, such as name, supply, and liquidity settings, all within a guided workflow. Our **AI-powered branding assistant** helps generate a **unique token concept**, including **logos and promotional content**. Once the setup is complete, the token can be **deployed instantly**, with all transactions **secured on-chain**. HedgeFi simplifies the **entire process** of token creation, making launching a new meme coin as easy as filling out a form.
+For those looking to **create their own meme coins**, MemeTron's **Launch Pad** provides a **user-friendly interface** that makes the process **accessible to anyone, regardless of technical expertise**. Users can configure their **token's details**, such as name, supply, and liquidity settings, all within a guided workflow. Our **AI-powered branding assistant** helps generate a **unique token concept**, including **logos and promotional content**. Once the setup is complete, the token can be **deployed instantly**, with all transactions **secured on-chain**. MemeTron simplifies the **entire process** of token creation, making launching a new meme coin as easy as filling out a form.
 
 ### **📊 AI-Powered Research & Trading Tools**
 
-Meme coin trading requires staying ahead of trends, identifying early opportunities, and making informed decisions. HedgeFi's **AI-powered Research Agent** acts as your **personal trading assistant**, designed to help users navigate the constantly changing landscape.
+Meme coin trading requires staying ahead of trends, identifying early opportunities, and making informed decisions. MemeTron's **AI-powered Research Agent** acts as your **personal trading assistant**, designed to help users navigate the constantly changing landscape.
 
 - **Real-time market insights**: Track meme coin trends, monitor **Google search volumes**, and analyze **social media engagement** across **Twitter, Reddit, and Telegram**.
 - **Early-stage coin detection**: Scans **Pump.fun** and other platforms to **identify new meme coin launches** before they trend.
@@ -33,11 +33,11 @@ Meme coin trading requires staying ahead of trends, identifying early opportunit
 
 ## 👨‍💻 Built by Passionate Developers
 
-HedgeFi was built by a team of top university students passionate about **crypto, blockchain, and AI-driven market analytics**. In just five days, we created a fully branded project with comprehensive features, including **authentication, real-time data visualization, AI-powered analysis, and blockchain integration**.
+MemeTron was built by a team of top university students passionate about **crypto, blockchain, and AI-driven market analytics**. In just five days, we created a fully branded project with comprehensive features, including **authentication, real-time data visualization, AI-powered analysis, and blockchain integration**.
 
-Whether you're **betting on market trends, launching your own meme coin, or researching the next big opportunity**, HedgeFi **provides the tools you need** to stay ahead in the fast-moving world of meme coins. With **AI-powered insights, secure blockchain integration, and an intuitive interface**, HedgeFi is **your gateway to the future of meme coin trading**.
+Whether you're **betting on market trends, launching your own meme coin, or researching the next big opportunity**, MemeTron **provides the tools you need** to stay ahead in the fast-moving world of meme coins. With **AI-powered insights, secure blockchain integration, and an intuitive interface**, MemeTron is **your gateway to the future of meme coin trading**.
 
-**TRY HEDGEFI TODAY.**
+**TRY MEMETRON TODAY.**
 
 ---
 

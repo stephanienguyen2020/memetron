@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 const faqItems = [
   {
@@ -25,36 +25,44 @@ const faqItems = [
     answer:
       "Meme coins are highly volatile investments. While some have generated significant returns, they carry substantial risk. Never invest more than you can afford to lose.",
   },
-]
+];
 
 export function AboutMemes() {
-  const [openItem, setOpenItem] = useState<number | null>(null)
+  const [openItem, setOpenItem] = useState<number | null>(null);
 
   return (
     <Card className="border-green-500/20 bg-black/60 backdrop-blur-xl">
       <CardContent className="p-6">
-                    <h1 className="text-4xl font-bold">
-              About{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">Memes</span>
-            </h1>
+        <h1 className="text-4xl font-bold">
+          About{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
+            Memes
+          </span>
+        </h1>
         <div className="space-y-4">
           {faqItems.map((item, index) => (
-            <div key={index} className="border-b border-green-500/10 last:border-0 pb-4 last:pb-0">
+            <div
+              key={index}
+              className="border-b border-green-500/10 last:border-0 pb-4 last:pb-0"
+            >
               <button
                 className="flex items-center justify-between w-full text-left"
                 onClick={() => setOpenItem(openItem === index ? null : index)}
               >
                 <span className="text-sm font-medium">{item.question}</span>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform ${openItem === index ? "transform rotate-180" : ""}`}
+                  className={`w-4 h-4 transition-transform ${
+                    openItem === index ? "transform rotate-180" : ""
+                  }`}
                 />
               </button>
-              {openItem === index && <p className="mt-2 text-sm text-gray-400">{item.answer}</p>}
+              {openItem === index && (
+                <p className="mt-2 text-sm text-gray-400">{item.answer}</p>
+              )}
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

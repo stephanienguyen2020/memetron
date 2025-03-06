@@ -1,4 +1,4 @@
-MemeTron is an **AI-driven platform** for meme coin trading, research, and creation. Whether you're betting on trends, launching tokens, or analyzing market data, MemeTron provides the tools to stay ahead.
+HyperSonic is an **AI-driven platform** for meme coin trading, research, and creation. Whether you're betting on trends, launching tokens, or analyzing market data, HyperSonic provides the tools to stay ahead.
 
 ## 🚀 Features
 
@@ -12,7 +12,7 @@ Monitor holdings in real-time, track profits/losses, and get AI-driven price pre
 
 ### **🛠 Betting Marketplace**
 
-Bet on meme coin trends directly via Twitter by tagging **@MemeTron**. Smart contracts ensure secure escrow and instant payouts.
+Bet on meme coin trends directly via Twitter by tagging **@HyperSonic**. Smart contracts ensure secure escrow and instant payouts.
 
 ### **🚀 Meme Coin Launch Pad**
 
@@ -31,7 +31,7 @@ Launch your own token with an AI-powered branding assistant, instant deployment,
 
 ---
 
-# **How to Run MemeTron**
+# **How to Run HyperSonic**
 
 ## **1. Clone the Repository**
 

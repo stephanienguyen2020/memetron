@@ -83,7 +83,7 @@ export function SocialSettings() {
           <div className="flex items-center gap-4 p-4 rounded-lg bg-black/40 border border-white/10">
             <MessageCircle className="h-8 w-8 text-blue-500" />
             <div className="flex-1">
-              <p className="font-medium">MemeTron Bot</p>
+              <p className="font-medium">HyperSonic Bot</p>
               <p className="text-sm text-muted-foreground">
                 Receive alerts and manage your portfolio via Telegram
               </p>
@@ -94,7 +94,7 @@ export function SocialSettings() {
           <div className="flex items-center gap-2 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
             <AlertTriangle className="h-5 w-5 text-yellow-500" />
             <p className="text-sm text-yellow-500">
-              Start a chat with @MemeTronBot on Telegram and use the command
+              Start a chat with @HyperSonicBot on Telegram and use the command
               /connect to link your account.
             </p>
           </div>

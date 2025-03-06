@@ -5,7 +5,7 @@ export default function Header() {
     <header className="bg-gray-900 text-white py-4">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold">
-          MemeTron
+          HyperSonic
         </Link>
         <nav>
           <ul className="flex space-x-6">

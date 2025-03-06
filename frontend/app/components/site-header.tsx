@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { NavigationMenu, NavItem } from "@/app/components/ui/navigation-menu";
+import {
+  NavigationMenu,
+  NavItem,
+  globalStyles,
+} from "@/app/components/ui/navigation-menu";
 import {
   Search,
   LineChart,
@@ -13,6 +17,8 @@ import {
   Target,
   Settings2,
   Wallet,
+  Menu,
+  X,
 } from "lucide-react";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -120,8 +126,8 @@ const MatrixConnectButton = () => {
       onMouseLeave={() => setButtonHovered(false)}
       className={`px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 ${
         buttonHovered
-          ? "bg-[#00ff00] text-black shadow-[0_0_10px_rgba(0,255,0,0.7)]"
-          : "bg-transparent border border-[#00ff00] text-[#00ff00]"
+          ? "bg-sky-400 text-black shadow-[0_0_10px_rgba(56,189,248,0.7)]"
+          : "bg-transparent border border-sky-400 text-sky-400"
       }`}
     >
       <div className="flex items-center">
@@ -171,7 +177,7 @@ const MatrixRainbowButton = () => {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black hover:shadow-[0_0_10px_rgba(0,255,0,0.7)]"
+                    className="px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 bg-transparent border border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-black hover:shadow-[0_0_10px_rgba(56,189,248,0.7)]"
                   >
                     <div className="flex items-center">
                       <Wallet className="mr-2 h-4 w-4" />
@@ -198,7 +204,7 @@ const MatrixRainbowButton = () => {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00]/10 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)]"
+                    className="px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 bg-transparent border border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-black hover:shadow-[0_0_10px_rgba(56,189,248,0.7)]"
                   >
                     <div className="flex items-center">
                       {chain.hasIcon && (
@@ -228,7 +234,7 @@ const MatrixRainbowButton = () => {
                   <button
                     onClick={openAccountModal}
                     type="button"
-                    className="px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00]/10 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)]"
+                    className="px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 bg-transparent border border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-black hover:shadow-[0_0_10px_rgba(56,189,248,0.7)]"
                   >
                     <div className="flex items-center">
                       <Wallet className="mr-2 h-4 w-4" />
@@ -255,6 +261,7 @@ export function SiteHeader() {
   const logoRef = useRef<HTMLSpanElement>(null);
   const scramblerRef = useRef<TextScramble | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Use wagmi account hook
   const { address, isConnected } = useAccount();
@@ -273,9 +280,19 @@ export function SiteHeader() {
   // Apply text scramble effect on hover
   const handleLogoHover = () => {
     if (scramblerRef.current) {
-      scramblerRef.current.setText("MEMETRON");
+      scramblerRef.current.setText("HYPERSONIC");
     }
   };
+
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // Close mobile menu when path changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   // Load authentication state and user data from localStorage on component mount
   useEffect(() => {
@@ -335,31 +352,70 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-[#00ff00]/20 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/60">
-      <div className="flex h-20 items-center px-4 md:px-6 lg:px-8 w-full">
-        <div className="flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="flex items-center space-x-2"
-            onMouseEnter={handleLogoHover}
-          >
-            <span
-              ref={logoRef}
-              className="text-2xl font-bold text-[#00ff00] font-mono"
-              style={{ textShadow: "0 0 5px rgba(0,255,0,0.7)" }}
+    <header className="fixed top-0 z-50 w-full border-b border-sky-400/20 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/60">
+      <div className="w-full px-6 md:px-8 lg:px-12">
+        <nav className="flex items-center justify-between h-20">
+          {/* Logo - aligned to the left edge of the screen */}
+          <div className="flex-shrink-0">
+            <Link
+              href="/dashboard"
+              className="flex items-center space-x-2"
+              onMouseEnter={handleLogoHover}
             >
-              MEMETRON
-            </span>
-          </Link>
-
-          <NavigationMenu items={menuItems} />
-        </div>
-
-        <div className="ml-auto">
-          <div className="flex items-center space-x-4">
-            <MatrixRainbowButton />
+              <span
+                ref={logoRef}
+                className="text-2xl font-bold text-sky-400 font-mono"
+                style={{ textShadow: "0 0 5px rgba(56,189,248,0.7)" }}
+              >
+                HYPERSONIC
+              </span>
+            </Link>
           </div>
-        </div>
+
+          {/* Navigation Links - centered */}
+          <div className="hidden md:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+            <NavigationMenu items={menuItems} />
+          </div>
+
+          {/* Connect Button and Mobile Menu Toggle - aligned to the right edge of the screen */}
+          <div className="flex-shrink-0 flex items-center space-x-4">
+            <MatrixRainbowButton />
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="md:hidden text-white/80 hover:text-white"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </nav>
+
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-4 border-t border-[#00ff00]/20 bg-black/95 backdrop-blur">
+            <nav className="flex flex-col space-y-4 px-2">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`text-sm transition-colors ${
+                    pathname === item.href
+                      ? "text-white font-medium"
+                      : "text-white/80 hover:text-white hover:glow"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
       </div>
 
       <style jsx global>{`
@@ -367,6 +423,7 @@ export function SiteHeader() {
           color: #0f0;
           opacity: 0.7;
         }
+        ${globalStyles}
       `}</style>
     </header>
   );

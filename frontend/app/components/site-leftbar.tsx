@@ -74,21 +74,19 @@ const NavItem = ({
     <div
       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
         isActive
-          ? "bg-black/40 border-l-2 border-green-500 text-green-400 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
-          : "hover:bg-black/30 text-gray-300 hover:text-green-400 hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
+          ? "bg-black/40 border-l-2 border-sky-400 text-sky-400 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
+          : "hover:bg-black/30 text-gray-300 hover:text-sky-400 hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
       }`}
     >
       <div className="flex items-center flex-1" onClick={handleMainClick}>
-        <span
-          className={`${isActive ? "text-green-500" : "text-green-700"} mr-3`}
-        >
+        <span className={`${isActive ? "text-sky-500" : "text-sky-700"} mr-3`}>
           {icon}
         </span>
         <span>{label}</span>
       </div>
       {hasSubItems && (
         <span
-          className="text-gray-500 hover:text-green-400 p-1 rounded-full hover:bg-black/40"
+          className="text-gray-500 hover:text-sky-400 p-1 rounded-full hover:bg-black/40"
           onClick={handleToggleClick}
         >
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -110,8 +108,8 @@ const SubNavItem = ({ label, href, isActive = false }: SubNavItemProps) => {
       href={href}
       className={`flex items-center pl-11 pr-4 py-2 rounded-lg transition-all ${
         isActive
-          ? "bg-black/40 text-green-400 shadow-[0_0_8px_rgba(0,255,0,0.15)]"
-          : "hover:bg-black/30 text-gray-400 hover:text-green-400 hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
+          ? "bg-black/40 text-sky-400 shadow-[0_0_8px_rgba(0,255,0,0.15)]"
+          : "hover:bg-black/30 text-gray-400 hover:text-sky-400 hover:shadow-[0_0_5px_rgba(0,255,0,0.1)]"
       }`}
     >
       <span>{label}</span>
@@ -232,12 +230,12 @@ export function SiteLeftbar() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-black/80 backdrop-blur-sm border-r border-green-500/20 py-4">
+    <div className="h-full overflow-y-auto bg-black/80 backdrop-blur-sm border-r border-sky-400/20 py-4">
       <div className="px-4 pt-5 mb-6">
-        <div className="text-green-500 text-xs uppercase tracking-wider mb-2 opacity-70">
-          MEMETRON TERMINAL
+        <div className="text-sky-400 text-xs uppercase tracking-wider mb-2 opacity-70">
+          HYPERSONIC TERMINAL
         </div>
-        <div className="h-0.5 bg-gradient-to-r from-green-500/50 to-transparent"></div>
+        <div className="h-0.5 bg-gradient-to-r from-sky-400/50 to-transparent"></div>
       </div>
 
       <nav className="space-y-1 px-2 pb-20">
@@ -299,13 +297,13 @@ export function SiteLeftbar() {
             <div className="px-4 py-2">
               <div className="relative">
                 <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-700"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-700"
                   size={16}
                 />
                 <input
                   type="text"
                   placeholder="Search conversations..."
-                  className="w-full bg-black/50 border border-green-900/50 rounded-lg py-2 pl-9 pr-3 text-sm text-green-300 placeholder-green-800 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                  className="w-full bg-black/50 border border-sky-900/50 rounded-lg py-2 pl-9 pr-3 text-sm text-sky-300 placeholder-sky-800 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500"
                 />
               </div>
             </div>
@@ -314,7 +312,7 @@ export function SiteLeftbar() {
             <div className="px-4 py-2">
               <Link href={`/chatbot?new=true&t=${Date.now()}`}>
                 <Button
-                  className="w-full bg-black hover:bg-black/80 text-green-500 border border-green-500/50 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)] transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-black hover:bg-black/80 text-sky-500 border border-sky-500/50 hover:border-sky-400 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)] transition-all flex items-center justify-center gap-2"
                   size="sm"
                 >
                   <Plus size={16} />
@@ -326,7 +324,7 @@ export function SiteLeftbar() {
             {/* Chat History */}
             <div className="mt-2">
               <div className="flex items-center justify-between px-4 py-2">
-                <span className="text-xs font-medium text-green-700 uppercase">
+                <span className="text-xs font-medium text-sky-700 uppercase">
                   Recent Chats
                 </span>
               </div>
@@ -342,7 +340,7 @@ export function SiteLeftbar() {
                 {chatHistory.length > 5 && (
                   <Link
                     href="/chatbot/history"
-                    className="flex items-center justify-center py-2 text-sm text-green-600 hover:text-green-400 transition-colors"
+                    className="flex items-center justify-center py-2 text-sm text-sky-600 hover:text-sky-400 transition-colors"
                   >
                     View more
                   </Link>
@@ -371,25 +369,25 @@ export function SiteLeftbar() {
         />
 
         <div className="mt-6 px-4">
-          <div className="h-0.5 bg-gradient-to-r from-green-500/50 to-transparent mb-4"></div>
-          <div className="text-xs text-green-700 mb-2">SYSTEM STATUS</div>
+          <div className="h-0.5 bg-gradient-to-r from-sky-500/50 to-transparent mb-4"></div>
+          <div className="text-xs text-sky-700 mb-2">SYSTEM STATUS</div>
           <div className="flex items-center justify-between text-xs mb-1">
             <span className="text-gray-400">Network</span>
-            <span className="text-green-400 flex items-center">
+            <span className="text-sky-400 flex items-center">
               <Zap size={12} className="mr-1" />
               Online
             </span>
           </div>
           <div className="flex items-center justify-between text-xs mb-1">
             <span className="text-gray-400">Market</span>
-            <span className="text-green-400 flex items-center">
+            <span className="text-sky-400 flex items-center">
               <TrendingUp size={12} className="mr-1" />
               Active
             </span>
           </div>
           <div className="flex items-center justify-between text-xs">
             <span className="text-gray-400">Latency</span>
-            <span className="text-green-400">23ms</span>
+            <span className="text-sky-400">23ms</span>
           </div>
         </div>
       </nav>

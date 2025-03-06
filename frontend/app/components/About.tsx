@@ -5,7 +5,7 @@ export default function About() {
         <h2 className="text-4xl font-bold text-center mb-12">About RugCheck</h2>
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xl mb-8">
-            MemeTron was founded with a simple mission: to democratize Discord
+            HyperSonic was founded with a simple mission: to democratize Discord
             bot creation. We believe that everyone should have the power to
             enhance their Discord communities, regardless of their coding
             skills.

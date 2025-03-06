@@ -261,7 +261,7 @@ export function WalletSettings() {
       <div>
         <h3 className="text-lg font-medium">Wallet Settings</h3>
         <p className="text-sm text-muted-foreground">
-          Manage your credits and wallet connection for MemeTron.
+          Manage your credits and wallet connection for HyperSonic.
         </p>
       </div>
 

@@ -481,7 +481,7 @@ function AIChatbotContent() {
             </div>
             <h1 className="text-4xl font-bold">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400">
-                MemeTron Bot
+                HyperSonic Bot
               </span>
             </h1>
           </motion.div>

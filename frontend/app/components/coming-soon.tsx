@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { RocketIcon as RocketLaunch, ArrowLeft, Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import GridBackground from "./GridBackground"
-import { SiteHeader } from "./site-header"
-import { Footer } from "./footer"
-import Image from "next/image"
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { RocketIcon as RocketLaunch, ArrowLeft, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import GridBackground from "./GridBackground";
+import { SiteHeader } from "./site-header";
+import { Footer } from "./Footer";
+import Image from "next/image";
 
 interface ComingSoonPageProps {
-  message: string
-  image?: string
+  message: string;
+  image?: string;
 }
 
 export default function ComingSoonPage({
   message,
   image = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rocket-to-moon-9CtIVDwF31CgvHZCL8GwzySvDqZBkk.webp", // Default rocket image
 }: ComingSoonPageProps) {
-  const [dots, setDots] = useState(".")
-  const [progressWidth, setProgressWidth] = useState(0)
+  const [dots, setDots] = useState(".");
+  const [progressWidth, setProgressWidth] = useState(0);
 
   useEffect(() => {
     const dotsInterval = setInterval(() => {
-      setDots((prevDots) => (prevDots.length >= 3 ? "." : prevDots + "."))
-    }, 500)
+      setDots((prevDots) => (prevDots.length >= 3 ? "." : prevDots + "."));
+    }, 500);
 
-    setProgressWidth(Math.random() * 100)
+    setProgressWidth(Math.random() * 100);
     const progressInterval = setInterval(() => {
-      setProgressWidth(Math.random() * 100)
-    }, 2000)
+      setProgressWidth(Math.random() * 100);
+    }, 2000);
 
     return () => {
-      clearInterval(dotsInterval)
-      clearInterval(progressInterval)
-    }
-  }, [])
+      clearInterval(dotsInterval);
+      clearInterval(progressInterval);
+    };
+  }, []);
 
   return (
     <div className="relative flex min-h-screen flex-col">
@@ -103,9 +103,15 @@ export default function ComingSoonPage({
               transition={{ delay: 0.5 }}
               className="max-w-md mx-auto space-y-4 mt-12"
             >
-              <p className="text-muted-foreground">Want to be notified when this feature launches?</p>
+              <p className="text-muted-foreground">
+                Want to be notified when this feature launches?
+              </p>
               <form className="flex gap-2">
-                <Input type="email" placeholder="Enter your email" className="flex-1" />
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1"
+                />
                 <Button className="gap-2 bg-gradient-to-r from-sky-400 to-blue-500">
                   <Bell className="h-4 w-4" />
                   Notify Me
@@ -117,6 +123,5 @@ export default function ComingSoonPage({
       </main>
       <Footer />
     </div>
-  )
+  );
 }
-

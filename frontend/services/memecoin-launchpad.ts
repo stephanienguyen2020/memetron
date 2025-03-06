@@ -4,6 +4,8 @@ import Factory from "../abi/Factory.json";
 import NativeLiquidityPool from "../abi/NativeLiquidityPool.json";
 import Token from "../abi/Token.json";
 import { config } from "../app/config/contract_addresses";
+import TokenABI from "../abi/Token.json";
+
 // Define TypeScript interfaces
 interface TokenSale {
   token: string;
@@ -24,6 +26,7 @@ interface Token {
   isOpen: boolean;
   image: string;
   description: string;
+  symbol: string;
 }
 
 interface ContractObjects {
@@ -270,6 +273,7 @@ export async function getTokens(options?: {
         isOpen: tokenSale.isOpen,
         image: metadata.imageURI,
         description: metadata.description,
+        symbol: metadata.symbol,
       });
     }
   }
@@ -298,8 +302,8 @@ export async function getUserTokens(): Promise<Token[]> {
  */
 async function fetchMetadata(
   metadataURI: string
-): Promise<{ name: string; description: string; imageURI: string }> {
-  if (!metadataURI) return { name: "Unknown", description: "", imageURI: "" };
+): Promise<{ name: string; description: string; imageURI: string, symbol: string }> {
+  if (!metadataURI) return { name: "Unknown", description: "", imageURI: "", symbol: "" };
 
   try {
     const response = await fetch(metadataURI);
@@ -311,6 +315,7 @@ async function fetchMetadata(
       name: "Unknown",
       description: "No description available",
       imageURI: "",
+      symbol: "",
     };
   }
 }
@@ -480,5 +485,163 @@ export async function getPurchasedTokens(): Promise<Token[]> {
   } catch (error) {
     console.error("Error getting purchased tokens:", error);
     return [];
+  }
+}
+
+/**
+ * Get tokens created by a specific address
+ * @param creatorAddress The address of the token creator
+ * @returns Array of tokens created by the specified address
+ */
+export async function getTokensByCreator(creatorAddress: string): Promise<Token[]> {
+  try {
+    // Connect to the provider
+    const provider = new ethers.JsonRpcProvider(
+      process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545"
+    );
+    
+    const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
+    const chainConfig = config[chainId as keyof typeof config];
+
+    if (!chainConfig) {
+      console.error(`Factory contract address not found for chain ID ${chainId}`);
+      return [];
+    }
+
+    // Create factory contract instance
+    const factoryContract = new ethers.Contract(
+      chainConfig.factory.address,
+      Factory,
+      provider
+    );
+
+    const totalTokens = await factoryContract.totalTokens();
+    const tokens: Token[] = [];
+
+    for (let i = 0; i < totalTokens; i++) {
+      const tokenSale: TokenSale = await factoryContract.getTokenSale(i);
+
+      // Check if the token was created by the specified address
+      if (tokenSale.creator.toLowerCase() === creatorAddress.toLowerCase()) {
+        const metadata = await fetchMetadata(tokenSale.metadataURI);
+        tokens.push({
+          token: tokenSale.token,
+          name: tokenSale.name,
+          creator: tokenSale.creator,
+          sold: Number(tokenSale.sold),
+          raised: Number(tokenSale.raised),
+          isOpen: tokenSale.isOpen,
+          image: metadata.imageURI,
+          description: metadata.description,
+          symbol: metadata.symbol,
+        });
+      }
+    }
+
+    return tokens.reverse();
+  } catch (error) {
+    console.error("Error getting tokens by creator:", error);
+    return [];
+  }
+}
+
+/**
+ * Get detailed information about a specific token
+ * @param tokenAddress The address of the token
+ * @returns Detailed token information or null if not found
+ */
+export async function getTokenDetails(tokenAddress: string): Promise<{
+  token: Token;
+  marketData: {
+    price: string;
+    marketCap: string;
+    volume24h: string;
+    holders: number;
+    liquidityPool: string;
+  };
+  contractData: {
+    totalSupply: string;
+    circulatingSupply: string;
+    owner: string;
+    creator: string;
+    metadataURI: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+} | null> {
+  try {
+    const { factory, liquidityPool } = await loadFactoryContract();
+
+    // Create token contract instance with full ABI
+    const tokenContract = new ethers.Contract(
+      tokenAddress,
+      TokenABI,
+      factory.runner
+    );
+
+    // Get all token data in parallel
+    const [
+      totalSupply,
+      lpBalance,
+      owner,
+      creator,
+      metadataURI,
+      name,
+      symbol,
+      decimals
+    ] = await Promise.all([
+      tokenContract.totalSupply(),
+      tokenContract.balanceOf(await liquidityPool.getAddress()),
+      tokenContract.owner(),
+      tokenContract.creator(),
+      tokenContract.metadataURI(),
+      tokenContract.name(),
+      tokenContract.symbol(),
+      tokenContract.decimals(),
+    ]);
+
+    // Fetch metadata
+    const metadata = await fetchMetadata(metadataURI);
+
+    // Get token sale info from factory if needed for price calculation
+    const tokenSale = await factory.getTokenSale(tokenAddress);
+    
+    // Calculate market data
+    const price = tokenSale.raised.toString() / tokenSale.sold.toString();
+    const marketCap = price * Number(ethers.formatEther(totalSupply));
+
+    return {
+      token: {
+        token: tokenAddress,
+        name: name,
+        creator: creator,
+        sold: tokenSale.sold,
+        raised: tokenSale.raised,
+        isOpen: tokenSale.isOpen,
+        image: metadata.imageURI,
+        description: metadata.description,
+      },
+      marketData: {
+        price: price.toString(),
+        marketCap: marketCap.toString(),
+        volume24h: "0", // You might want to track this separately
+        holders: 0, // You might want to track this separately
+        liquidityPool: ethers.formatEther(lpBalance),
+      },
+      contractData: {
+        totalSupply: ethers.formatEther(totalSupply),
+        circulatingSupply: ethers.formatEther(totalSupply - lpBalance),
+        owner: owner,
+        creator: creator,
+        metadataURI: metadataURI,
+        name: name,
+        symbol: symbol,
+        decimals: decimals,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting token details:", error);
+    return null;
   }
 }

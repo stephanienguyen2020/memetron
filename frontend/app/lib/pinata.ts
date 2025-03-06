@@ -8,58 +8,35 @@ export const pinata = new PinataSDK({
   })
 
 export const pinFileToIPFS = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    
     try {
-        const response = await fetch("/api/pinata/pin/image", {
-            method: "POST",
-            body: formData,
-        });
-
-        const data = await response.json();
-        const url = `${pinataImageUrl}/${data.hash}`;
-        return url; 
+            const uploadData = await pinata.upload.file(file);
+        if (!uploadData?.IpfsHash) {
+            throw new Error("Failed to get IPFS hash from upload");
+        }
+        return `${pinataImageUrl}/${uploadData.IpfsHash}`;
     } catch (error) {
         console.error("Error uploading to IPFS:", error);
-        return null;
+        throw error;
     }
 };
 
-
 export const pinJSONToIPFS = async (json: Record<string, any>) => {
     try {
-        const response = await fetch("/api/pinata/pin/json", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(json),
-        });
-
-        const data = await response.json();
-        const url = `${pinataImageUrl}/${data.hash}`;
-        return url;
+        const uploadData = await pinata.upload.json(json);
+        if (!uploadData?.IpfsHash) {
+            throw new Error("Failed to get IPFS hash from upload");
+        }
+        return `${pinataImageUrl}/${uploadData.IpfsHash}`;
     } catch (error) {
         console.error("Error pinning JSON to IPFS:", error);
-        return null;
+        throw error;
     }
 };
 
 export const unPinFromIPFS = async (hash: string) => {
     try {
-        const response = await fetch(`/api/pinata/unpin/${hash}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (response.ok) {
-            return true;
-        } else {
-            throw new Error("Unpin failed");
-        }
+        await pinata.unpin([hash]);
+        return true;
     } catch (error) {
         console.error("Error unpinning file:", error);
         return false;

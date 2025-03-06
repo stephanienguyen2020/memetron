@@ -90,24 +90,17 @@ export default function MarketcapPage(): JSX.Element {
   return (
     <AppLayout showFooter={false}>
       <GridBackground />
-      <div className="relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="container py-8"
-        >
-          <h1 className="mb-2 text-4xl font-bold">
-            Today's Meme Coin Prices by{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
-              Market Cap
-            </span>
-          </h1>
-          <p className="mb-8 text-muted-foreground">
-            Track and analyze the latest meme coins across multiple chains
-          </p>
-          <MemeCoinMarketCap coins={trendingCoins} />
-        </motion.div>
+      <div className="relative z-10 container py-8">
+        <h1 className="mb-2 text-4xl font-bold">
+          Today's Meme Coin Prices by{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400">
+            Market Cap
+          </span>
+        </h1>
+        <p className="mb-8 text-muted-foreground">
+          Track and analyze the latest meme coins across multiple chains
+        </p>
+        <MemeCoinMarketCap coins={trendingCoins} />
       </div>
     </AppLayout>
   );

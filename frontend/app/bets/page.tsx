@@ -18,6 +18,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useWalletClient } from "wagmi";
 import { Bet } from "./types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Our internal type for blockchain data
 interface BlockchainBet {
@@ -46,6 +52,9 @@ export default function BetsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeCurrentPage, setActiveCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [timeFilter, setTimeFilter] = useState<"all" | "120min" | "12hours">(
+    "all"
+  );
 
   // Bets data state
   const [bets, setBets] = useState<Bet[]>([]);
@@ -63,6 +72,31 @@ export default function BetsPage() {
 
   // Track if data has been fetched to prevent refetching
   const dataFetched = useRef(false);
+
+  // Add a periodic check for ended bets
+  useEffect(() => {
+    // Function to check if any active bets have ended
+    const checkForEndedBets = () => {
+      const now = new Date();
+
+      // Check if any active bets have ended
+      const hasEndedBets = activeBets.some((bet) => {
+        const endDate = new Date(bet.endDate);
+        return endDate <= now;
+      });
+
+      // If we found ended bets, trigger a refresh
+      if (hasEndedBets) {
+        console.log("Found ended bets, refreshing...");
+        handleRefresh();
+      }
+    };
+
+    // Check every minute
+    const interval = setInterval(checkForEndedBets, 60000);
+
+    return () => clearInterval(interval);
+  }, [activeBets]);
 
   // Update wallet connection status
   useEffect(() => {
@@ -174,8 +208,20 @@ export default function BetsPage() {
         }));
 
         // Update all state in a batch
-        const active = formattedBets.filter((bet) => !bet.isResolved);
-        const past = formattedBets.filter((bet) => bet.isResolved);
+        const active = formattedBets.filter((bet) => {
+          // Check if the bet is not resolved and the end date is in the future
+          const endDate = new Date(bet.endDate);
+          const now = new Date();
+          return !bet.isResolved && endDate > now;
+        });
+
+        const past = formattedBets.filter((bet) => {
+          // A bet is considered past if it's either resolved or its end date has passed
+          const endDate = new Date(bet.endDate);
+          const now = new Date();
+          return bet.isResolved || endDate <= now;
+        });
+
         const volume = formattedBets.reduce(
           (acc, bet) => acc + bet.totalPool,
           0
@@ -231,13 +277,71 @@ export default function BetsPage() {
     return () => window.removeEventListener("fetch", refetchHandler);
   }, []);
 
-  // Filter bets based on search term and category
-  const filteredActiveBets = activeBets.filter(
-    (bet) =>
+  // Reset pagination when filters change
+  useEffect(() => {
+    setActiveCurrentPage(1);
+  }, [searchTerm, selectedCategory, timeFilter]);
+
+  // Filter bets based on search term, category, and time filter
+  const filteredActiveBets = activeBets.filter((bet) => {
+    // First apply search and category filters
+    const matchesSearchAndCategory =
+      (bet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bet.category.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!selectedCategory || bet.category === selectedCategory);
+
+    // Then apply time filter if needed
+    if (timeFilter === "all") {
+      return matchesSearchAndCategory;
+    }
+
+    // Get the current time
+    const now = new Date();
+    const endDate = new Date(bet.endDate);
+
+    // Calculate time difference in milliseconds
+    const timeDiff = endDate.getTime() - now.getTime();
+
+    // Convert to hours and minutes
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+    if (timeFilter === "120min") {
+      // Show bets ending within the next 120 minutes (2 hours)
+      return matchesSearchAndCategory && hoursDiff <= 2;
+    } else if (timeFilter === "12hours") {
+      // Show bets ending within the next 12 hours
+      return matchesSearchAndCategory && hoursDiff <= 12;
+    }
+
+    return matchesSearchAndCategory;
+  });
+
+  // Calculate counts for each time filter
+  const betsIn120Min = activeBets.filter((bet) => {
+    const now = new Date();
+    const endDate = new Date(bet.endDate);
+    const timeDiff = endDate.getTime() - now.getTime();
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
+    return (
+      hoursDiff <= 2 &&
       (bet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bet.category.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (!selectedCategory || bet.category === selectedCategory)
-  );
+    );
+  }).length;
+
+  const betsIn12Hours = activeBets.filter((bet) => {
+    const now = new Date();
+    const endDate = new Date(bet.endDate);
+    const timeDiff = endDate.getTime() - now.getTime();
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
+    return (
+      hoursDiff <= 12 &&
+      (bet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bet.category.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!selectedCategory || bet.category === selectedCategory)
+    );
+  }).length;
 
   const filteredPastBets = pastBets.filter(
     (bet) =>
@@ -250,7 +354,7 @@ export default function BetsPage() {
     <AppLayout showFooter={false}>
       <GridBackground />
       <div className="py-8">
-        <div className="container max-w-[1600px] mx-auto px-4">
+        <div className="container pt-2 pl-12 max-w-[1600px] mx-auto px-4">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -260,7 +364,7 @@ export default function BetsPage() {
           >
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
+                <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
                   Prediction Bets
                 </h1>
                 <p className="text-muted-foreground">
@@ -269,7 +373,7 @@ export default function BetsPage() {
               </div>
               <div className="flex items-center gap-4">
                 <Link href="/bets/create">
-                  <Button className="bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-400/90 hover:to-blue-500/90">
+                  <Button className="bg-gradient-to-r from-green-400 to-[#00ff00] hover:from-green-400/90 hover:to-[#00ff00]/90">
                     <Rocket className="mr-2 h-4 w-4" />
                     Create Prediction
                   </Button>
@@ -335,6 +439,177 @@ export default function BetsPage() {
             />
           </div>
 
+          {/* Time Filters */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Time Filter:</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 rounded-full p-0 text-muted-foreground"
+                    >
+                      <span className="sr-only">Time filter info</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-4 w-4"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-xs">
+                    <p>Filter active bets by their remaining time:</p>
+                    <ul className="mt-2 list-disc list-inside text-xs">
+                      <li>
+                        <span className="font-medium">All:</span> Show all
+                        active bets
+                      </li>
+                      <li>
+                        <span className="font-medium">120 Minutes:</span> Show
+                        bets ending within 2 hours
+                      </li>
+                      <li>
+                        <span className="font-medium">12 Hours:</span> Show bets
+                        ending within 12 hours
+                      </li>
+                    </ul>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={timeFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTimeFilter("all")}
+                className={
+                  timeFilter === "all"
+                    ? "bg-gradient-to-r from-green-400 to-[#00ff00] text-black font-medium"
+                    : "border-white/10 hover:bg-green-500/10 hover:text-green-400"
+                }
+              >
+                <span className="flex items-center gap-1">
+                  All
+                  <span className="inline-flex items-center justify-center ml-1.5 px-1.5 py-0.5 rounded-full text-xs bg-black/30">
+                    {loading ? (
+                      <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      filteredActiveBets.length
+                    )}
+                  </span>
+                </span>
+              </Button>
+              <Button
+                variant={timeFilter === "120min" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTimeFilter("120min")}
+                className={
+                  timeFilter === "120min"
+                    ? "bg-gradient-to-r from-green-400 to-[#00ff00] text-black font-medium"
+                    : "border-white/10 hover:bg-green-500/10 hover:text-green-400"
+                }
+              >
+                <span className="flex items-center gap-1">
+                  120 Minutes
+                  <span className="inline-flex items-center justify-center ml-1.5 px-1.5 py-0.5 rounded-full text-xs bg-black/30">
+                    {loading ? (
+                      <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      betsIn120Min
+                    )}
+                  </span>
+                  {timeFilter === "120min" && (
+                    <span className="inline-flex items-center justify-center w-4 h-4 ml-1 bg-black/30 rounded-full">
+                      <span className="w-2 h-2 bg-black rounded-full"></span>
+                    </span>
+                  )}
+                </span>
+              </Button>
+              <Button
+                variant={timeFilter === "12hours" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTimeFilter("12hours")}
+                className={
+                  timeFilter === "12hours"
+                    ? "bg-gradient-to-r from-green-400 to-[#00ff00] text-black font-medium"
+                    : "border-white/10 hover:bg-green-500/10 hover:text-green-400"
+                }
+              >
+                <span className="flex items-center gap-1">
+                  12 Hours
+                  <span className="inline-flex items-center justify-center ml-1.5 px-1.5 py-0.5 rounded-full text-xs bg-black/30">
+                    {loading ? (
+                      <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      betsIn12Hours
+                    )}
+                  </span>
+                  {timeFilter === "12hours" && (
+                    <span className="inline-flex items-center justify-center w-4 h-4 ml-1 bg-black/30 rounded-full">
+                      <span className="w-2 h-2 bg-black rounded-full"></span>
+                    </span>
+                  )}
+                </span>
+              </Button>
+            </div>
+          </div>
+
           {/* Loading State */}
           {loading && (
             <div className="flex flex-col items-center justify-center py-20">
@@ -384,7 +659,13 @@ export default function BetsPage() {
                 {/* Active Bets */}
                 {filteredActiveBets.length > 0 ? (
                   <BetSection
-                    title="Active Bets"
+                    title={`Active Bets${
+                      timeFilter !== "all"
+                        ? timeFilter === "120min"
+                          ? " (Next 2 Hours)"
+                          : " (Next 12 Hours)"
+                        : ""
+                    }`}
                     bets={filteredActiveBets}
                     currentPage={activeCurrentPage}
                     onPageChange={setActiveCurrentPage}
@@ -393,10 +674,21 @@ export default function BetsPage() {
                   />
                 ) : (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-semibold">Active Bets</h2>
+                    <h2 className="text-2xl font-semibold">
+                      {`Active Bets${
+                        timeFilter !== "all"
+                          ? timeFilter === "120min"
+                            ? " (Next 2 Hours)"
+                            : " (Next 12 Hours)"
+                          : ""
+                      }`}
+                    </h2>
                     <div className="text-center py-10 border border-white/10 rounded-xl bg-black/20">
                       <p className="text-muted-foreground">
                         No active bets available
+                        {timeFilter !== "all"
+                          ? ` in the selected time range`
+                          : ""}
                       </p>
                     </div>
                   </div>

@@ -23,89 +23,118 @@ import {
 export default function ShillManagerPage() {
   return (
     <AppLayout showFooter={false}>
-      <GridBackground />
-      <div className="container max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col gap-4">
-            <Badge
-              variant="outline"
-              className="w-fit bg-sky-500/10 text-sky-500 border-sky-500/20"
+      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 overflow-hidden">
+        <GridBackground />
+        <div className="container max-w-7xl mx-auto px-4 py-8 relative z-10">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-12 pb-6 border-b border-white/10"
+          >
+            <div className="flex flex-col gap-4">
+              <Badge
+                variant="outline"
+                className="w-fit bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1"
+              >
+                AI Shill Manager
+              </Badge>
+              <h1 className="text-4xl font-bold">
+                Automate Your{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400">
+                  Meme Coin Marketing
+                </span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl">
+                Let AI handle your social media presence while you focus on
+                building. Our advanced shill bot uses natural language
+                processing to engage with your community and promote your token.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Main Content */}
+          <Tabs defaultValue="dashboard" className="space-y-8">
+            <div className="overflow-x-auto pb-2">
+              <TabsList className="bg-white/5 p-1 rounded-lg inline-flex min-w-full lg:grid lg:grid-cols-6 gap-4">
+                <TabsTrigger
+                  value="dashboard"
+                  className="data-[state=active]:bg-green-500 gap-2 whitespace-nowrap"
+                >
+                  <Bot className="h-4 w-4" />
+                  Dashboard
+                </TabsTrigger>
+                <TabsTrigger
+                  value="settings"
+                  className="data-[state=active]:bg-green-500 gap-2 whitespace-nowrap"
+                >
+                  <Settings className="h-4 w-4" />
+                  Auto-Shill
+                </TabsTrigger>
+                <TabsTrigger
+                  value="automation"
+                  className="data-[state=active]:bg-green-500 gap-2 whitespace-nowrap"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Replies
+                </TabsTrigger>
+                <TabsTrigger
+                  value="ai"
+                  className="data-[state=active]:bg-green-500 gap-2 whitespace-nowrap"
+                >
+                  <Wand2 className="h-4 w-4" />
+                  AI Config
+                </TabsTrigger>
+                <TabsTrigger
+                  value="conversations"
+                  className="data-[state=active]:bg-green-500 gap-2 whitespace-nowrap"
+                >
+                  <Users className="h-4 w-4" />
+                  Tracking
+                </TabsTrigger>
+                <TabsTrigger
+                  value="analytics"
+                  className="data-[state=active]:bg-green-500 gap-2 whitespace-nowrap"
+                >
+                  <BarChart2 className="h-4 w-4" />
+                  Analytics
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-white/5 rounded-xl border border-white/10 p-6 overflow-hidden"
             >
-              AI Shill Manager
-            </Badge>
-            <h1 className="text-4xl font-bold">
-              Automate Your{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
-                Meme Coin Marketing
-              </span>
-            </h1>
-            <p className="text-muted-foreground max-w-2xl">
-              Let AI handle your social media presence while you focus on
-              building. Our advanced shill bot uses natural language processing
-              to engage with your community and promote your token.
-            </p>
-          </div>
-        </motion.div>
+              <TabsContent value="dashboard" className="space-y-6 mt-0">
+                <DashboardOverview />
+              </TabsContent>
 
-        {/* Main Content */}
-        <Tabs defaultValue="dashboard" className="space-y-8">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-            <TabsTrigger value="dashboard" className="gap-2">
-              <Bot className="h-4 w-4" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Auto-Shill
-            </TabsTrigger>
-            <TabsTrigger value="automation" className="gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Replies
-            </TabsTrigger>
-            <TabsTrigger value="ai" className="gap-2">
-              <Wand2 className="h-4 w-4" />
-              AI Config
-            </TabsTrigger>
-            <TabsTrigger value="conversations" className="gap-2">
-              <Users className="h-4 w-4" />
-              Tracking
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <BarChart2 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
+              <TabsContent value="settings" className="space-y-6 mt-0">
+                <AutoShillSettings />
+              </TabsContent>
 
-          <TabsContent value="dashboard" className="space-y-4">
-            <DashboardOverview />
-          </TabsContent>
+              <TabsContent value="automation" className="space-y-6 mt-0">
+                <ReplyAutomation />
+              </TabsContent>
 
-          <TabsContent value="settings" className="space-y-4">
-            <AutoShillSettings />
-          </TabsContent>
+              <TabsContent value="ai" className="space-y-6 mt-0">
+                <AICustomization />
+              </TabsContent>
 
-          <TabsContent value="automation" className="space-y-4">
-            <ReplyAutomation />
-          </TabsContent>
+              <TabsContent value="conversations" className="space-y-6 mt-0">
+                <ConversationTracking />
+              </TabsContent>
 
-          <TabsContent value="ai" className="space-y-4">
-            <AICustomization />
-          </TabsContent>
-
-          <TabsContent value="conversations" className="space-y-4">
-            <ConversationTracking />
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-4">
-            <LogsAnalytics />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="analytics" className="space-y-6 mt-0">
+                <LogsAnalytics />
+              </TabsContent>
+            </motion.div>
+          </Tabs>
+        </div>
       </div>
     </AppLayout>
   );

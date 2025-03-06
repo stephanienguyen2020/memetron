@@ -20,22 +20,15 @@ export default function PortfolioPage() {
       <GridBackground />
       <div className="container max-w-7xl pt-10 mx-auto px-4">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl font-bold">
-            Portfolio{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
-              Overview
-            </span>
-          </h1>
-          <p className="text-muted-foreground">
-            Track and manage your crypto assets
-          </p>
-        </motion.div>
+        <h1 className="text-4xl font-bold">
+          Portfolio{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
+            Overview
+          </span>
+        </h1>
+        <p className="text-muted-foreground">
+          Track and manage your crypto assets
+        </p>
 
         <div className="flex items-center justify-between mb-4">
           <QuickActions />

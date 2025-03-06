@@ -225,7 +225,8 @@ const RainingLetters: React.FC<RainingLettersProps> = ({ onConnectWallet }) => {
 
         <p className="text-gray-400 mt-6 mb-8 text-center max-w-md text-lg">
           The ultimate platform for crypto enthusiasts. Predict trends, launch
-          tokens, and capitalize on the next big opportunity.
+          tokens, and capitalize on the next big opportunity. Built on
+          Electroneum.
         </p>
 
         <button

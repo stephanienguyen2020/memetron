@@ -1,19 +1,36 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Calendar, CheckCircle, Clock, Filter } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button";
+import { Calendar, CheckCircle, Clock, Filter } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface BetFiltersProps {
-  activeFilter: "all" | "active" | "resolved"
-  selectedCategory: string | null
-  onFilterChange: (filter: "all" | "active" | "resolved") => void
-  onCategoryChange: (category: string | null) => void
+  activeFilter: "all" | "active" | "resolved";
+  selectedCategory: string | null;
+  onFilterChange: (filter: "all" | "active" | "resolved") => void;
+  onCategoryChange: (category: string | null) => void;
 }
 
-const categories = ["Crypto", "Politics", "Sports", "Entertainment", "Technology", "Finance"]
+const categories = [
+  "Crypto",
+  "Politics",
+  "Sports",
+  "Entertainment",
+  "Technology",
+  "Finance",
+];
 
-export function BetFilters({ activeFilter, selectedCategory, onFilterChange, onCategoryChange }: BetFiltersProps) {
+export function BetFilters({
+  activeFilter,
+  selectedCategory,
+  onFilterChange,
+  onCategoryChange,
+}: BetFiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button
@@ -25,24 +42,6 @@ export function BetFilters({ activeFilter, selectedCategory, onFilterChange, onC
         <Filter className="mr-2 h-4 w-4" />
         All Bets
       </Button>
-      <Button
-        variant={activeFilter === "active" ? "default" : "outline"}
-        size="sm"
-        onClick={() => onFilterChange("active")}
-        className="border-white/10"
-      >
-        <Clock className="mr-2 h-4 w-4" />
-        Active
-      </Button>
-      <Button
-        variant={activeFilter === "resolved" ? "default" : "outline"}
-        size="sm"
-        onClick={() => onFilterChange("resolved")}
-        className="border-white/10"
-      >
-        <CheckCircle className="mr-2 h-4 w-4" />
-        Resolved
-      </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -52,15 +51,19 @@ export function BetFilters({ activeFilter, selectedCategory, onFilterChange, onC
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onCategoryChange(null)}>All Categories</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onCategoryChange(null)}>
+            All Categories
+          </DropdownMenuItem>
           {categories.map((category) => (
-            <DropdownMenuItem key={category} onClick={() => onCategoryChange(category)}>
+            <DropdownMenuItem
+              key={category}
+              onClick={() => onCategoryChange(category)}
+            >
               {category}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }
-

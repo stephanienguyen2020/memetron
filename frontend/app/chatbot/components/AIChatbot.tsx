@@ -480,15 +480,10 @@ function AIChatbotContent() {
               <Brain className="w-8 h-8 text-primary" />
             </div>
             <h1 className="text-4xl font-bold">
-              Where Knowledge{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
-                Begins
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400">
+                MemeTron Bot
               </span>
             </h1>
-            <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-              I'm your MemeTron AI assistant. I can help you analyze meme coins,
-              track whale activity, and spot potential opportunities.
-            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -543,14 +538,14 @@ function AIChatbotContent() {
               <Avatar>
                 {isBot ? (
                   <>
-                    <AvatarImage src="/hedgefi-bot.png" />
+                    <AvatarImage src="https://example.com/bot-meme-avatar.png" />
                     <AvatarFallback>
                       <Bot className="w-5 h-5" />
                     </AvatarFallback>
                   </>
                 ) : (
                   <>
-                    <AvatarImage src="/placeholder.svg" />
+                    <AvatarImage src="https://example.com/user-meme-avatar.png" />
                     <AvatarFallback>U</AvatarFallback>
                   </>
                 )}

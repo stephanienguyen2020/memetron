@@ -293,10 +293,10 @@ export function SiteLeftbar() {
           )}
         </AnimatePresence>
 
-        {/* Hedge Bot Section */}
+        {/* Chat Bot Section */}
         <NavItem
           icon={<Bot size={20} />}
-          label="Hedge Bot"
+          label="Chat Bot"
           href="/chatbot"
           hasSubItems={true}
           isActive={activeSection === "hedge-bot"}

@@ -13,7 +13,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -39,11 +39,37 @@ export function BetSection({
     console.log(`BetSection "${title}" received ${bets.length} bets`);
   }, [bets, title]);
 
-  const totalPages = Math.ceil(bets.length / itemsPerPage);
+  // Add ranks to bets based on total pool value
+  const rankedBets = useMemo(() => {
+    // Sort bets by total pool value in descending order and consider other factors
+    const sortedBets = [...bets].sort((a, b) => {
+      // Primary sort by total pool value
+      const poolDiff = b.totalPool - a.totalPool;
+
+      if (poolDiff !== 0) return poolDiff;
+
+      // Secondary sort by activity (yes/no votes ratio)
+      const aActivity = a.yesPool + a.noPool;
+      const bActivity = b.yesPool + b.noPool;
+
+      if (bActivity !== aActivity) return bActivity - aActivity;
+
+      // Tertiary sort by end date (more recent end dates first)
+      return new Date(b.endDate).getTime() - new Date(a.endDate).getTime();
+    });
+
+    // Add rank property to each bet
+    return sortedBets.map((bet, index) => ({
+      ...bet,
+      rank: index,
+    }));
+  }, [bets]);
+
+  const totalPages = Math.ceil(rankedBets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentBets = bets.slice(startIndex, endIndex);
-  const totalBets = bets.length;
+  const currentBets = rankedBets.slice(startIndex, endIndex);
+  const totalBets = rankedBets.length;
 
   return (
     <section className="space-y-6">
@@ -66,7 +92,7 @@ export function BetSection({
 
       {currentBets.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 auto-rows-fr">
             {currentBets.map((bet) => {
               // Log each bet to help with debugging
               console.log(`Rendering bet: ${bet.id} - ${bet.title}`);

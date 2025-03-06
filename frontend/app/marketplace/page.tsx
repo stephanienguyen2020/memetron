@@ -631,7 +631,7 @@ export default function MarketplacePage() {
             <div>
               <h1 className="text-4xl font-bold">
                 Meme Token{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400">
                   Marketplace
                 </span>
               </h1>
@@ -645,7 +645,7 @@ export default function MarketplacePage() {
                 <Input
                   type="search"
                   placeholder="Search tokens..."
-                  className="pl-8 w-[200px] md:w-[300px]"
+                  className="pl-8 w-[200px] md:w-[300px] border border-gray-600 rounded-lg"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -670,37 +670,39 @@ export default function MarketplacePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            {isLoading ? (
-              // Show loading state
-              Array(8)
-                .fill(0)
-                .map((_, index) => (
-                  <div
-                    key={index}
-                    className="overflow-hidden border bg-black/60 rounded-2xl border-white/10 animate-pulse"
-                  >
-                    <div className="bg-gray-800 aspect-square"></div>
-                    <div className="p-4 space-y-3">
-                      <div className="w-2/3 h-5 bg-gray-800 rounded"></div>
-                      <div className="w-1/2 h-4 bg-gray-800 rounded"></div>
-                      <div className="w-full h-4 bg-gray-800 rounded"></div>
-                      <div className="w-full h-10 bg-gray-800 rounded"></div>
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              {isLoading ? (
+                // Loading state
+                Array(8)
+                  .fill(0)
+                  .map((_, index) => (
+                    <div
+                      key={index}
+                      className="overflow-hidden border bg-black/60 rounded-2xl border-white/10 animate-pulse"
+                    >
+                      <div className="bg-gray-800 aspect-square"></div>
+                      <div className="p-4 space-y-3">
+                        <div className="w-2/3 h-5 bg-gray-800 rounded"></div>
+                        <div className="w-1/2 h-4 bg-gray-800 rounded"></div>
+                        <div className="w-full h-4 bg-gray-800 rounded"></div>
+                        <div className="w-full h-10 bg-gray-800 rounded"></div>
+                      </div>
                     </div>
-                  </div>
+                  ))
+              ) : currentTokens.length > 0 ? (
+                currentTokens.map((token, index) => (
+                  <TokenCard key={token.symbol} token={token} index={index} />
                 ))
-            ) : currentTokens.length > 0 ? (
-              currentTokens.map((token, index) => (
-                <TokenCard key={token.symbol} token={token} index={index} />
-              ))
-            ) : (
-              <div className="py-12 text-center col-span-full">
-                <h3 className="mb-2 text-xl font-medium">No tokens found</h3>
-                <p className="text-muted-foreground">
-                  Try adjusting your search or filters
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="py-12 text-center col-span-full">
+                  <h3 className="mb-2 text-xl font-medium">No tokens found</h3>
+                  <p className="text-muted-foreground">
+                    Try adjusting your search or filters
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {totalPages > 1 && (
@@ -724,8 +726,6 @@ export default function MarketplacePage() {
 
                   {[...Array(totalPages)].map((_, i) => {
                     const page = i + 1;
-
-                    // Show first page, last page, and pages around current page
                     if (
                       page === 1 ||
                       page === totalPages ||
@@ -746,8 +746,6 @@ export default function MarketplacePage() {
                         </PaginationItem>
                       );
                     }
-
-                    // Show ellipsis for breaks in page numbers
                     if (page === currentPage - 2 || page === currentPage + 2) {
                       return (
                         <PaginationItem key={page}>
@@ -755,7 +753,6 @@ export default function MarketplacePage() {
                         </PaginationItem>
                       );
                     }
-
                     return null;
                   })}
 

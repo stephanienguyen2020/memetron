@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
 import { Input } from "@/components/ui/input";
 import { Search, Rocket, Loader2, AlertCircle, Wallet } from "lucide-react";
@@ -339,12 +338,7 @@ export default function BetsPage() {
       <div className="py-8">
         <div className="container pt-2 pl-12 max-w-[1600px] mx-auto px-4">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-12"
-          >
+          <div className="mb-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
@@ -378,16 +372,11 @@ export default function BetsPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Wallet Warning - show when wallet is not connected */}
           {!isWalletConnected && !loading && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
+            <div className="mb-8">
               <Alert
                 variant="default"
                 className="bg-yellow-500/10 border-yellow-500/20"
@@ -399,7 +388,7 @@ export default function BetsPage() {
                   and see the latest data.
                 </AlertDescription>
               </Alert>
-            </motion.div>
+            </div>
           )}
 
           {/* Search and Filters */}

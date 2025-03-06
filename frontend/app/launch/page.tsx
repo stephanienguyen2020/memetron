@@ -10,19 +10,13 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
 import { InputMethodSelector, type InputMethod } from "./input-method-selector";
 import { AIInputForm } from "./ai-input-form";
 import { RegenerationControls } from "./regeneration-controls";
 import { TokenFormSection } from "./token-form";
 import { useTokenStore, type Token } from "../store/tokenStore";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createToken } from "@/services/memecoin-launchpad";
@@ -312,12 +306,7 @@ export default function LaunchPage() {
       <div className="py-8">
         <div className="container max-w-7xl">
           <div className="flex flex-col items-center mb-12 space-y-4 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="space-y-4"
-            >
+            <div className="space-y-4">
               <Badge variant="secondary" className="mb-4">
                 Token Launch Platform
               </Badge>
@@ -328,14 +317,10 @@ export default function LaunchPage() {
                 Create, deploy, and manage your meme token with our secure and
                 automated platform. No coding required.
               </p>
-            </motion.div>
+            </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
+          <div>
             <Card className="border-primary/20 bg-background/60 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Create Your Token</CardTitle>
@@ -393,20 +378,18 @@ export default function LaunchPage() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
       </div>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20">
-                <Check className="w-4 h-4 text-green-500" />
-              </div>
-              Token Created Successfully
-            </DialogTitle>
-          </DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20">
+              <Check className="w-4 h-4 text-green-500" />
+            </div>
+            Token Created Successfully
+          </DialogTitle>
           <div className="space-y-4">
             {createdToken && (
               <div className="space-y-2">

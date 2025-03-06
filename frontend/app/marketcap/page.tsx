@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
 import { MemeCoinMarketCap } from "../components/MemeCoinMarketCap";
 import { fetchTrendingTokens } from "@/app/lib/coins";
@@ -33,8 +32,15 @@ function Sparkline({
     .join(" ");
 
   return (
-    <svg width={width} height={height}>
-      <polyline fill="none" stroke={color} strokeWidth="1" points={points} />
+    <svg width={width} height={height} className="overflow-visible">
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

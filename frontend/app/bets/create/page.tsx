@@ -3,7 +3,6 @@
 import type React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
 import {
   Calendar,
   ImageIcon,
@@ -362,12 +361,7 @@ export default function CreateBet() {
     return (
       <AppLayout>
         <div className="container max-w-4xl mx-auto px-4 pt-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 p-6 rounded-md"
-          >
+          <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 p-6 rounded-md">
             <h2 className="text-2xl font-bold mb-2">Authentication Required</h2>
             <p className="mb-4">You need to be signed in to create a bet.</p>
             <div className="flex gap-4">
@@ -375,7 +369,7 @@ export default function CreateBet() {
                 Back to Bets
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </AppLayout>
     );
@@ -384,480 +378,463 @@ export default function CreateBet() {
   return (
     <AppLayout showFooter={false}>
       <div className="container max-w-full mx-auto px-12 pt-6 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="mb-6">
-            <Link href="/bets">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Bets
-              </Button>
-            </Link>
-          </div>
+        <div className="mb-6">
+          <Link href="/bets">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Bets
+            </Button>
+          </Link>
+        </div>
 
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
-              Create a New Bet
-            </h1>
-            <p className="text-muted-foreground">
-              Set up your bet and let others bet on the outcome
-            </p>
-          </div>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
+            Create a New Bet
+          </h1>
+          <p className="text-muted-foreground">
+            Set up your bet and let others bet on the outcome
+          </p>
+        </div>
 
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Form - Takes 2/3 of the space */}
-            <div className="lg:col-span-2">
-              <Card className="border-white/10 bg-black/50 backdrop-blur-xl">
-                <CardContent className="p-6">
-                  <Form {...form}>
-                    <form
-                      onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-6"
-                    >
-                      {/* Title - Full Width */}
-                      <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Bet Title</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Will Bitcoin reach $100k by 2024?"
-                                className="border-white/10"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              Make it clear and specific
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Form - Takes 2/3 of the space */}
+          <div className="lg:col-span-2">
+            <Card className="border-white/10 bg-black/50 backdrop-blur-xl">
+              <CardContent className="p-6">
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
+                  >
+                    {/* Title - Full Width */}
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bet Title</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Will Bitcoin reach $100k by 2024?"
+                              className="border-white/10"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Make it clear and specific
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      {/* Description - Full Width */}
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Bet Description</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Provide more details about your bet..."
-                                className="min-h-[100px] border-white/10 resize-none"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    {/* Description - Full Width */}
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bet Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Provide more details about your bet..."
+                              className="min-h-[100px] border-white/10 resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      {/* Two Column Layout for remaining fields */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Left Column */}
-                        <div className="space-y-6">
-                          {/* Category */}
-                          <FormField
-                            control={form.control}
-                            name="category"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Category</FormLabel>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger className="border-white/10">
-                                      <SelectValue placeholder="Select a category" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {categories.map((category) => (
-                                      <SelectItem
-                                        key={category}
-                                        value={category}
-                                      >
-                                        {category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* End Date */}
-                          <FormField
-                            control={form.control}
-                            name="endDate"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>End Date</FormLabel>
+                    {/* Two Column Layout for remaining fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Left Column */}
+                      <div className="space-y-6">
+                        {/* Category */}
+                        <FormField
+                          control={form.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Category</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
-                                  <div className="relative">
-                                    <Input
-                                      type="datetime-local"
-                                      className="border-white/10"
-                                      {...field}
-                                      min={new Date()
-                                        .toISOString()
-                                        .slice(0, 16)}
-                                    />
-                                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                  </div>
+                                  <SelectTrigger className="border-white/10">
+                                    <SelectValue placeholder="Select a category" />
+                                  </SelectTrigger>
                                 </FormControl>
-                                <FormDescription>
-                                  When will the bet be resolved?
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                                <SelectContent>
+                                  {categories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                          {/* Initial Pool */}
-                          <FormField
-                            control={form.control}
-                            name="initialPool"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Initial Pool Amount (ETH)</FormLabel>
-                                <FormControl>
+                        {/* End Date */}
+                        <FormField
+                          control={form.control}
+                          name="endDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>End Date</FormLabel>
+                              <FormControl>
+                                <div className="relative">
                                   <Input
-                                    type="number"
-                                    step="0.001"
-                                    placeholder="1.0"
+                                    type="datetime-local"
                                     className="border-white/10"
                                     {...field}
+                                    min={new Date().toISOString().slice(0, 16)}
                                   />
-                                </FormControl>
-                                <FormDescription>
-                                  Minimum bet is 0.001 ETH
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Join Amount */}
-                          <FormField
-                            control={form.control}
-                            name="_amount"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Join Amount (ETH)</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="number"
-                                    step="0.001"
-                                    placeholder="0.1"
-                                    className="border-white/10"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormDescription>
-                                  Amount required for others to join this bet
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        {/* Right Column */}
-                        <div className="space-y-6">
-                          {/* Twitter Handle (Required) */}
-                          <FormField
-                            control={form.control}
-                            name="twitterHandle"
-                            render={({ field }) => (
-                              <FormItem>
-                                <div className="flex items-center gap-2">
-                                  <FormLabel>Twitter Handle</FormLabel>
-                                  {twitterInfo?.connected &&
-                                    !twitterHandleChanged && (
-                                      <Badge
-                                        variant="outline"
-                                        className="bg-green-500/10 text-green-500 border-green-500/20"
-                                      >
-                                        Connected
-                                      </Badge>
-                                    )}
-                                  {twitterInfo?.connected &&
-                                    twitterHandleChanged && (
-                                      <Badge
-                                        variant="outline"
-                                        className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
-                                      >
-                                        Modified
-                                      </Badge>
-                                    )}
+                                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 </div>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                      placeholder="@username"
-                                      className="border-white/10 pl-10"
-                                      {...field}
-                                      onChange={(e) => {
-                                        field.onChange(e);
-                                        handleTwitterHandleChange(
-                                          e.target.value
-                                        );
-                                      }}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <div className="flex items-center justify-between mt-2">
-                                  <FormDescription>
-                                    Required for verification
-                                  </FormDescription>
-                                  {!twitterInfo?.connected && (
+                              </FormControl>
+                              <FormDescription>
+                                When will the bet be resolved?
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Initial Pool */}
+                        <FormField
+                          control={form.control}
+                          name="initialPool"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Initial Pool Amount (ETH)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="0.001"
+                                  placeholder="1.0"
+                                  className="border-white/10"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Minimum bet is 0.001 ETH
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Join Amount */}
+                        <FormField
+                          control={form.control}
+                          name="_amount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Join Amount (ETH)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="0.001"
+                                  placeholder="0.1"
+                                  className="border-white/10"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Amount required for others to join this bet
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="space-y-6">
+                        {/* Twitter Handle (Required) */}
+                        <FormField
+                          control={form.control}
+                          name="twitterHandle"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center gap-2">
+                                <FormLabel>Twitter Handle</FormLabel>
+                                {twitterInfo?.connected &&
+                                  !twitterHandleChanged && (
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-green-500/10 text-green-500 border-green-500/20"
+                                    >
+                                      Connected
+                                    </Badge>
+                                  )}
+                                {twitterInfo?.connected &&
+                                  twitterHandleChanged && (
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+                                    >
+                                      Modified
+                                    </Badge>
+                                  )}
+                              </div>
+                              <FormControl>
+                                <div className="relative">
+                                  <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                  <Input
+                                    placeholder="@username"
+                                    className="border-white/10 pl-10"
+                                    {...field}
+                                    onChange={(e) => {
+                                      field.onChange(e);
+                                      handleTwitterHandleChange(e.target.value);
+                                    }}
+                                  />
+                                </div>
+                              </FormControl>
+                              <div className="flex items-center justify-between mt-2">
+                                <FormDescription>
+                                  Required for verification
+                                </FormDescription>
+                                {!twitterInfo?.connected && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleTwitterConnect}
+                                    className="border-green-500/20 text-green-500 hover:bg-green-500/10"
+                                  >
+                                    <Twitter className="mr-2 h-3 w-3" />
+                                    Connect
+                                  </Button>
+                                )}
+                                {twitterInfo?.connected &&
+                                  twitterHandleChanged && (
                                     <Button
                                       type="button"
                                       variant="outline"
                                       size="sm"
                                       onClick={handleTwitterConnect}
-                                      className="border-green-500/20 text-green-500 hover:bg-green-500/10"
+                                      className="border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10"
                                     >
                                       <Twitter className="mr-2 h-3 w-3" />
-                                      Connect
+                                      Update
                                     </Button>
                                   )}
-                                  {twitterInfo?.connected &&
-                                    twitterHandleChanged && (
-                                      <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleTwitterConnect}
-                                        className="border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10"
-                                      >
-                                        <Twitter className="mr-2 h-3 w-3" />
-                                        Update
-                                      </Button>
-                                    )}
+                              </div>
+                              {!twitterInfo?.connected && (
+                                <div className="flex items-center gap-2 p-3 mt-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                                  <AlertTriangle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                                  <p className="text-xs text-yellow-500">
+                                    Twitter account required for bets
+                                  </p>
                                 </div>
-                                {!twitterInfo?.connected && (
-                                  <div className="flex items-center gap-2 p-3 mt-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                                    <AlertTriangle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
-                                    <p className="text-xs text-yellow-500">
-                                      Twitter account required for bets
-                                    </p>
-                                  </div>
-                                )}
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Image Upload (Optional) */}
-                          <FormField
-                            control={form.control}
-                            name="image"
-                            render={({
-                              field: { value, onChange, ...field },
-                            }) => (
-                              <FormItem>
-                                <div className="flex items-center gap-2">
-                                  <FormLabel>Cover Image</FormLabel>
-                                  <Badge
-                                    variant="outline"
-                                    className="bg-gray-500/10 text-gray-400 border-gray-500/20"
-                                  >
-                                    Optional
-                                  </Badge>
-                                </div>
-                                <FormControl>
-                                  <div className="space-y-4">
-                                    <div
-                                      className={cn(
-                                        "flex items-center justify-center border-2 border-dashed rounded-lg p-4 transition-colors",
-                                        "border-white/10 hover:border-white/20"
-                                      )}
-                                    >
-                                      <label
-                                        htmlFor="image-upload"
-                                        className="flex flex-col items-center gap-2 cursor-pointer"
-                                      >
-                                        {previewImage ? (
-                                          <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                              src={
-                                                previewImage ||
-                                                "/placeholder.svg"
-                                              }
-                                              alt="Preview"
-                                              className="object-cover"
-                                            />
-                                            {isUploadingImage && (
-                                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                                <div className="text-center">
-                                                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-green-400" />
-                                                  <p className="text-sm text-white">
-                                                    Uploading to IPFS...
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            )}
-                                            {previewImage.startsWith(
-                                              "https://"
-                                            ) && (
-                                              <div className="absolute top-2 right-2">
-                                                <Badge className="bg-green-500 text-white">
-                                                  Stored on IPFS
-                                                </Badge>
-                                              </div>
-                                            )}
-                                            <Button
-                                              type="button"
-                                              variant="ghost"
-                                              size="sm"
-                                              className="absolute bottom-2 right-2 bg-black/50 hover:bg-black/70 text-white"
-                                              onClick={() => {
-                                                setPreviewImage(null);
-                                                setSelectedFile(null);
-                                              }}
-                                              disabled={isUploadingImage}
-                                            >
-                                              Change
-                                            </Button>
-                                          </div>
-                                        ) : (
-                                          <>
-                                            {isUploadingImage ? (
-                                              <div className="py-8 text-center">
-                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-green-400" />
-                                                <span className="text-sm text-muted-foreground">
-                                                  Uploading image to IPFS...
-                                                </span>
-                                              </div>
-                                            ) : (
-                                              <>
-                                                <ImageIcon className="h-20 w-8 text-muted-foreground" />
-                                                <span className="text-sm text-muted-foreground text-center">
-                                                  Click to upload or drag and
-                                                  drop
-                                                </span>
-                                                <span className="text-xs text-muted-foreground text-center">
-                                                  (We'll generate one if not
-                                                  provided)
-                                                </span>
-                                              </>
-                                            )}
-                                          </>
-                                        )}
-                                        <Input
-                                          id="image-upload"
-                                          type="file"
-                                          accept="image/*"
-                                          className="hidden"
-                                          onChange={(e) => {
-                                            handleImageUpload(e);
-                                            onChange(e.target.files?.[0]);
-                                          }}
-                                          {...field}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Submit Button - Full Width */}
-                      <div className="flex justify-end gap-4 pt-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="border-white/10"
-                          onClick={() => router.push("/bets")}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="submit"
-                          disabled={isSubmitting || isUploadingImage}
-                          className="bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500"
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Creating...
-                            </>
-                          ) : isUploadingImage ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Uploading Image...
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="mr-2 h-4 w-4" />
-                              Create Bet
-                            </>
+                              )}
+                              <FormMessage />
+                            </FormItem>
                           )}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            </div>
+                        />
 
-            {/* How It Works Card - Takes 1/3 of the space */}
-            <div className="lg:col-span-1">
-              <Card className="border-white/10 bg-black/50 backdrop-blur-xl sticky top-24">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Info className="h-5 w-5" />
-                    How It Works
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4 text-sm">
-                    <p>
-                      <span className="font-medium">
-                        1. Create a Prediction:
-                      </span>{" "}
-                      Define a yes/no question with a clear resolution date.
-                    </p>
-                    <p>
-                      <span className="font-medium">2. Initial Stake:</span>{" "}
-                      Your initial stake creates the betting pool and shows your
-                      confidence.
-                    </p>
-                    <p>
-                      <span className="font-medium">3. Others Bet:</span> Users
-                      can bet on either "Yes" or "No" outcomes.
-                    </p>
-                    <p>
-                      <span className="font-medium">4. Resolution:</span> When
-                      the end date arrives, the prediction is resolved based on
-                      real-world outcome.
-                    </p>
-                    <p>
-                      <span className="font-medium">5. Rewards:</span> Winners
-                      share the pool proportionally to their bet amounts.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                        {/* Image Upload (Optional) */}
+                        <FormField
+                          control={form.control}
+                          name="image"
+                          render={({
+                            field: { value, onChange, ...field },
+                          }) => (
+                            <FormItem>
+                              <div className="flex items-center gap-2">
+                                <FormLabel>Cover Image</FormLabel>
+                                <Badge
+                                  variant="outline"
+                                  className="bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                >
+                                  Optional
+                                </Badge>
+                              </div>
+                              <FormControl>
+                                <div className="space-y-4">
+                                  <div
+                                    className={cn(
+                                      "flex items-center justify-center border-2 border-dashed rounded-lg p-4 transition-colors",
+                                      "border-white/10 hover:border-white/20"
+                                    )}
+                                  >
+                                    <label
+                                      htmlFor="image-upload"
+                                      className="flex flex-col items-center gap-2 cursor-pointer"
+                                    >
+                                      {previewImage ? (
+                                        <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                                          <img
+                                            src={
+                                              previewImage || "/placeholder.svg"
+                                            }
+                                            alt="Preview"
+                                            className="object-cover"
+                                          />
+                                          {isUploadingImage && (
+                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                              <div className="text-center">
+                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-green-400" />
+                                                <p className="text-sm text-white">
+                                                  Uploading to IPFS...
+                                                </p>
+                                              </div>
+                                            </div>
+                                          )}
+                                          {previewImage.startsWith(
+                                            "https://"
+                                          ) && (
+                                            <div className="absolute top-2 right-2">
+                                              <Badge className="bg-green-500 text-white">
+                                                Stored on IPFS
+                                              </Badge>
+                                            </div>
+                                          )}
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="absolute bottom-2 right-2 bg-black/50 hover:bg-black/70 text-white"
+                                            onClick={() => {
+                                              setPreviewImage(null);
+                                              setSelectedFile(null);
+                                            }}
+                                            disabled={isUploadingImage}
+                                          >
+                                            Change
+                                          </Button>
+                                        </div>
+                                      ) : (
+                                        <>
+                                          {isUploadingImage ? (
+                                            <div className="py-8 text-center">
+                                              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-green-400" />
+                                              <span className="text-sm text-muted-foreground">
+                                                Uploading image to IPFS...
+                                              </span>
+                                            </div>
+                                          ) : (
+                                            <>
+                                              <ImageIcon className="h-20 w-8 text-muted-foreground" />
+                                              <span className="text-sm text-muted-foreground text-center">
+                                                Click to upload or drag and drop
+                                              </span>
+                                              <span className="text-xs text-muted-foreground text-center">
+                                                (We'll generate one if not
+                                                provided)
+                                              </span>
+                                            </>
+                                          )}
+                                        </>
+                                      )}
+                                      <Input
+                                        id="image-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                          handleImageUpload(e);
+                                          onChange(e.target.files?.[0]);
+                                        }}
+                                        {...field}
+                                      />
+                                    </label>
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Submit Button - Full Width */}
+                    <div className="flex justify-end gap-4 pt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-white/10"
+                        onClick={() => router.push("/bets")}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting || isUploadingImage}
+                        className="bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating...
+                          </>
+                        ) : isUploadingImage ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Uploading Image...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="mr-2 h-4 w-4" />
+                            Create Bet
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
           </div>
-        </motion.div>
+
+          {/* How It Works Card - Takes 1/3 of the space */}
+          <div className="lg:col-span-1">
+            <Card className="border-white/10 bg-black/50 backdrop-blur-xl sticky top-24">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How It Works
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 text-sm">
+                  <p>
+                    <span className="font-medium">1. Create a Prediction:</span>{" "}
+                    Define a yes/no question with a clear resolution date.
+                  </p>
+                  <p>
+                    <span className="font-medium">2. Initial Stake:</span> Your
+                    initial stake creates the betting pool and shows your
+                    confidence.
+                  </p>
+                  <p>
+                    <span className="font-medium">3. Others Bet:</span> Users
+                    can bet on either "Yes" or "No" outcomes.
+                  </p>
+                  <p>
+                    <span className="font-medium">4. Resolution:</span> When the
+                    end date arrives, the prediction is resolved based on
+                    real-world outcome.
+                  </p>
+                  <p>
+                    <span className="font-medium">5. Rewards:</span> Winners
+                    share the pool proportionally to their bet amounts.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </AppLayout>
   );

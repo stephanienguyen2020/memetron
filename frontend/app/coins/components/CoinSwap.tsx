@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
 import {
   getPriceForTokens,
   getEstimatedTokensForEth,
@@ -1185,13 +1184,9 @@ const CoinSwap = ({
           ) : (
             // Success View (in-component instead of modal)
             <div className="flex flex-col items-center text-center space-y-6 py-4">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="w-20 h-20 rounded-full bg-gradient-to-r from-yellow-400 via-green-400 to-green-500 flex items-center justify-center"
-              >
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-yellow-400 via-green-400 to-green-500 flex items-center justify-center">
                 <Check className="h-10 w-10 text-black" />
-              </motion.div>
+              </div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-medium text-white">
                   Transfer has been completed!

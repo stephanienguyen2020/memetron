@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
-import GridBackground from "../components/GridBackground";
 import { MemeCoinMarketCap } from "../components/MemeCoinMarketCap";
 import { fetchTrendingTokens } from "@/app/lib/coins";
 import { useState, useEffect } from "react";
@@ -89,7 +88,6 @@ export default function MarketcapPage(): JSX.Element {
 
   return (
     <AppLayout showFooter={false}>
-      <GridBackground />
       <div className="relative z-10 container py-8">
         <h1 className="mb-2 text-4xl font-bold">
           Today's Meme Coin Prices by{" "}

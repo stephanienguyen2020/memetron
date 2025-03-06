@@ -12,7 +12,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
-import GridBackground from "../components/GridBackground";
 import { InputMethodSelector, type InputMethod } from "./input-method-selector";
 import { AIInputForm } from "./ai-input-form";
 import { RegenerationControls } from "./regeneration-controls";
@@ -251,7 +250,7 @@ export default function LaunchPage() {
         holders: "0",
         volume24h: "$0",
         launchDate: new Date().toISOString().split("T")[0],
-        chain: data.chain || "ELECTRON",
+        chain: data.chain || "NEAR",
         status: "active",
         fundingRaised: "0",
       };
@@ -310,7 +309,6 @@ export default function LaunchPage() {
 
   return (
     <AppLayout showFooter={false}>
-      <GridBackground />
       <div className="py-8">
         <div className="container max-w-7xl">
           <div className="flex flex-col items-center mb-12 space-y-4 text-center">
@@ -323,7 +321,7 @@ export default function LaunchPage() {
               <Badge variant="secondary" className="mb-4">
                 Token Launch Platform
               </Badge>
-              <h1 className="text-4xl font-bold text-transparent md:text-5xl bg-gradient-to-r from-sky-400 via-blue-500 to-purple-500 bg-clip-text">
+              <h1 className="text-4xl font-bold text-transparent md:text-5xl bg-gradient-to-r from-green-400  to-emerald-400 bg-clip-text">
                 Launch Your Meme Token
               </h1>
               <p className="max-w-2xl mx-auto text-lg text-muted-foreground">

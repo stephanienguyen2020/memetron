@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppLayout } from "@/app/components/app-layout";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,8 @@ import { useBettingService } from "@/services/BettingService";
 import { useWalletClient } from "wagmi";
 import { AlertCircle, Info, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
-export default function PlaceBetPage() {
+// Create a wrapper component that uses useSearchParams
+function PlaceBetContent() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const betId = searchParams.get("id");
@@ -420,5 +421,22 @@ export default function PlaceBetPage() {
         </motion.div>
       </div>
     </AppLayout>
+  );
+}
+
+// Main component wrapped in Suspense
+export default function PlaceBetPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout>
+          <div className="container py-12 flex items-center justify-center min-h-[60vh]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </AppLayout>
+      }
+    >
+      <PlaceBetContent />
+    </Suspense>
   );
 }

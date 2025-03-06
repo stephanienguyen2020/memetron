@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,6 +121,7 @@ type ExtraContentFields = {
 
 type ContentWithUser = Content & ExtraContentFields;
 
+// Wrap the content component that uses useSearchParams
 function AIChatbotContent() {
   const agentId: UUID = "c3bd776c-4465-037f-9c7a-bf94dfba78d9";
   const { toast } = useToast();
@@ -771,12 +772,17 @@ function AIChatbotContent() {
   );
 }
 
+// Export the main component with Suspense
 export default function AIChatbot() {
-  const [queryClient] = useState(() => new QueryClient());
-
   return (
-    <QueryClientProvider client={queryClient}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <ThinkingDots />
+        </div>
+      }
+    >
       <AIChatbotContent />
-    </QueryClientProvider>
+    </Suspense>
   );
 }

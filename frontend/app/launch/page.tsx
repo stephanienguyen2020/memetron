@@ -323,7 +323,7 @@ export default function LaunchPage() {
               <Badge variant="secondary" className="mb-4">
                 Token Launch Platform
               </Badge>
-              <h1 className="text-4xl font-bold text-transparent md:text-5xl bg-gradient-to-r from-sky-400 via-blue-500 to-purple-500 bg-clip-text">
+              <h1 className="text-4xl font-bold text-transparent md:text-5xl bg-gradient-to-r from-green-400  to-emerald-400 bg-clip-text">
                 Launch Your Meme Token
               </h1>
               <p className="max-w-2xl mx-auto text-lg text-muted-foreground">

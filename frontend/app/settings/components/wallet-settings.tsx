@@ -47,9 +47,10 @@ export function WalletSettings() {
       try {
         const [betCreds, tokenCreds] = await Promise.all([
           bettingService.getUserBetCredits(address),
-          launchpadAgentService.getUserTokenCredits(address)
+          launchpadAgentService.getUserTokenCredits(address),
         ]);
-        
+        console.log("Bet credits:", betCreds);
+        console.log("Token credits:", tokenCreds);
         if (mounted) {
           setBetCredits(ethers.formatEther(betCreds));
           setTokenCredits(ethers.formatEther(tokenCreds));
@@ -160,11 +161,15 @@ export function WalletSettings() {
     setIsRegistering(true);
     try {
       await bettingService.registerTwitterHandle(twitterHandle);
-      toast.success(`Successfully registered Twitter handle for betting: ${twitterHandle}`);
+      toast.success(
+        `Successfully registered Twitter handle for betting: ${twitterHandle}`
+      );
       setTwitterHandle("");
     } catch (error: any) {
       console.error("Error registering Twitter handle for betting:", error);
-      toast.error(error.message || "Failed to register Twitter handle for betting");
+      toast.error(
+        error.message || "Failed to register Twitter handle for betting"
+      );
     } finally {
       setIsRegistering(false);
     }
@@ -179,11 +184,15 @@ export function WalletSettings() {
     setIsTokenRegistering(true);
     try {
       await launchpadAgentService.registerTwitterHandle(tokenTwitterHandle);
-      toast.success(`Successfully registered Twitter handle for tokens: ${tokenTwitterHandle}`);
+      toast.success(
+        `Successfully registered Twitter handle for tokens: ${tokenTwitterHandle}`
+      );
       setTokenTwitterHandle("");
     } catch (error: any) {
       console.error("Error registering Twitter handle for tokens:", error);
-      toast.error(error.message || "Failed to register Twitter handle for tokens");
+      toast.error(
+        error.message || "Failed to register Twitter handle for tokens"
+      );
     } finally {
       setIsTokenRegistering(false);
     }
@@ -205,7 +214,9 @@ export function WalletSettings() {
 
       // Refresh token credits
       if (address) {
-        const credits = await launchpadAgentService.getUserTokenCredits(address);
+        const credits = await launchpadAgentService.getUserTokenCredits(
+          address
+        );
         setTokenCredits(ethers.formatEther(credits));
       }
     } catch (error: any) {
@@ -232,7 +243,9 @@ export function WalletSettings() {
 
       // Refresh token credits
       if (address) {
-        const credits = await launchpadAgentService.getUserTokenCredits(address);
+        const credits = await launchpadAgentService.getUserTokenCredits(
+          address
+        );
         setTokenCredits(ethers.formatEther(credits));
       }
     } catch (error: any) {
@@ -482,7 +495,8 @@ export function WalletSettings() {
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Connect your wallet to manage your token credits and create tokens.
+                  Connect your wallet to manage your token credits and create
+                  tokens.
                 </p>
                 <Button onClick={() => {}} className="w-full">
                   Connect Wallet

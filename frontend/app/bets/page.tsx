@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
 import { Input } from "@/components/ui/input";
@@ -73,52 +73,29 @@ export default function BetsPage() {
   // Track if data has been fetched to prevent refetching
   const dataFetched = useRef(false);
 
-  // Add a periodic check for ended bets
+  // Update wallet connection status and trigger fetch
   useEffect(() => {
-    // Function to check if any active bets have ended
-    const checkForEndedBets = () => {
-      const now = new Date();
+    const isConnected = !!walletClient;
+    setIsWalletConnected(isConnected);
 
-      // Check if any active bets have ended
-      const hasEndedBets = activeBets.some((bet) => {
-        const endDate = new Date(bet.endDate);
-        return endDate <= now;
-      });
-
-      // If we found ended bets, trigger a refresh
-      if (hasEndedBets) {
-        console.log("Found ended bets, refreshing...");
-        handleRefresh();
-      }
-    };
-
-    // Check every minute
-    const interval = setInterval(checkForEndedBets, 60000);
-
-    return () => clearInterval(interval);
-  }, [activeBets]);
-
-  // Update wallet connection status
-  useEffect(() => {
-    setIsWalletConnected(!!walletClient);
+    if (isConnected) {
+      // Reset dataFetched when wallet connects
+      dataFetched.current = false;
+      handleRefresh();
+    }
   }, [walletClient]);
 
-  // Fetch bets data only once on component mount
+  // Fetch bets data when wallet is connected
   useEffect(() => {
-    // Skip if data has already been fetched
-    if (dataFetched.current) return;
+    if (!isWalletConnected || dataFetched.current) return;
 
     async function fetchBets() {
       try {
-        // Set loading state and mark as fetched
         setLoading(true);
         dataFetched.current = true;
 
-        // Get bets from blockchain
         const allBets = await bettingService.getAllBets();
-        // console.log("Fetched bets:", allBets);
 
-        // Handle empty or error cases
         if (!allBets || allBets.length === 0) {
           setBets([]);
           setActiveBets([]);
@@ -240,7 +217,6 @@ export default function BetsPage() {
           variant: "destructive",
         });
 
-        // Reset states
         setBets([]);
         setActiveBets([]);
         setPastBets([]);
@@ -251,31 +227,38 @@ export default function BetsPage() {
     }
 
     fetchBets();
+  }, [bettingService, isWalletConnected, toast]);
 
-    // No cleanup needed since we use dataFetched.current to prevent refetching
-  }, [bettingService, toast]); // Only stable dependencies
+  // Manual refresh function
+  const handleRefresh = useCallback(() => {
+    dataFetched.current = false;
+    setLoading(true);
+  }, []);
 
-  // Manual refresh function for user-triggered refreshes
-  const handleRefresh = () => {
-    dataFetched.current = false; // Reset the fetched flag
-    setLoading(true); // Show loading state again
-
-    // Re-run the effect in the next tick
-    setTimeout(() => {
-      const event = new Event("fetch");
-      window.dispatchEvent(event);
-    }, 0);
-  };
-
-  // Listen for custom fetch event (triggered by handleRefresh)
+  // Add a periodic check for ended bets
   useEffect(() => {
-    const refetchHandler = () => {
-      dataFetched.current = false;
+    // Function to check if any active bets have ended
+    const checkForEndedBets = () => {
+      const now = new Date();
+
+      // Check if any active bets have ended
+      const hasEndedBets = activeBets.some((bet) => {
+        const endDate = new Date(bet.endDate);
+        return endDate <= now;
+      });
+
+      // If we found ended bets, trigger a refresh
+      if (hasEndedBets) {
+        console.log("Found ended bets, refreshing...");
+        handleRefresh();
+      }
     };
 
-    window.addEventListener("fetch", refetchHandler);
-    return () => window.removeEventListener("fetch", refetchHandler);
-  }, []);
+    // Check every minute
+    const interval = setInterval(checkForEndedBets, 60000);
+
+    return () => clearInterval(interval);
+  }, [activeBets]);
 
   // Reset pagination when filters change
   useEffect(() => {

@@ -4,7 +4,6 @@ import { ReactNode, useEffect, useState } from "react";
 import { SiteHeader } from "./site-header";
 import { SiteLeftbar } from "./site-leftbar";
 import { Footer } from "./Footer";
-import { motion } from "framer-motion";
 
 interface AppLayoutProps {
   children: ReactNode;

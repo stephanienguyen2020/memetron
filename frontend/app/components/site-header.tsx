@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { NavigationMenu, NavItem } from "@/app/components/ui/navigation-menu";
 import {
   Search,
@@ -336,12 +335,7 @@ export function SiteHeader() {
   );
 
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="fixed top-0 z-50 w-full border-b border-[#00ff00]/20 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/60"
-    >
+    <header className="fixed top-0 z-50 w-full border-b border-[#00ff00]/20 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/60">
       <div className="flex h-20 items-center px-4 md:px-6 lg:px-8 w-full">
         <div className="flex items-center gap-6">
           <Link
@@ -349,16 +343,13 @@ export function SiteHeader() {
             className="flex items-center space-x-2"
             onMouseEnter={handleLogoHover}
           >
-            <motion.span
+            <span
               ref={logoRef}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
               className="text-2xl font-bold text-[#00ff00] font-mono"
               style={{ textShadow: "0 0 5px rgba(0,255,0,0.7)" }}
             >
               MEMETRON
-            </motion.span>
+            </span>
           </Link>
 
           <NavigationMenu items={menuItems} />
@@ -377,6 +368,6 @@ export function SiteHeader() {
           opacity: 0.7;
         }
       `}</style>
-    </motion.header>
+    </header>
   );
 }

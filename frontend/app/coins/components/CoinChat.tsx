@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import {
   Brain,
   Send,
@@ -16,91 +16,221 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { apiClient } from "@/app/lib/chat";
+
+import {
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { toast, useToast } from "@/hooks/use-toast";
+import { NewsTickerWidget } from "@/app/chatbot/components/NewsTickerWidget";
+import { ThinkingDots } from "@/components/ui/thinking-dots";
+
+type UUID = string;
+type Content = {
+  text: string;
+  attachments?: Array<{
+    url: string;
+    contentType: string;
+    title: string;
+  }>;
+};
+interface IAttachment {
+  url: string;
+  contentType: string;
+  title: string;
+}
+type News = {
+  author: string;
+  content: string;
+  description: string;
+  publishedAt: string;
+  source: { id: null; name: string };
+  title: string;
+  url: string;
+  urlToImage: string;
+};
+
+type ExtraContentFields = {
+  user: string;
+  createdAt: number;
+  isLoading?: boolean;
+  data?: {
+    articles: News[];
+  };
+};
+
+type ContentWithUser = Content & ExtraContentFields;
+
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-const CoinChat = ({ symbol = "BTC" }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: `What would you like to know about ${symbol}?`,
-    },
-  ]);
+function CoinChatContent({ symbol }: { symbol: string }) {
+  const agentId: UUID = "c3bd776c-4465-037f-9c7a-bf94dfba78d9";
+  const { toast } = useToast();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Scroll to the bottom when messages update
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const queryClient = useQueryClient();
+  const messages =
+    queryClient.getQueryData<ContentWithUser[]>(["messages", agentId]) || [];
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSendMessage = (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault();
+    if (!input || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        `Based on current market conditions, ${symbol} is showing bullish momentum with strong support at $0.00120.`,
-        `The recent trading volume suggests increasing interest from institutional investors in ${symbol}.`,
-        `Technical indicators point to a potential breakout above the $0.00130 resistance level in the next 24-48 hours for ${symbol}.`,
-        `I recommend monitoring ${symbol} closely as volatility may increase following the upcoming economic data release.`,
-      ];
+    const attachments: IAttachment[] | undefined = selectedFile
+      ? [
+          {
+            url: URL.createObjectURL(selectedFile),
+            contentType: selectedFile.type,
+            title: selectedFile.name,
+          },
+        ]
+      : undefined;
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: responses[Math.floor(Math.random() * responses.length)],
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const handleInsightRequest = (insight: string) => {
-    const userMessage: Message = {
-      role: "user",
-      content: `Tell me about ${insight} for ${symbol}`,
+    const userMessage = {
+      text: input + "about " + symbol,
+      user: "user",
+      createdAt: Date.now(),
+      attachments,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
+    const thinkingMessage = {
+      text: "Cooking up my response...",
+      user: "Sage",
+      createdAt: Date.now() + 1,
+      isLoading: true,
+    };
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses: Record<string, string> = {
-        "Holder Analysis": `Current holder analysis shows 65% of ${symbol} tokens are held by long-term investors (>1 year). This suggests strong confidence in the asset's future performance.`,
-        "Liquidity Pools": `The largest liquidity pool for ${symbol} is on Uniswap with $1.2M in liquidity. The current APY for liquidity providers is approximately 18.5%.`,
-        "Twitter Sentiment": `Twitter sentiment analysis for ${symbol} shows 72% positive mentions in the last 24 hours, with increasing discussion volume (+35% week-over-week).`,
-        "Trading Activity": `Recent trading activity shows accumulation by large wallets. In the past 24 hours, wallets holding >10,000 ${symbol} have increased their positions by 2.3%.`,
-      };
+    queryClient.setQueryData(
+      ["messages", agentId],
+      (old: ContentWithUser[] = []) => [...old, userMessage, thinkingMessage]
+    );
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: responses[insight] || `Let me analyze ${symbol} for you...`,
-      };
+    sendMessageMutation.mutate({
+      message: input,
+      selectedFile: selectedFile ? selectedFile : null,
+    });
 
-      setMessages((prev) => [...prev, assistantMessage]);
+    setSelectedFile(null);
+    setInput("");
+    if (formRef.current) formRef.current.reset();
+  };
+
+  const handleInsightRequest = (insightType: string) => {
+    const insightPrompts: Record<string, string> = {
+      "Holder Analysis": `Analyze the holder distribution for ${symbol}. Who are the top holders and is there any concerning concentration?`,
+      "Liquidity Pools": `What are the main liquidity pools for ${symbol}? How stable is the liquidity?`,
+      "Twitter Sentiment": `What's the current Twitter sentiment around ${symbol}? Any notable influencers talking about it?`,
+      "Trading Activity": `Analyze recent trading activity for ${symbol}. Any unusual patterns or whale movements?`,
+    };
+
+    const prompt =
+      insightPrompts[insightType] ||
+      `Tell me about ${insightType} for ${symbol}`;
+    setInput(prompt);
+    handleSendMessage();
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const sendMessageMutation = useMutation({
+    mutationKey: ["send_message", agentId],
+    mutationFn: ({
+      message,
+      selectedFile,
+    }: {
+      message: string;
+      selectedFile?: File | null;
+    }) => apiClient.sendMessage(agentId, message, selectedFile),
+    onSuccess: (newMessages: ContentWithUser[]) => {
+      queryClient.setQueryData(
+        ["messages", agentId],
+        (old: ContentWithUser[] = []) => [
+          ...old.filter((msg) => !msg.isLoading),
+          ...newMessages.map((msg) => ({
+            ...msg,
+            createdAt: Date.now(),
+          })),
+        ]
+      );
       setIsLoading(false);
-    }, 1000);
+    },
+    onError: (e) => {
+      // Remove the thinking message on error
+      queryClient.setQueryData(
+        ["messages", agentId],
+        (old: ContentWithUser[] = []) => old.filter((msg) => !msg.isLoading)
+      );
+
+      // Add an error message
+      const errorMessage = {
+        text: `Sorry, I encountered an error: ${e.message}. Please try again.`,
+        user: "Sage",
+        createdAt: Date.now(),
+      };
+
+      queryClient.setQueryData(
+        ["messages", agentId],
+        (old: ContentWithUser[] = []) => [...old, errorMessage]
+      );
+
+      toast({
+        variant: "destructive",
+        title: "Unable to send message",
+        description: e.message,
+      });
+
+      setIsLoading(false);
+    },
+  });
+
+  const renderMessageContent = (message: ContentWithUser) => {
+    if (message.data) {
+      return (
+        <div className="w-full">
+          <NewsTickerWidget news={message.data.articles} />
+        </div>
+      );
+    }
+    return (
+      <p className="whitespace-pre-wrap">
+        {message.text}
+        {message.isLoading && <ThinkingDots />}
+      </p>
+    );
   };
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 p-3 bg-black/20 rounded-t-lg"></div>
+      <div className="flex items-center gap-2 p-3 rounded-t-lg bg-black/20"></div>
 
       <Card className="bg-[#1A1B1E] border-none w-full h-full overflow-hidden shadow-xl flex flex-col">
-        <CardContent className="p-0 flex flex-col h-full">
-          {/* Header */}
-
+        <CardContent className="flex flex-col h-full p-0">
           {/* Chat messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#1A1B1E]">
             <AnimatePresence>
@@ -111,17 +241,17 @@ const CoinChat = ({ symbol = "BTC" }) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className={`flex ${
-                    msg.role === "user" ? "justify-end" : "justify-start"
+                    msg.user === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
                     className={`p-3 rounded-xl text-sm max-w-[80%] ${
-                      msg.role === "user"
+                      msg.user === "user"
                         ? "bg-blue-600 text-white self-end"
                         : "bg-[#2A2B2E] text-gray-200 self-start"
                     }`}
                   >
-                    {msg.content}
+                    {renderMessageContent(msg)}
                   </div>
                 </motion.div>
               ))}
@@ -129,7 +259,7 @@ const CoinChat = ({ symbol = "BTC" }) => {
 
             {isLoading && (
               <div className="flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
               </div>
             )}
             <div ref={chatEndRef} />
@@ -143,7 +273,7 @@ const CoinChat = ({ symbol = "BTC" }) => {
                 className="bg-[#2A2B2E] border-[#353538] text-gray-300 hover:bg-[#353538] hover:text-white flex items-center justify-start text-xs sm:text-sm"
                 onClick={() => handleInsightRequest("Holder Analysis")}
               >
-                <Users className="mr-1 h-4 w-4 flex-shrink-0" />
+                <Users className="flex-shrink-0 w-4 h-4 mr-1" />
                 <span className="truncate">Holder Analysis</span>
               </Button>
               <Button
@@ -151,7 +281,7 @@ const CoinChat = ({ symbol = "BTC" }) => {
                 className="bg-[#2A2B2E] border-[#353538] text-gray-300 hover:bg-[#353538] hover:text-white flex items-center justify-start text-xs sm:text-sm"
                 onClick={() => handleInsightRequest("Liquidity Pools")}
               >
-                <Droplets className="mr-1 h-4 w-4 flex-shrink-0" />
+                <Droplets className="flex-shrink-0 w-4 h-4 mr-1" />
                 <span className="truncate">Liquidity Pools</span>
               </Button>
               <Button
@@ -159,7 +289,7 @@ const CoinChat = ({ symbol = "BTC" }) => {
                 className="bg-[#2A2B2E] border-[#353538] text-gray-300 hover:bg-[#353538] hover:text-white flex items-center justify-start text-xs sm:text-sm"
                 onClick={() => handleInsightRequest("Twitter Sentiment")}
               >
-                <Twitter className="mr-1 h-4 w-4 flex-shrink-0" />
+                <Twitter className="flex-shrink-0 w-4 h-4 mr-1" />
                 <span className="truncate">Twitter Sentiment</span>
               </Button>
               <Button
@@ -167,38 +297,58 @@ const CoinChat = ({ symbol = "BTC" }) => {
                 className="bg-[#2A2B2E] border-[#353538] text-gray-300 hover:bg-[#353538] hover:text-white flex items-center justify-start text-xs sm:text-sm"
                 onClick={() => handleInsightRequest("Trading Activity")}
               >
-                <Activity className="mr-1 h-4 w-4 flex-shrink-0" />
+                <Activity className="flex-shrink-0 w-4 h-4 mr-1" />
                 <span className="truncate">Trading Activity</span>
               </Button>
             </div>
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-[#2A2B2E] flex items-center gap-2 bg-[#1A1B1E]">
+          <form
+            onSubmit={handleSendMessage}
+            ref={formRef}
+            className="p-4 border-t border-[#2A2B2E] flex items-center gap-2 bg-[#1A1B1E]"
+          >
             <Input
+              ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about trading insights..."
               className="flex-1 bg-[#2A2B2E] border-[#353538] focus-visible:ring-blue-600 text-white"
               disabled={isLoading}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
                   handleSendMessage();
                 }
               }}
             />
             <Button
+              type="submit"
               size="icon"
-              onClick={handleSendMessage}
               disabled={isLoading || !input.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="text-white bg-blue-600 hover:bg-blue-700"
             >
               <Send className="w-4 h-4" />
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+const CoinChat = ({ symbol }: { symbol: string }) => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <ThinkingDots />
+        </div>
+      }
+    >
+      <CoinChatContent symbol={symbol} />
+    </Suspense>
   );
 };
 

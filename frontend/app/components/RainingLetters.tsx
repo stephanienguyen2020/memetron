@@ -1,9 +1,11 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "../providers/WalletProvider";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Wallet } from "lucide-react";
 
 interface Character {
   char: string;
@@ -131,12 +133,88 @@ interface RainingLettersProps {
   onConnectWallet?: () => Promise<void>;
 }
 
+const MatrixRainbowButton = () => {
+  const router = useRouter();
+
+  return (
+    <ConnectButton.Custom>
+      {({
+        account,
+        chain,
+        openAccountModal,
+        openChainModal,
+        openConnectModal,
+        authenticationStatus,
+        mounted,
+      }) => {
+        const ready = mounted && authenticationStatus !== "loading";
+        const connected =
+          ready &&
+          account &&
+          chain &&
+          (!authenticationStatus || authenticationStatus === "authenticated");
+
+        useEffect(() => {
+          if (connected && !chain.unsupported) {
+            router.push("/dashboard");
+          }
+        }, [connected, chain?.unsupported]);
+
+        return (
+          <div
+            {...(!ready && {
+              "aria-hidden": true,
+              style: {
+                opacity: 0,
+                pointerEvents: "none",
+                userSelect: "none",
+              },
+            })}
+          >
+            {(() => {
+              if (!connected) {
+                return (
+                  <button
+                    onClick={openConnectModal}
+                    type="button"
+                    className={`px-8 py-3 rounded-md text-lg font-bold transition-all duration-300 bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black hover:shadow-[0_0_20px_rgba(0,255,0,0.7)]`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <Wallet className="mr-2 h-5 w-5" />
+                      <span>GET STARTED</span>
+                    </div>
+                  </button>
+                );
+              }
+
+              if (chain.unsupported) {
+                return (
+                  <button
+                    onClick={openChainModal}
+                    type="button"
+                    className="px-8 py-3 rounded-md text-lg font-bold transition-all duration-300 bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-black hover:shadow-[0_0_20px_rgba(255,0,0,0.7)]"
+                  >
+                    Wrong network
+                  </button>
+                );
+              }
+
+              return null;
+            })()}
+          </div>
+        );
+      }}
+    </ConnectButton.Custom>
+  );
+};
+
 const RainingLetters: React.FC<RainingLettersProps> = ({ onConnectWallet }) => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [activeIndices, setActiveIndices] = useState<Set<number>>(new Set());
-  const [buttonHovered, setButtonHovered] = useState(false);
   const router = useRouter();
   const { connect, isConnected } = useWallet();
+
+  const animationFrameId = useRef<number | null>(null);
 
   const handleConnectClick = async () => {
     if (onConnectWallet) {
@@ -157,7 +235,7 @@ const RainingLetters: React.FC<RainingLettersProps> = ({ onConnectWallet }) => {
 
   const createCharacters = useCallback(() => {
     const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789₿ΞÐETH₮SOLBNB";
-    const charCount = 300;
+    const charCount = 100;
     const newCharacters: Character[] = [];
 
     for (let i = 0; i < charCount; i++) {
@@ -186,13 +264,11 @@ const RainingLetters: React.FC<RainingLettersProps> = ({ onConnectWallet }) => {
       setActiveIndices(newActiveIndices);
     };
 
-    const flickerInterval = setInterval(updateActiveIndices, 50);
+    const flickerInterval = setInterval(updateActiveIndices, 200);
     return () => clearInterval(flickerInterval);
   }, [characters.length]);
 
   useEffect(() => {
-    let animationFrameId: number;
-
     const updatePositions = () => {
       setCharacters((prevChars) =>
         prevChars.map((char) => ({
@@ -210,12 +286,46 @@ const RainingLetters: React.FC<RainingLettersProps> = ({ onConnectWallet }) => {
           }),
         }))
       );
-      animationFrameId = requestAnimationFrame(updatePositions);
+      animationFrameId.current = requestAnimationFrame(updatePositions);
     };
 
-    animationFrameId = requestAnimationFrame(updatePositions);
-    return () => cancelAnimationFrame(animationFrameId);
+    animationFrameId.current = requestAnimationFrame(updatePositions);
+
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
   }, []);
+
+  const characterElements = useMemo(() => {
+    return characters.map((char, index) => (
+      <span
+        key={index}
+        className={`absolute text-xs transition-colors duration-100 ${
+          activeIndices.has(index)
+            ? "text-[#00ff00] text-base scale-125 z-10 font-bold animate-pulse"
+            : "text-[#00ff00]/30 font-light"
+        }`}
+        style={{
+          left: `${char.x}%`,
+          top: `${char.y}%`,
+          transform: `translate(-50%, -50%) ${
+            activeIndices.has(index) ? "scale(1.25)" : "scale(1)"
+          }`,
+          textShadow: activeIndices.has(index)
+            ? "0 0 8px rgba(0,255,0,0.8), 0 0 12px rgba(0,255,0,0.4)"
+            : "none",
+          opacity: activeIndices.has(index) ? 1 : 0.4,
+          transition: "color 0.1s, transform 0.1s, text-shadow 0.1s",
+          willChange: "transform, top",
+          fontSize: "1.8rem",
+        }}
+      >
+        {char.char}
+      </span>
+    ));
+  }, [characters, activeIndices]);
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
@@ -229,47 +339,11 @@ const RainingLetters: React.FC<RainingLettersProps> = ({ onConnectWallet }) => {
           Electroneum.
         </p>
 
-        <button
-          className={`px-8 py-3 rounded-md text-lg font-bold transition-all duration-300 ${
-            buttonHovered
-              ? "bg-[#00ff00] text-black shadow-[0_0_20px_rgba(0,255,0,0.7)]"
-              : "bg-transparent border border-[#00ff00] text-[#00ff00]"
-          }`}
-          onMouseEnter={() => setButtonHovered(true)}
-          onMouseLeave={() => setButtonHovered(false)}
-          onClick={handleConnectClick}
-        >
-          GET STARTED
-        </button>
+        <MatrixRainbowButton />
       </div>
 
-      {/* Raining Characters */}
-      {characters.map((char, index) => (
-        <span
-          key={index}
-          className={`absolute text-xs transition-colors duration-100 ${
-            activeIndices.has(index)
-              ? "text-[#00ff00] text-base scale-125 z-10 font-bold animate-pulse"
-              : "text-[#00ff00]/30 font-light"
-          }`}
-          style={{
-            left: `${char.x}%`,
-            top: `${char.y}%`,
-            transform: `translate(-50%, -50%) ${
-              activeIndices.has(index) ? "scale(1.25)" : "scale(1)"
-            }`,
-            textShadow: activeIndices.has(index)
-              ? "0 0 8px rgba(0,255,0,0.8), 0 0 12px rgba(0,255,0,0.4)"
-              : "none",
-            opacity: activeIndices.has(index) ? 1 : 0.4,
-            transition: "color 0.1s, transform 0.1s, text-shadow 0.1s",
-            willChange: "transform, top",
-            fontSize: "1.8rem",
-          }}
-        >
-          {char.char}
-        </span>
-      ))}
+      {/* Raining Characters - now using memoized elements */}
+      {characterElements}
 
       <style jsx global>{`
         .dud {

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { SiteHeader } from "../components/site-header";
 import { Footer } from "../components/Footer";
 import { Input } from "@/components/ui/input";
@@ -256,13 +255,7 @@ const TokenCard = ({
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ y: -5 }}
-      className="w-full group"
-    >
+    <div className="w-full group">
       <div className="relative overflow-hidden bg-black border rounded-2xl border-white/10">
         {/* Image Container */}
         <Link href={`/token/${tokenIdentifier}`} className="block">
@@ -447,7 +440,7 @@ const TokenCard = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -621,12 +614,7 @@ export default function MarketplacePage() {
     <AppLayout showFooter={false}>
       <GridBackground />
       <div className="relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="container py-8"
-        >
+        <div className="container py-8">
           <div className="flex flex-col items-start justify-between gap-4 mb-8 md:flex-row md:items-center">
             <div>
               <h1 className="text-4xl font-bold">
@@ -775,7 +763,7 @@ export default function MarketplacePage() {
               </Pagination>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </AppLayout>
   );

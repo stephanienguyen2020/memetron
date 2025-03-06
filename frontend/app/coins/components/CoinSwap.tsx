@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
 import {
   getPriceForTokens,
   getEstimatedTokensForEth,
@@ -49,6 +48,8 @@ import {
   swapTokenForEth,
 } from "@/services/memecoin-launchpad";
 import { ethers } from "ethers";
+import { useAccount, useWalletClient } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // Define the Token interface to match what's returned by getTokens
 interface Token {
@@ -120,6 +121,10 @@ const CoinSwap = ({
   handleTradeAction,
   marketplaceTokens = [],
 }: CoinSwapProps) => {
+  // Replace isAuthenticated prop with wagmi hooks
+  const { address, isConnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
+
   // State for token balances
   const [tokenBalances, setTokenBalances] = useState<Record<string, string>>(
     {}
@@ -182,17 +187,10 @@ const CoinSwap = ({
   const [gasCost, setGasCost] = useState("0.0 BNB");
   const [estimatedTime, setEstimatedTime] = useState("0 min");
 
-  // Fetch balances when component mounts or when tokens change
+  // Update wallet connection check
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!isAuthenticated) {
-        setIsLoadingBalances(false);
-        return;
-      }
-
-      // Check if wallet is connected
-      if (!window.ethereum || !window.ethereum.selectedAddress) {
-        console.error("Wallet not connected");
+      if (!isConnected || !walletClient) {
         setIsLoadingBalances(false);
         return;
       }
@@ -259,7 +257,7 @@ const CoinSwap = ({
     };
 
     fetchBalances();
-  }, [isAuthenticated, marketplaceTokens]);
+  }, [isConnected, walletClient, marketplaceTokens]);
 
   // Get the current balance of the selected token
   const getSelectedTokenBalance = (token: UIToken): string => {
@@ -553,7 +551,7 @@ const CoinSwap = ({
 
   // Update balances after a successful swap
   const updateBalancesAfterSwap = async () => {
-    if (!isAuthenticated) return;
+    if (!isConnected || !walletClient) return;
 
     try {
       // Fetch updated balances
@@ -623,39 +621,27 @@ const CoinSwap = ({
                 </div>
               </div>
 
-              {!isAuthenticated && (
+              {!isConnected && (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md p-3 mb-4 text-sm text-yellow-400 flex items-start">
                   <Info className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
                     <strong>Wallet not connected:</strong> Please connect your
                     wallet to view your balances and make trades.
                   </div>
-                  <Button
-                    className="ml-2 bg-yellow-500 hover:bg-yellow-600 text-black"
-                    onClick={() => {
-                      if (window.ethereum) {
-                        window.ethereum
-                          .request({ method: "eth_requestAccounts" })
-                          .then(() => {
-                            // This will trigger the accountsChanged event which will update isAuthenticated
-                            console.log("Wallet connection requested");
-                          })
-                          .catch((error: any) => {
-                            console.error("Error connecting wallet:", error);
-                          });
-                      } else {
-                        alert(
-                          "Please install a Web3 wallet like MetaMask to use this feature"
-                        );
-                      }
-                    }}
-                  >
-                    Connect
-                  </Button>
+                  <ConnectButton.Custom>
+                    {({ openConnectModal }) => (
+                      <Button
+                        className="ml-2 bg-yellow-500 hover:bg-yellow-600 text-black"
+                        onClick={openConnectModal}
+                      >
+                        Connect
+                      </Button>
+                    )}
+                  </ConnectButton.Custom>
                 </div>
               )}
 
-              {isLoadingBalances && isAuthenticated && (
+              {isLoadingBalances && isConnected && (
                 <div className="bg-green-500/10 border border-green-500/20 rounded-md p-3 mb-4 text-sm text-green-400 flex items-start">
                   <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-400 mr-2 mt-0.5"></div>
                   <div>
@@ -1162,32 +1148,9 @@ const CoinSwap = ({
                 {/* Swap Button */}
                 <Button
                   className="w-full h-14 text-lg font-medium mt-4 bg-green-400 hover:bg-green-500 text-white rounded-xl"
-                  onClick={
-                    !isAuthenticated
-                      ? () => {
-                          if (window.ethereum) {
-                            window.ethereum
-                              .request({ method: "eth_requestAccounts" })
-                              .then(() => {
-                                // This will trigger the accountsChanged event which will update isAuthenticated
-                                console.log("Wallet connection requested");
-                              })
-                              .catch((error: any) => {
-                                console.error(
-                                  "Error connecting wallet:",
-                                  error
-                                );
-                              });
-                          } else {
-                            alert(
-                              "Please install a Web3 wallet like MetaMask to use this feature"
-                            );
-                          }
-                        }
-                      : handleSwap
-                  }
+                  onClick={!isConnected ? () => {} : handleSwap}
                   disabled={
-                    isAuthenticated &&
+                    isConnected &&
                     (isLoadingBalances ||
                       !fromAmount ||
                       parseFloat(fromAmount) <= 0 ||
@@ -1195,31 +1158,35 @@ const CoinSwap = ({
                         parseFloat(getSelectedTokenBalance(fromToken)))
                   }
                 >
-                  {!isAuthenticated
-                    ? "Connect Wallet"
-                    : isLoadingBalances
-                    ? "Loading Balances..."
-                    : !fromAmount || parseFloat(fromAmount) <= 0
-                    ? "Enter Amount"
-                    : parseFloat(fromAmount) >
-                      parseFloat(getSelectedTokenBalance(fromToken))
-                    ? "Insufficient Balance"
-                    : swapDirection === "ethToToken"
-                    ? `Swap ${fromToken.symbol} for ${toToken.symbol}`
-                    : `Swap ${fromToken.symbol} for ${toToken.symbol}`}
+                  {!isConnected ? (
+                    <ConnectButton.Custom>
+                      {({ openConnectModal }) => (
+                        <div onClick={openConnectModal} className="w-full">
+                          Connect Wallet
+                        </div>
+                      )}
+                    </ConnectButton.Custom>
+                  ) : isLoadingBalances ? (
+                    "Loading Balances..."
+                  ) : !fromAmount || parseFloat(fromAmount) <= 0 ? (
+                    "Enter Amount"
+                  ) : parseFloat(fromAmount) >
+                    parseFloat(getSelectedTokenBalance(fromToken)) ? (
+                    "Insufficient Balance"
+                  ) : swapDirection === "ethToToken" ? (
+                    `Swap ${fromToken.symbol} for ${toToken.symbol}`
+                  ) : (
+                    `Swap ${fromToken.symbol} for ${toToken.symbol}`
+                  )}
                 </Button>
               </div>
             </>
           ) : (
             // Success View (in-component instead of modal)
             <div className="flex flex-col items-center text-center space-y-6 py-4">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="w-20 h-20 rounded-full bg-gradient-to-r from-yellow-400 via-green-400 to-green-500 flex items-center justify-center"
-              >
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-yellow-400 via-green-400 to-green-500 flex items-center justify-center">
                 <Check className="h-10 w-10 text-black" />
-              </motion.div>
+              </div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-medium text-white">
                   Transfer has been completed!

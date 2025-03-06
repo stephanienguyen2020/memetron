@@ -1,8 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { AppLayout } from "../components/app-layout";
-import GridBackground from "../components/GridBackground";
 import { MemeCoinMarketCap } from "../components/MemeCoinMarketCap";
 import { fetchTrendingTokens } from "@/app/lib/coins";
 import { useState, useEffect } from "react";
@@ -34,8 +32,15 @@ function Sparkline({
     .join(" ");
 
   return (
-    <svg width={width} height={height}>
-      <polyline fill="none" stroke={color} strokeWidth="1" points={points} />
+    <svg width={width} height={height} className="overflow-visible">
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -89,7 +94,6 @@ export default function MarketcapPage(): JSX.Element {
 
   return (
     <AppLayout showFooter={false}>
-      <GridBackground />
       <div className="relative z-10 container py-8">
         <h1 className="mb-2 text-4xl font-bold">
           Today's Meme Coin Prices by{" "}

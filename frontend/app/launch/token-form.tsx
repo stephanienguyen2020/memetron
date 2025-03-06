@@ -1,17 +1,36 @@
-"use client"
+"use client";
 
-import { Shield, Wand2, AlertCircle, Lock, Zap, Rocket, Info } from "lucide-react"
-import { TokenForm } from "../components/TokenForm"
-import { ImageUpload } from "./image-upload"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
-import { motion } from "framer-motion"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { createToken } from "@/services/memecoin-launchpad"
+import {
+  Shield,
+  Wand2,
+  AlertCircle,
+  Lock,
+  Zap,
+  Rocket,
+  Info,
+} from "lucide-react";
+import { TokenForm } from "../components/TokenForm";
+import { ImageUpload } from "./image-upload";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { motion } from "framer-motion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { createToken } from "@/services/memecoin-launchpad";
 
 const tokenInfoFields = [
   {
@@ -35,40 +54,40 @@ const tokenInfoFields = [
     placeholder: "Brief description of your token",
     tooltip: "Explain the purpose and unique features of your token",
   },
-]
+];
 
 interface TokenDetails {
-  name: string
-  symbol: string
-  description: string
-  imageUrl: string
+  name: string;
+  symbol: string;
+  description: string;
+  imageUrl: string;
 }
 
 interface LaunchConfig {
-  initialSupply: string
-  maxSupply: string
-  launchCost: string
-  liquidityPercentage: string
-  lockupPeriod: string
+  initialSupply: string;
+  maxSupply: string;
+  launchCost: string;
+  liquidityPercentage: string;
+  lockupPeriod: string;
 }
 
 interface TokenFormSectionProps {
-  inputMethod: "manual" | "ai-joke" | "ai-tweet"
-  generatedDetails: TokenDetails | null
-  error: string
-  imageFile: File | null
-  previewUrl: string | null
-  aiImageUrl: string
-  prompt: string
-  loadingAI: boolean
-  isLoading: boolean
-  launchConfig: LaunchConfig
-  onImageSelect: (file: File) => void
-  onClearImage: () => void
-  onPromptChange: (prompt: string) => void
-  onGenerateImage: () => void
-  onSubmit: (data: Record<string, string>) => void
-  onConfigChange: (key: keyof LaunchConfig, value: string) => void
+  inputMethod: "manual" | "ai-joke" | "ai-tweet";
+  generatedDetails: TokenDetails | null;
+  error: string;
+  imageFile: File | null;
+  previewUrl: string | null;
+  aiImageUrl: string;
+  prompt: string;
+  loadingAI: boolean;
+  isLoading: boolean;
+  launchConfig: LaunchConfig;
+  onImageSelect: (file: File) => void;
+  onClearImage: () => void;
+  onPromptChange: (prompt: string) => void;
+  onGenerateImage: () => void;
+  onSubmit: (data: Record<string, string>) => void;
+  onConfigChange: (key: keyof LaunchConfig, value: string) => void;
 }
 
 export function TokenFormSection({
@@ -113,12 +132,16 @@ export function TokenFormSection({
                 <Input
                   type="number"
                   value={launchConfig.initialSupply}
-                  onChange={(e) => onConfigChange("initialSupply", e.target.value)}
+                  onChange={(e) =>
+                    onConfigChange("initialSupply", e.target.value)
+                  }
                   className="font-mono"
                   min="1000"
                   max={launchConfig.maxSupply}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">tokens</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  tokens
+                </span>
               </div>
             </div>
 
@@ -146,7 +169,9 @@ export function TokenFormSection({
                   className="font-mono"
                   min={launchConfig.initialSupply}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">tokens</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  tokens
+                </span>
               </div>
             </div>
 
@@ -168,7 +193,9 @@ export function TokenFormSection({
               </div>
               <Select
                 value={launchConfig.liquidityPercentage}
-                onValueChange={(value) => onConfigChange("liquidityPercentage", value)}
+                onValueChange={(value) =>
+                  onConfigChange("liquidityPercentage", value)
+                }
               >
                 <SelectTrigger className="font-mono">
                   <SelectValue placeholder="Select percentage" />
@@ -218,70 +245,89 @@ export function TokenFormSection({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 
   // Add this function inside the TokenFormSection component
-const validateAndSubmitForm = async () => {
-  const form = document.querySelector("form") as HTMLFormElement;
-  
-  // Validate token info
-  const nameInput = form.querySelector('input[name="name"]') as HTMLInputElement;
-  const symbolInput = form.querySelector('input[name="symbol"]') as HTMLInputElement;
-  const descriptionInput = form.querySelector('input[name="description"]') as HTMLInputElement;
-  
-  // Check required fields
-  if (!nameInput?.value.trim()) {
-    onSubmit({ error: "Token name is required" });
-    return false;
-  }
-  
-  if (!symbolInput?.value.trim()) {
-    onSubmit({ error: "Token symbol is required" });
-    return false;
-  }
-  
-  // Validate image exists
-  if (!imageFile) {
-    onSubmit({ error: "Token image is required" });
-    return false;
-  }
-  
-  
-  // All validations passed, show confirmation dialog
-  if (window.confirm(`Are you sure you want to create ${nameInput.value} (${symbolInput.value}) token?`)) {
-    try{
-      // Prepare metadata
-      const metaData = {
-        name: nameInput.value,
-        ticker: symbolInput.value,
-        description: descriptionInput?.value || ""
-      };
-      
-      const result = await createToken(metaData, imageFile);
+  const validateAndSubmitForm = async () => {
+    const form = document.querySelector("form") as HTMLFormElement;
 
-      if (result.success) {
-        alert("Token created successfully!");
-      } else {
-        onSubmit({ error: result.error?.message || "Failed to create token" });
-      }
-      
-      return result.success;
-    } catch (error) {
-      console.error("Error creating token:", error);
-      onSubmit({ error: "An unexpected error occurred" });
+    // Validate token info
+    const nameInput = form.querySelector(
+      'input[name="name"]'
+    ) as HTMLInputElement;
+    const symbolInput = form.querySelector(
+      'input[name="symbol"]'
+    ) as HTMLInputElement;
+    const descriptionInput = form.querySelector(
+      'input[name="description"]'
+    ) as HTMLInputElement;
+
+    // Check required fields
+    if (!nameInput?.value.trim()) {
+      onSubmit({ error: "Token name is required" });
       return false;
     }
-  }
-  
-  return false;
-};
+
+    if (!symbolInput?.value.trim()) {
+      onSubmit({ error: "Token symbol is required" });
+      return false;
+    }
+
+    // Validate image exists
+    if (!imageFile) {
+      onSubmit({ error: "Token image is required" });
+      return false;
+    }
+
+    // All validations passed, show confirmation dialog
+    if (
+      window.confirm(
+        `Are you sure you want to create ${nameInput.value} (${symbolInput.value}) token?`
+      )
+    ) {
+      try {
+        // Prepare metadata
+        const metaData = {
+          name: nameInput.value,
+          ticker: symbolInput.value,
+          description: descriptionInput?.value || "",
+        };
+
+        const result = await createToken(metaData, imageFile);
+
+        if (result.success) {
+          alert("Token created successfully!");
+        } else {
+          onSubmit({
+            error: result.error?.message || "Failed to create token",
+          });
+        }
+
+        return result.success;
+      } catch (error) {
+        console.error("Error creating token:", error);
+        onSubmit({ error: "An unexpected error occurred" });
+        return false;
+      }
+    }
+
+    return false;
+  };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="lg:sticky lg:top-24">
           <h3 className="text-lg font-semibold mb-4">Token Preview</h3>
-          <ImageUpload onImageSelect={onImageSelect} previewUrl={previewUrl || aiImageUrl} onClear={onClearImage} />
+          <ImageUpload
+            onImageSelect={onImageSelect}
+            previewUrl={previewUrl || aiImageUrl}
+            onClear={onClearImage}
+          />
         </div>
 
         <div className="space-y-8">
@@ -296,7 +342,7 @@ const validateAndSubmitForm = async () => {
               <>
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <Wand2 className="h-5 w-5 text-sky-400" />
+                    <Wand2 className="h-5 w-5 text-green-400" />
                     <h3 className="font-medium">AI Image Generator</h3>
                   </div>
                   <div className="relative">
@@ -351,12 +397,12 @@ const validateAndSubmitForm = async () => {
       <div className="flex justify-center mb-8 mt-8">
         <Button
           onClick={() => {
-            const form = document.querySelector("form") as HTMLFormElement
-            if (form) form.requestSubmit()
+            const form = document.querySelector("form") as HTMLFormElement;
+            if (form) form.requestSubmit();
           }}
           disabled={isLoading}
           size="lg"
-          className="w-[calc(100%)] bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-400/90 hover:to-blue-500/90 text-primary-foreground"
+          className="w-[calc(100%-1rem)] bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-400/90 hover:to-emerald-400/90 text-primary-foreground"
         >
           {isLoading ? (
             <>
@@ -376,7 +422,8 @@ const validateAndSubmitForm = async () => {
             {
               icon: Shield,
               title: "Anti-bot Protection",
-              description: "Advanced protection against malicious bots and snipers",
+              description:
+                "Advanced protection against malicious bots and snipers",
             },
             {
               icon: Lock,
@@ -402,7 +449,9 @@ const validateAndSubmitForm = async () => {
                   </div>
                   <div className="space-y-1">
                     <h4 className="font-medium">{feature.title}</h4>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -411,6 +460,5 @@ const validateAndSubmitForm = async () => {
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
-

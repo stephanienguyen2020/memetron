@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { AppLayout } from "../components/app-layout";
 import { Input } from "@/components/ui/input";
 import { Search, Rocket, Loader2, AlertCircle, Wallet } from "lucide-react";
@@ -73,52 +72,29 @@ export default function BetsPage() {
   // Track if data has been fetched to prevent refetching
   const dataFetched = useRef(false);
 
-  // Add a periodic check for ended bets
+  // Update wallet connection status and trigger fetch
   useEffect(() => {
-    // Function to check if any active bets have ended
-    const checkForEndedBets = () => {
-      const now = new Date();
+    const isConnected = !!walletClient;
+    setIsWalletConnected(isConnected);
 
-      // Check if any active bets have ended
-      const hasEndedBets = activeBets.some((bet) => {
-        const endDate = new Date(bet.endDate);
-        return endDate <= now;
-      });
-
-      // If we found ended bets, trigger a refresh
-      if (hasEndedBets) {
-        console.log("Found ended bets, refreshing...");
-        handleRefresh();
-      }
-    };
-
-    // Check every minute
-    const interval = setInterval(checkForEndedBets, 60000);
-
-    return () => clearInterval(interval);
-  }, [activeBets]);
-
-  // Update wallet connection status
-  useEffect(() => {
-    setIsWalletConnected(!!walletClient);
+    if (isConnected) {
+      // Reset dataFetched when wallet connects
+      dataFetched.current = false;
+      handleRefresh();
+    }
   }, [walletClient]);
 
-  // Fetch bets data only once on component mount
+  // Fetch bets data when wallet is connected
   useEffect(() => {
-    // Skip if data has already been fetched
-    if (dataFetched.current) return;
+    if (!isWalletConnected || dataFetched.current) return;
 
     async function fetchBets() {
       try {
-        // Set loading state and mark as fetched
         setLoading(true);
         dataFetched.current = true;
 
-        // Get bets from blockchain
         const allBets = await bettingService.getAllBets();
-        // console.log("Fetched bets:", allBets);
 
-        // Handle empty or error cases
         if (!allBets || allBets.length === 0) {
           setBets([]);
           setActiveBets([]);
@@ -240,7 +216,6 @@ export default function BetsPage() {
           variant: "destructive",
         });
 
-        // Reset states
         setBets([]);
         setActiveBets([]);
         setPastBets([]);
@@ -251,31 +226,38 @@ export default function BetsPage() {
     }
 
     fetchBets();
+  }, [bettingService, isWalletConnected, toast]);
 
-    // No cleanup needed since we use dataFetched.current to prevent refetching
-  }, [bettingService, toast]); // Only stable dependencies
+  // Manual refresh function
+  const handleRefresh = useCallback(() => {
+    dataFetched.current = false;
+    setLoading(true);
+  }, []);
 
-  // Manual refresh function for user-triggered refreshes
-  const handleRefresh = () => {
-    dataFetched.current = false; // Reset the fetched flag
-    setLoading(true); // Show loading state again
-
-    // Re-run the effect in the next tick
-    setTimeout(() => {
-      const event = new Event("fetch");
-      window.dispatchEvent(event);
-    }, 0);
-  };
-
-  // Listen for custom fetch event (triggered by handleRefresh)
+  // Add a periodic check for ended bets
   useEffect(() => {
-    const refetchHandler = () => {
-      dataFetched.current = false;
+    // Function to check if any active bets have ended
+    const checkForEndedBets = () => {
+      const now = new Date();
+
+      // Check if any active bets have ended
+      const hasEndedBets = activeBets.some((bet) => {
+        const endDate = new Date(bet.endDate);
+        return endDate <= now;
+      });
+
+      // If we found ended bets, trigger a refresh
+      if (hasEndedBets) {
+        console.log("Found ended bets, refreshing...");
+        handleRefresh();
+      }
     };
 
-    window.addEventListener("fetch", refetchHandler);
-    return () => window.removeEventListener("fetch", refetchHandler);
-  }, []);
+    // Check every minute
+    const interval = setInterval(checkForEndedBets, 60000);
+
+    return () => clearInterval(interval);
+  }, [activeBets]);
 
   // Reset pagination when filters change
   useEffect(() => {
@@ -356,12 +338,7 @@ export default function BetsPage() {
       <div className="py-8">
         <div className="container pt-2 pl-12 max-w-[1600px] mx-auto px-4">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-12"
-          >
+          <div className="mb-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
@@ -395,16 +372,11 @@ export default function BetsPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Wallet Warning - show when wallet is not connected */}
           {!isWalletConnected && !loading && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
+            <div className="mb-8">
               <Alert
                 variant="default"
                 className="bg-yellow-500/10 border-yellow-500/20"
@@ -416,7 +388,7 @@ export default function BetsPage() {
                   and see the latest data.
                 </AlertDescription>
               </Alert>
-            </motion.div>
+            </div>
           )}
 
           {/* Search and Filters */}

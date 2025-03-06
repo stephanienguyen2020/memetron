@@ -3,7 +3,6 @@
 import type React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
 import {
   Calendar,
   ImageIcon,
@@ -51,7 +50,6 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
-import GridBackground from "@/app/components/GridBackground";
 import { cn } from "@/lib/utils";
 import { AppLayout } from "@/app/components/app-layout";
 import { Separator } from "@/components/ui/separator";
@@ -362,14 +360,8 @@ export default function CreateBet() {
   if (showAuthWarning) {
     return (
       <AppLayout>
-        <GridBackground />
         <div className="container max-w-4xl mx-auto px-4 pt-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 p-6 rounded-md"
-          >
+          <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 p-6 rounded-md">
             <h2 className="text-2xl font-bold mb-2">Authentication Required</h2>
             <p className="mb-4">You need to be signed in to create a bet.</p>
             <div className="flex gap-4">
@@ -377,7 +369,7 @@ export default function CreateBet() {
                 Back to Bets
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </AppLayout>
     );
@@ -385,32 +377,28 @@ export default function CreateBet() {
 
   return (
     <AppLayout showFooter={false}>
-      <GridBackground />
       <div className="container max-w-full mx-auto px-12 pt-6 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="mb-6">
-            <Link href="/bets">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Bets
-              </Button>
-            </Link>
-          </div>
+        <div className="mb-6">
+          <Link href="/bets">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Bets
+            </Button>
+          </Link>
+        </div>
 
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
-              Create a New Bet
-            </h1>
-            <p className="text-muted-foreground">
-              Set up your bet and let others bet on the outcome
-            </p>
-          </div>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
+            Create a New Bet
+          </h1>
+          <p className="text-muted-foreground">
+            Set up your bet and let others bet on the outcome
+          </p>
+        </div>
 
-          <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Form - Takes 2/3 of the space */}
+          <div className="lg:col-span-2">
             <Card className="border-white/10 bg-black/50 backdrop-blur-xl">
               <CardContent className="p-6">
                 <Form {...form}>
@@ -581,7 +569,7 @@ export default function CreateBet() {
                                   !twitterHandleChanged && (
                                     <Badge
                                       variant="outline"
-                                      className="bg-blue-500/10 text-blue-500 border-blue-500/20"
+                                      className="bg-green-500/10 text-green-500 border-green-500/20"
                                     >
                                       Connected
                                     </Badge>
@@ -620,7 +608,7 @@ export default function CreateBet() {
                                     variant="outline"
                                     size="sm"
                                     onClick={handleTwitterConnect}
-                                    className="border-blue-500/20 text-blue-500 hover:bg-blue-500/10"
+                                    className="border-green-500/20 text-green-500 hover:bg-green-500/10"
                                   >
                                     <Twitter className="mr-2 h-3 w-3" />
                                     Connect
@@ -695,7 +683,7 @@ export default function CreateBet() {
                                           {isUploadingImage && (
                                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                               <div className="text-center">
-                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-blue-400" />
+                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-green-400" />
                                                 <p className="text-sm text-white">
                                                   Uploading to IPFS...
                                                 </p>
@@ -706,7 +694,7 @@ export default function CreateBet() {
                                             "https://"
                                           ) && (
                                             <div className="absolute top-2 right-2">
-                                              <Badge className="bg-blue-500 text-white">
+                                              <Badge className="bg-green-500 text-white">
                                                 Stored on IPFS
                                               </Badge>
                                             </div>
@@ -729,14 +717,14 @@ export default function CreateBet() {
                                         <>
                                           {isUploadingImage ? (
                                             <div className="py-8 text-center">
-                                              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-400" />
+                                              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-green-400" />
                                               <span className="text-sm text-muted-foreground">
                                                 Uploading image to IPFS...
                                               </span>
                                             </div>
                                           ) : (
                                             <>
-                                              <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                                              <ImageIcon className="h-20 w-8 text-muted-foreground" />
                                               <span className="text-sm text-muted-foreground text-center">
                                                 Click to upload or drag and drop
                                               </span>
@@ -783,7 +771,7 @@ export default function CreateBet() {
                       <Button
                         type="submit"
                         disabled={isSubmitting || isUploadingImage}
-                        className="bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600"
+                        className="bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500"
                       >
                         {isSubmitting ? (
                           <>
@@ -807,9 +795,11 @@ export default function CreateBet() {
                 </Form>
               </CardContent>
             </Card>
+          </div>
 
-            {/* How It Works Card */}
-            <Card className="border-white/10 bg-black/50 backdrop-blur-xl mt-6">
+          {/* How It Works Card - Takes 1/3 of the space */}
+          <div className="lg:col-span-1">
+            <Card className="border-white/10 bg-black/50 backdrop-blur-xl sticky top-24">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Info className="h-5 w-5" />
@@ -844,7 +834,7 @@ export default function CreateBet() {
               </CardContent>
             </Card>
           </div>
-        </motion.div>
+        </div>
       </div>
     </AppLayout>
   );

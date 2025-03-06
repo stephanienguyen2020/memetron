@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "../providers/WalletProvider";
 import {
@@ -253,45 +252,35 @@ export function SiteLeftbar() {
           onToggle={() => toggleSection("dashboard")}
         />
 
-        <AnimatePresence>
-          {expandedSections.includes("dashboard") && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="pt-1 pb-1">
-                <SubNavItem
-                  label="My Portfolio"
-                  href="/dashboard/portfolio"
-                  isActive={pathname === "/dashboard/portfolio"}
-                />
-                <SubNavItem
-                  label="Quick Swap"
-                  href="/dashboard/quick-swap"
-                  isActive={pathname === "/dashboard/quick-swap"}
-                />
-                <SubNavItem
-                  label="My Bets"
-                  href="/dashboard/my-bets"
-                  isActive={pathname === "/dashboard/my-bets"}
-                />
-                <SubNavItem
-                  label="My Tokens"
-                  href="/dashboard/my-tokens"
-                  isActive={pathname === "/dashboard/my-tokens"}
-                />
-                <SubNavItem
-                  label="Shill Manager"
-                  href="/dashboard/shill-manager"
-                  isActive={pathname === "/dashboard/shill-manager"}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {expandedSections.includes("dashboard") && (
+          <div className="pt-1 pb-1">
+            <SubNavItem
+              label="My Portfolio"
+              href="/dashboard/portfolio"
+              isActive={pathname === "/dashboard/portfolio"}
+            />
+            <SubNavItem
+              label="Quick Swap"
+              href="/dashboard/quick-swap"
+              isActive={pathname === "/dashboard/quick-swap"}
+            />
+            <SubNavItem
+              label="My Bets"
+              href="/dashboard/my-bets"
+              isActive={pathname === "/dashboard/my-bets"}
+            />
+            <SubNavItem
+              label="My Tokens"
+              href="/dashboard/my-tokens"
+              isActive={pathname === "/dashboard/my-tokens"}
+            />
+            <SubNavItem
+              label="Shill Manager"
+              href="/dashboard/shill-manager"
+              isActive={pathname === "/dashboard/shill-manager"}
+            />
+          </div>
+        )}
 
         {/* Chat Bot Section */}
         <NavItem
@@ -304,74 +293,64 @@ export function SiteLeftbar() {
           onToggle={() => toggleSection("hedge-bot")}
         />
 
-        <AnimatePresence>
-          {expandedSections.includes("hedge-bot") && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="pt-1 pb-1">
-                {/* Search Bar */}
-                <div className="px-4 py-2">
-                  <div className="relative">
-                    <Search
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-700"
-                      size={16}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search conversations..."
-                      className="w-full bg-black/50 border border-green-900/50 rounded-lg py-2 pl-9 pr-3 text-sm text-green-300 placeholder-green-800 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* New Chat Button */}
-                <div className="px-4 py-2">
-                  <Link href={`/chatbot?new=true&t=${Date.now()}`}>
-                    <Button
-                      className="w-full bg-black hover:bg-black/80 text-green-500 border border-green-500/50 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)] transition-all flex items-center justify-center gap-2"
-                      size="sm"
-                    >
-                      <Plus size={16} />
-                      <span>New Chat</span>
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Chat History */}
-                <div className="mt-2">
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <span className="text-xs font-medium text-green-700 uppercase">
-                      Recent Chats
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    {chatHistory.slice(0, 5).map((chat, index) => (
-                      <ChatHistoryItem
-                        key={index}
-                        title={chat.title}
-                        date={chat.date}
-                        href={chat.href}
-                      />
-                    ))}
-                    {chatHistory.length > 5 && (
-                      <Link
-                        href="/chatbot/history"
-                        className="flex items-center justify-center py-2 text-sm text-green-600 hover:text-green-400 transition-colors"
-                      >
-                        View more
-                      </Link>
-                    )}
-                  </div>
-                </div>
+        {expandedSections.includes("hedge-bot") && (
+          <div className="pt-1 pb-1">
+            {/* Search Bar */}
+            <div className="px-4 py-2">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-700"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  placeholder="Search conversations..."
+                  className="w-full bg-black/50 border border-green-900/50 rounded-lg py-2 pl-9 pr-3 text-sm text-green-300 placeholder-green-800 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                />
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+
+            {/* New Chat Button */}
+            <div className="px-4 py-2">
+              <Link href={`/chatbot?new=true&t=${Date.now()}`}>
+                <Button
+                  className="w-full bg-black hover:bg-black/80 text-green-500 border border-green-500/50 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,0,0.3)] transition-all flex items-center justify-center gap-2"
+                  size="sm"
+                >
+                  <Plus size={16} />
+                  <span>New Chat</span>
+                </Button>
+              </Link>
+            </div>
+
+            {/* Chat History */}
+            <div className="mt-2">
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-xs font-medium text-green-700 uppercase">
+                  Recent Chats
+                </span>
+              </div>
+              <div className="space-y-1">
+                {chatHistory.slice(0, 5).map((chat, index) => (
+                  <ChatHistoryItem
+                    key={index}
+                    title={chat.title}
+                    date={chat.date}
+                    href={chat.href}
+                  />
+                ))}
+                {chatHistory.length > 5 && (
+                  <Link
+                    href="/chatbot/history"
+                    className="flex items-center justify-center py-2 text-sm text-green-600 hover:text-green-400 transition-colors"
+                  >
+                    View more
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Watchlist */}
         <NavItem

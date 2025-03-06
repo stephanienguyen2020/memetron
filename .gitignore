@@ -17,6 +17,8 @@ OAI_CONFIG_LIST.json
 /__pycache__/*
 */__pycache__/*
 
+.vscode/*
+
 # Start Generation Here
 **/__pycache__/*
 # End Generation Here

@@ -10,12 +10,10 @@ const GridBackground = () => {
   // Only render on the landing page (root path)
   const isLandingPage = pathname === "/";
 
-  // If not on landing page, don't render anything
-  if (!isLandingPage) {
-    return null;
-  }
-
   useEffect(() => {
+    // Skip effect if not on landing page
+    if (!isLandingPage) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -130,7 +128,12 @@ const GridBackground = () => {
     return () => {
       window.removeEventListener("resize", setCanvasSize);
     };
-  }, []);
+  }, [isLandingPage]); // Add isLandingPage to dependencies
+
+  // Return null if not on landing page
+  if (!isLandingPage) {
+    return null;
+  }
 
   return (
     <canvas

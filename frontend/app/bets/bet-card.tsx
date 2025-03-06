@@ -133,8 +133,8 @@ export function BetCard({ bet }: { bet: Bet }) {
     // Calculate immediately
     calculateTimeAndPhase();
 
-    // Then check every minute
-    const interval = setInterval(calculateTimeAndPhase, 60000);
+    // Then check every second instead of every minute
+    const interval = setInterval(calculateTimeAndPhase, 1000);
 
     return () => clearInterval(interval);
   }, [bet.endDate]);

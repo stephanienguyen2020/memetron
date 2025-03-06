@@ -113,7 +113,7 @@ export function MarketFilters({
 
       <Button
         asChild
-        className="bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-400/90 hover:to-blue-500/90"
+        className="bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400 hover:from-green-400/90 hover:to-emerald-400/90"
       >
         <Link href="/launch">
           <Rocket className="mr-2 h-4 w-4" />

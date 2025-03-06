@@ -303,55 +303,56 @@ export default function TokensPage() {
 
   return (
     <AppLayout>
-      <main className="pt-6 pb-16">
-        <div className="container max-w-full">
+      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900">
+        <div className="container py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4"
           >
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h1 className="text-3xl font-bold">
-                  My
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
-                    {" "}
-                    Tokens
-                  </span>
-                </h1>
-                <p className="text-muted-foreground">
-                  Manage and monitor all your tokens
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link href="/launch">
-                  <Button className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    Create New Token
-                  </Button>
-                </Link>
+            {/* Header section */}
+            <div className="relative mb-12 pb-6 border-b border-white/10">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div>
+                  <h1 className="text-4xl font-bold mb-2">
+                    My{" "}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-[#00ff00] to-emerald-400">
+                      Tokens
+                    </span>
+                  </h1>
+                  <p className="text-lg text-muted-foreground">
+                    Manage and monitor your token portfolio
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Link href="/launch">
+                    <Button className="bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 transition-all">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create New Token
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
 
             {/* Token Type Tabs */}
-            <div className="flex justify-center mb-6">
+            <div className="mb-8">
               <Tabs
                 value={tokenTypeTab}
                 onValueChange={setTokenTypeTab}
-                className="w-full max-w-md"
+                className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="bg-white/5 p-1 rounded-lg grid w-full max-w-md mx-auto grid-cols-2">
                   <TabsTrigger
                     value="created"
-                    className="flex items-center gap-2"
+                    className="data-[state=active]:bg-green-500 flex items-center gap-2"
                   >
                     <Rocket className="w-4 h-4" />
                     Created Tokens
                   </TabsTrigger>
                   <TabsTrigger
                     value="purchased"
-                    className="flex items-center gap-2"
+                    className="data-[state=active]:bg-green-500 flex items-center gap-2"
                   >
                     <Wallet className="w-4 h-4" />
                     Purchased Tokens
@@ -360,175 +361,205 @@ export default function TokensPage() {
               </Tabs>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-              <Card className="overflow-hidden border-white/10 bg-black/60 backdrop-blur-xl">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <Rocket className="w-5 h-5 text-sky-400" />
+            {/* Stats Cards */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 mb-8">
+              <Card className="bg-white/5 border-white/10 hover:border-green-500/50 transition-all hover:transform hover:scale-[1.02] cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <Rocket className="w-5 h-5 text-green-400" />
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       Total Tokens
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-bold">{tokens.length}</p>
+                      <p className="text-3xl font-bold">{tokens.length}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border-white/10 bg-black/60 backdrop-blur-xl">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+              <Card className="bg-white/5 border-white/10 hover:border-green-500/50 transition-all hover:transform hover:scale-[1.02] cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <Users className="w-5 h-5 text-purple-400" />
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       Total Holders
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-bold">3,617</p>
-                      <span className="text-green-500">+12.5%</span>
+                      <p className="text-3xl font-bold">3,617</p>
+                      <span className="text-sm text-green-500">+12.5%</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border-white/10 bg-black/60 backdrop-blur-xl">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+              <Card className="bg-white/5 border-white/10 hover:border-green-500/50 transition-all hover:transform hover:scale-[1.02] cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <DollarSign className="w-5 h-5 text-green-400" />
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       Total Volume
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-bold">
+                      <p className="text-3xl font-bold">
                         ${totalVolume.toLocaleString()}
                       </p>
-                      <span className="text-green-500">+8.3%</span>
+                      <span className="text-sm text-green-500">+8.3%</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border-white/10 bg-black/60 backdrop-blur-xl">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+              <Card className="bg-white/5 border-white/10 hover:border-green-500/50 transition-all hover:transform hover:scale-[1.02] cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <TrendingUp className="w-5 h-5 text-yellow-400" />
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">24h Volume</p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-bold">$155,840</p>
-                      <span className="text-red-500">-3.2%</span>
+                      <p className="text-3xl font-bold">$155,840</p>
+                      <span className="text-sm text-red-500">-3.2%</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border-white/10 bg-black/60 backdrop-blur-xl xl:col-span-1">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+              <Card className="bg-white/5 border-white/10 hover:border-green-500/50 transition-all hover:transform hover:scale-[1.02] cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <TrendingUp className="w-5 h-5 text-green-400" />
-                    <p className="text-base font-medium">Best Performer</p>
                   </div>
-                  <div className="mt-2">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      Best Performer
+                    </p>
                     <div className="flex items-center gap-2">
-                      <div className="text-xl font-bold">
+                      <div className="text-2xl font-bold">
                         {bestPerformer?.symbol}
                       </div>
                       <Badge
                         variant="default"
-                        className="text-green-500 bg-green-500/20"
+                        className="bg-green-500/20 text-green-500"
                       >
                         +{bestPerformer?.priceChange.toFixed(2)}%
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">24h change</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border-white/10 bg-black/60 backdrop-blur-xl xl:col-span-1">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+              <Card className="bg-white/5 border-white/10 hover:border-green-500/50 transition-all hover:transform hover:scale-[1.02] cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <TrendingDown className="w-5 h-5 text-red-400" />
-                    <p className="text-base font-medium">Worst Performer</p>
                   </div>
-                  <div className="mt-2">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      Worst Performer
+                    </p>
                     <div className="flex items-center gap-2">
-                      <div className="text-xl font-bold">
+                      <div className="text-2xl font-bold">
                         {worstPerformer?.symbol}
                       </div>
                       <Badge
                         variant="destructive"
-                        className="text-red-500 bg-red-500/20"
+                        className="bg-red-500/20 text-red-500"
                       >
                         {worstPerformer?.priceChange.toFixed(2)}%
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">24h change</p>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-              <Tabs
-                defaultValue="all"
-                className="w-full"
-                onValueChange={setActiveTab}
-              >
-                <TabsList>
-                  <TabsTrigger value="all">All Tokens</TabsTrigger>
-                  <TabsTrigger value="active">Active</TabsTrigger>
-                  <TabsTrigger value="locked">Locked</TabsTrigger>
-                </TabsList>
-              </Tabs>
+            {/* Filters and Search */}
+            <div className="bg-white/5 rounded-xl p-6 mb-8">
+              <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center mb-6">
+                <Tabs
+                  defaultValue="all"
+                  className="w-full md:w-auto"
+                  onValueChange={setActiveTab}
+                >
+                  <TabsList className="bg-black/20 p-1">
+                    <TabsTrigger
+                      value="all"
+                      className="data-[state=active]:bg-green-500"
+                    >
+                      All Tokens
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="active"
+                      className="data-[state=active]:bg-green-500"
+                    >
+                      Active
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="locked"
+                      className="data-[state=active]:bg-green-500"
+                    >
+                      Locked
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
 
-              <div className="flex w-full gap-2 md:w-auto">
-                <div className="relative flex-1 md:w-64">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search tokens..."
-                    className="pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+                <div className="flex w-full md:w-auto gap-2">
+                  <div className="relative flex-1 md:w-64">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search tokens..."
+                      className="pl-10 bg-black/20 border-white/10 focus:border-green-500/50 transition-colors"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="border-white/10 hover:border-green-500/50 transition-colors"
+                      >
+                        <Filter className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="bg-black/90 border-white/10"
+                    >
+                      <DropdownMenuLabel className="text-xs text-gray-400">
+                        Filter By
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-white/10" />
+                      <DropdownMenuItem className="hover:bg-white/5">
+                        Newest First
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-white/5">
+                        Oldest First
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-white/5">
+                        Highest Market Cap
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-white/5">
+                        Most Holders
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Filter className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Filter By</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Newest First</DropdownMenuItem>
-                    <DropdownMenuItem>Oldest First</DropdownMenuItem>
-                    <DropdownMenuItem>Highest Market Cap</DropdownMenuItem>
-                    <DropdownMenuItem>Most Holders</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
-            </div>
 
-            <Card className="border-white/10 bg-black/60 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle>
-                  {tokenTypeTab === "created"
-                    ? "Your Created Tokens"
-                    : "Your Purchased Tokens"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              {/* Token Table */}
+              <div className="rounded-lg overflow-hidden border border-white/10">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-b border-white/10">
+                    <TableRow className="border-b border-white/10 bg-black/20">
                       <TableHead className="text-xs font-medium text-gray-400 uppercase">
                         Token
                       </TableHead>
@@ -567,14 +598,14 @@ export default function TokensPage() {
                     {filteredTokens.map((token) => (
                       <TableRow
                         key={token.id}
-                        className="transition-colors border-b border-white/5 hover:bg-white/5"
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
                       >
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <img
                               src={token.imageUrl || "/placeholder.svg"}
                               alt={token.name}
-                              className="w-10 h-10 border rounded-full border-white/10"
+                              className="w-10 h-10 rounded-full border border-white/10"
                             />
                             <div>
                               <div className="font-medium">{token.name}</div>
@@ -632,7 +663,7 @@ export default function TokensPage() {
                         <TableCell className="hidden lg:table-cell">
                           <Badge
                             variant="outline"
-                            className="px-2 py-1 bg-black/40 border-white/20"
+                            className="bg-black/40 border-white/20"
                           >
                             {token.chain}
                           </Badge>
@@ -659,7 +690,7 @@ export default function TokensPage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="w-8 h-8 rounded-full"
+                                className="h-8 w-8 rounded-full"
                               >
                                 <MoreHorizontal className="w-4 h-4" />
                               </Button>
@@ -704,11 +735,11 @@ export default function TokensPage() {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         </div>
-      </main>
+      </div>
     </AppLayout>
   );
 }

@@ -126,15 +126,34 @@ export async function POST(req: NextRequest) {
     }
 
     const receipt = await tx.wait();
-    // Get the created token address from the event logs
-    const createdEvent = receipt.logs.find(
-      (log: any) => log.eventName === "Created"
-    );
-    const tokenAddress = createdEvent?.args[0];
+    console.log("receipt", receipt.logs);
+    // Get the Factory contract's Created event from the transaction receipt
+    const factoryInterface = new ethers.Interface(FactoryABI);
+    const createdEvent = receipt.logs
+        .map((log: any) => {
+            try {
+                return factoryInterface.parseLog({ topics: log.topics, data: log.data });
+            } catch (e) {
+                return null;
+            }
+        })
+        .find((log: any) => log?.name === "Created");
+
+    if (!createdEvent) {
+        return NextResponse.json(
+            {
+                error: "Token creation failed",
+                message: "Could not find token creation event in transaction logs",
+            },
+            { status: 500 }
+        );
+    }
+
+    const tokenAddress = createdEvent.args[0];
 
     // Construct the redirect URL
     const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const redirectUrl = `${baseURL}/tokens/${tokenAddress}`;
+    const redirectUrl = `${baseURL}/token/${tokenAddress}`;
 
     // Return success response with transaction details
     return NextResponse.json({

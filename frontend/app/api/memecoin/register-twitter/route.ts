@@ -1,3 +1,5 @@
+// no need 
+
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 import LaunchpadAgentABI from "@/abi/LaunchpadAgent.json";
@@ -73,7 +75,7 @@ export async function POST(req: NextRequest) {
       LaunchpadAgentABI,
       wallet
     );
-    console.log("launchpadAgent");
+
     // Call the registerTwitterHandle function
     const tx = await launchpadAgent.registerTwitterHandle(twitterHandle);
     const receipt = await tx.wait();

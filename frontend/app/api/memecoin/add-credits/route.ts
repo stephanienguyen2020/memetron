@@ -1,3 +1,4 @@
+// no need for this
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 import LaunchpadAgentABI from "@/abi/LaunchpadAgent.json";
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
       LaunchpadAgentABI,
       wallet
     );
+    console.log("launchPadAgent", launchpadAgent)
 
     // First verify if the Twitter handle is registered
     const userAddress = await launchpadAgent.twitterToAddress(twitterHandle);

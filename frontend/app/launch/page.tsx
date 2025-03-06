@@ -251,7 +251,7 @@ export default function LaunchPage() {
         holders: "0",
         volume24h: "$0",
         launchDate: new Date().toISOString().split("T")[0],
-        chain: data.chain || "NEAR",
+        chain: data.chain || "ELECTRON",
         status: "active",
         fundingRaised: "0",
       };

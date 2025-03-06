@@ -53,18 +53,26 @@ contract Factory {
     function create(
         string memory _name, 
         string memory _symbol,
-        string memory _metadataURI
+        string memory _metadataURI,
+        address _creator
     ) external payable {
         require(msg.value >= fee, "Creator fee not met");
-        Token token = new Token(msg.sender, _name, _symbol, _metadataURI, 1_000_000 ether);
+
+        // Default to msg.sender if _creator is zero address
+        if (_creator == address(0)) {
+            _creator = msg.sender;
+        }
+
+        Token token = new Token(_creator, _name, _symbol, _metadataURI, 1_000_000 ether);
         tokens.push(address(token));
         totalTokens++;
 
-        TokenSale memory sale = TokenSale(address(token), _name, _metadataURI, msg.sender, 0, 0, true, false);
+        TokenSale memory sale = TokenSale(address(token), _name, _metadataURI, _creator, 0, 0, true, false);
         tokenToSale[address(token)] = sale;
 
         emit Created(address(token));
     }
+
 
     function buy(address _token, uint256 _amount) external payable{
         TokenSale storage sale = tokenToSale[_token];

@@ -19,8 +19,8 @@ describe("Factory", function () {
         
         // Set the liquidity pool address
         await factory.setLiquidityPool(await liquidityPool.getAddress());
-        // Create token from creator perspective
-        const transaction = await factory.connect(creator).create("Dapp Uni", "DAPP", "https://pinata.cloud/ipfs",{value: FEE})
+        // Create token from creator perspective, passing address(0) to test default to msg.sender
+        const transaction = await factory.connect(creator).create("Dapp Uni", "DAPP", "https://pinata.cloud/ipfs", ethers.ZeroAddress, {value: FEE})
         await transaction.wait()
 
         // Get token address
@@ -94,6 +94,33 @@ describe("Factory", function () {
             expect(sale.sold).to.equal(0)
             expect(sale.raised).to.equal(0)
             expect(sale.isOpen).to.equal(true)
+        })
+        
+        it("Should set the specified creator when real address is passed", async function(){
+            const [deployer, creator, buyer, specifiedCreator] = await ethers.getSigners()
+            
+            // Deploy factory and liquidity pool
+            const Factory = await ethers.getContractFactory("Factory")
+            const factory = await Factory.deploy(FEE)
+            const NativeLiquidityPool = await ethers.getContractFactory("NativeLiquidityPool");
+            const liquidityPool = await NativeLiquidityPool.deploy(await factory.getAddress());
+            await factory.setLiquidityPool(await liquidityPool.getAddress());
+
+            // Create token with specified creator address
+            const transaction = await factory.connect(creator).create(
+                "Test Token", 
+                "TEST", 
+                "https://pinata.cloud/ipfs", 
+                specifiedCreator.address, 
+                {value: FEE}
+            )
+            await transaction.wait()
+
+            const tokenAddress = await factory.tokens(0)
+            const token = await ethers.getContractAt("Token", tokenAddress)
+
+            // Verify the creator is set to the specified address, not msg.sender
+            expect(await token.creator()).to.equal(specifiedCreator.address)
         })
     })
     
@@ -292,7 +319,7 @@ describe("NativeLiquidityPool", function () {
         // Set the liquidity pool address
         await factory.setLiquidityPool(await liquidityPool.getAddress());
 
-        const transaction = await factory.connect(creator).create("Dapp Uni", "DAPP", "https://pinata.cloud/ipfs",{value: FEE})
+        const transaction = await factory.connect(creator).create("Dapp Uni", "DAPP", "https://pinata.cloud/ipfs", ethers.ZeroAddress,{value: FEE})
         await transaction.wait()
 
         // Get token address

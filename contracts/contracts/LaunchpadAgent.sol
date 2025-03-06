@@ -66,18 +66,7 @@ contract LaunchpadAgent {
     ) external onlyAgent {
         address userAddress = twitterToAddress[twitterHandle];
         require(userAddress != address(0), "Twitter handle not registered");
-
-        uint baseFee = factory.fee();
-        uint agentFee = calculateAgentFee(baseFee);
-        uint totalCost = baseFee + agentFee;
-
-        require(userTokenCredits[userAddress] >= totalCost, "Insufficient token credits");
-
-        // Deduct total amount from user credits
-        userTokenCredits[userAddress] -= totalCost;
-
-        // Create token through factory
-        factory.create{value: baseFee}(_name, _symbol, _metadataURI);
+        _createTokenForUser(userAddress, _name, _symbol, _metadataURI);
     }
 
     function createTokenForUserViaAddress(
@@ -85,19 +74,28 @@ contract LaunchpadAgent {
         string memory _name, 
         string memory _symbol,
         string memory _metadataURI
-    ) external onlyAgent{
+    ) external onlyAgent {
         require(userAddress != address(0), "Twitter handle not registered");
+        _createTokenForUser(userAddress, _name, _symbol, _metadataURI);
+    }
 
+    function _createTokenForUser(
+        address userAddress,
+        string memory _name,
+        string memory _symbol,
+        string memory _metadataURI
+    ) internal {
         uint baseFee = factory.fee();
         uint agentFee = calculateAgentFee(baseFee);
         uint totalCost = baseFee + agentFee;
 
         require(userTokenCredits[userAddress] >= totalCost, "Insufficient token credits");
-         // Deduct total amount from user credits
+        
+        // Deduct total amount from user credits
         userTokenCredits[userAddress] -= totalCost;
 
         // Create token through factory
-        factory.create{value: baseFee}(_name, _symbol, _metadataURI);
+        factory.create{value: baseFee}(_name, _symbol, _metadataURI, userAddress);
     }
 
     function withdrawAgentFees() external onlyAgent {

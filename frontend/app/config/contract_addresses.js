@@ -1,13 +1,13 @@
 export const config = {
   31337: {
     factory: {
-      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     },
     nativeLiquidityPool: {
-      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     },
     LaunchpadAgent: {
-      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
     },
   },
   57054: {
@@ -23,13 +23,13 @@ export const config = {
   },
   5201420: {
     factory: {
-      address: "0x53083e4c228Dad830791a4D41eD4e0b0Ec8B7717",
+      address: "0xC699def0dB413Bff70192Fd986a20d4bFFa02641",
     },
     nativeLiquidityPool: {
-      address: "0x2EEb7CBB098559BD4A65e2ad0C43aE418107c55F",
+      address: "0x2e4c31F33080462dc3f658D283397B532d9C6182",
     },
     LaunchpadAgent: {
-      address: "0x9ffe5C21D89C7e685175381aCE1b6381BC093297",
+      address: "0xaC348bAB58b649a41DC23D108e90d949A8852fa0",
     },
   },
 };

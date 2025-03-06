@@ -153,7 +153,7 @@ export async function createToken(
 
     const tx = await factory
       .connect(signer)
-      .create(metaData.name, metaData.ticker, metadataURI, { value: fee });
+      .create(metaData.name, metaData.ticker, metadataURI, ethers.ZeroAddress, { value: fee });
 
     const receipt = await tx.wait();
 

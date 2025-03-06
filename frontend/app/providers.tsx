@@ -85,13 +85,37 @@ const sonicBlazeTestnet = {
   testnet: true,
 };
 
+// Configure custom Hardhat testnet
+const hardhatTestnet = {
+  id: 31337,
+  name: "Hardhat",
+  network: "hardhat",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ethereum",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    public: { http: ["http://127.0.0.1:8545"] },
+    default: { http: ["http://127.0.0.1:8545"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Block Explorer",
+      url: "http://localhost:8545", // Local explorer if you have one
+    },
+  },
+  testnet: true,
+};
+
 // Create wagmi config
 const config = createConfig({
-  chains: [auroraTestnet, sonicBlazeTestnet, electroneumTestnet],
+  chains: [auroraTestnet, sonicBlazeTestnet, electroneumTestnet, hardhatTestnet],
   transports: {
     [auroraTestnet.id]: http(),
     [sonicBlazeTestnet.id]: http(),
     [electroneumTestnet.id]: http(),
+    [hardhatTestnet.id]: http(),
   },
 });
 

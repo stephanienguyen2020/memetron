@@ -621,6 +621,7 @@ export async function getTokenDetails(tokenAddress: string): Promise<{
         isOpen: tokenSale.isOpen,
         image: metadata.imageURI,
         description: metadata.description,
+        symbol: metadata.symbol,
       },
       marketData: {
         price: price.toString(),

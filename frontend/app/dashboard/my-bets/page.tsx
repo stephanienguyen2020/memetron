@@ -46,7 +46,7 @@ interface ContractBet {
 
 // Interface for bet card display
 interface DisplayBet {
-  id: number;
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -239,7 +239,7 @@ export default function MyBetsPage() {
     const poolAmount = BigInt(bet.initialPoolAmount.toString());
 
     return {
-      id: bet.id,
+      id: bet.id.toString(),
       title: bet.title,
       image: bet.imageURL,
       category: bet.category,

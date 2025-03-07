@@ -40,7 +40,7 @@ export default function CommunitiesPage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
               <h1 className="text-4xl font-bold">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
                   Communities
                 </span>
               </h1>
@@ -68,7 +68,7 @@ export default function CommunitiesPage() {
               className="bg-black/40 backdrop-blur-sm rounded-xl p-4 mb-8 border border-white/10"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-sky-400 to-blue-500" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-[#00ff00]" />
                 <Input
                   placeholder="Share your thoughts with the community..."
                   className="bg-transparent border-white/10"

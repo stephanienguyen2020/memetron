@@ -502,7 +502,7 @@ export default function TokenDetailPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-4">
                         <h1 className="text-3xl font-bold">{token?.name}</h1>
-                        <Badge className="bg-gradient-to-r from-sky-400 to-blue-500 text-white font-semibold">
+                        <Badge className="bg-gradient-to-r from-green-400 to-[#00ff00] text-white font-semibold">
                           ${token?.symbol}
                         </Badge>
                       </div>
@@ -780,7 +780,7 @@ export default function TokenDetailPage() {
                   )}
 
                   <Button
-                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white rounded-lg"
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-green-400 to-[#00ff00] hover:from-green-500 hover:to-green-600 text-white rounded-lg"
                     onClick={handleBuyToken}
                     disabled={
                       isBuying ||
@@ -939,7 +939,7 @@ export default function TokenDetailPage() {
                       </div>
                       <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full"
+                          className="bg-gradient-to-r from-green-400 to-[#00ff00] h-full rounded-full"
                           style={{ width: "35%" }}
                         ></div>
                       </div>
@@ -954,7 +954,7 @@ export default function TokenDetailPage() {
                       </div>
                       <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full"
+                          className="bg-gradient-to-r from-green-400 to-[#00ff00] h-full rounded-full"
                           style={{ width: "62%" }}
                         ></div>
                       </div>

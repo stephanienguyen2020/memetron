@@ -289,7 +289,7 @@ function PlaceBetContent() {
                     </div>
                     <div className="relative h-2 overflow-hidden rounded-full bg-white/5">
                       <div
-                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-sky-400 to-blue-500"
+                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-400 to-[#00ff00]"
                         style={{ width: `${bet.yesProbability * 100}%` }}
                       />
                     </div>

@@ -65,6 +65,15 @@ import {
 import Link from "next/link";
 import { useTokenStore } from "../../store/tokenStore";
 import { useTestTokenService } from "@/services/TestTokenService";
+import {
+  getTokens,
+  getPriceForTokens,
+  getPurchasedTokens,
+  getTokenBalance,
+} from "@/services/memecoin-launchpad";
+import { useRouter } from "next/navigation";
+import { useWallet } from "@/app/providers/WalletProvider";
+import { toast } from "@/components/ui/use-toast";
 
 export default function TokensPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,6 +89,8 @@ export default function TokensPage() {
   const [createdTokens, setCreatedTokens] = useState<any[]>([]);
   const [purchasedTokens, setPurchasedTokens] = useState<any[]>([]);
   const testTokenService = useTestTokenService();
+  const router = useRouter();
+  const { networkName } = useWallet();
 
   // Fetch user created tokens from blockchain
   useEffect(() => {
@@ -128,7 +139,7 @@ export default function TokensPage() {
             marketCap: (Number(token.raised) / 1e18).toFixed(2),
             priceChange: Math.random() * 20 - 10,
             fundingRaised: token.raised.toString(),
-            chain: "Electroneum",
+            chain: "Electroneum", // Use Electroneum as the default chain
             volume24h: "$" + (Math.random() * 100000).toFixed(2),
             holders: (Math.random() * 1000).toFixed(0).toString(),
             launchDate: new Date().toISOString().split("T")[0],
@@ -141,6 +152,11 @@ export default function TokensPage() {
         setCreatedTokens(formattedTokens);
       } catch (error) {
         console.error("Error fetching created tokens:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your created tokens.",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -196,7 +212,7 @@ export default function TokensPage() {
             marketCap: (Number(token.raised) / 1e18).toFixed(2),
             priceChange: Math.random() * 20 - 10,
             fundingRaised: token.raised.toString(),
-            chain: "NEAR",
+            chain: "Electroneum", // Use Electroneum as the default chain
             volume24h: "$" + (Math.random() * 100000).toFixed(2),
             holders: (Math.random() * 1000).toFixed(0).toString(),
             launchDate: new Date().toISOString().split("T")[0],
@@ -210,6 +226,11 @@ export default function TokensPage() {
         setPurchasedTokens(formattedTokens);
       } catch (error) {
         console.error("Error fetching purchased tokens:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your purchased tokens.",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -286,6 +307,14 @@ export default function TokensPage() {
     const volumeNumber = parseFloat(token.volume24h.replace(/[^0-9.]/g, ""));
     return sum + volumeNumber;
   }, 0);
+
+  // Get chain from wallet if available, otherwise use Electroneum as fallback
+  const getChainFromWallet = () => {
+    if (networkName && networkName.includes("Electroneum")) {
+      return "Electroneum";
+    }
+    return "Electroneum"; // Fallback to Electroneum
+  };
 
   return (
     <AppLayout>
@@ -584,7 +613,8 @@ export default function TokensPage() {
                     {filteredTokens.map((token) => (
                       <TableRow
                         key={token.id}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/token/${token.symbol}`)}
                       >
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -651,7 +681,7 @@ export default function TokensPage() {
                             variant="outline"
                             className="bg-black/40 border-white/20"
                           >
-                            {token.chain}
+                            {getChainFromWallet()}
                           </Badge>
                         </TableCell>
                         <TableCell className="hidden lg:table-cell">

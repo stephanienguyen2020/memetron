@@ -37,7 +37,7 @@ interface BaseTokenInfo {
 
 export async function fetchTokenInfo(token_address: string) {
   const url =
-    "http://localhost:8000/coins/token?network=aurora&token_address=" +
+    "http://localhost:8000/coins/token?network=sonic&token_address=" +
     token_address;
 
   try {

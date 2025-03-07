@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
 import { useWalletClient } from "wagmi";
 import Factory from "../abi/Factory.json";
+import Token from "../abi/Token.json";
+import NativeLiquidityPool from "../abi/NativeLiquidityPool.json";
 import { config } from "../app/config/contract_addresses";
 import { pinFileToIPFS, pinJSONToIPFS, unPinFromIPFS } from "@/app/lib/pinata";
 import { useCallback } from "react";
@@ -18,6 +20,15 @@ interface TokenSale {
 interface GetTokensOptions {
   isCreator?: boolean;
   isOpen?: boolean;
+}
+
+interface FactoryContract extends ethers.BaseContract {
+  create(name: string, ticker: string, metadataURI: string, creator: string, overrides?: any): Promise<any>;
+  fee(): Promise<bigint>;
+  getTokenSale(index: number): Promise<TokenSale>;
+  totalTokens(): Promise<number>;
+  getPriceForTokens(token: string, amount: bigint): Promise<bigint>;
+  buy(token: string, amount: bigint, overrides?: any): Promise<any>;
 }
 
 export const useTestTokenService = () => {
@@ -221,9 +232,211 @@ export const useTestTokenService = () => {
     }
   }, [walletClient, getContractAddress]);
 
+  const testGetPurchasedTokens = useCallback(async () => {
+    if (!walletClient) {
+      console.warn("Wallet client not found");
+      return [];
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+
+      // Get all tokens first
+      const allTokens = await testGetTokens();
+
+      // Check balance for each token
+      const purchasedTokensPromises = allTokens.map(async (token) => {
+        const tokenContract = new ethers.Contract(
+          token.token,
+          Token,
+          signer
+        );
+
+        const balance = await tokenContract.balanceOf(userAddress);
+
+        if (balance > BigInt(0)) {
+          return {
+            ...token,
+            balance,
+          };
+        }
+        return null;
+      });
+
+      const purchasedTokens = (await Promise.all(purchasedTokensPromises)).filter(
+        (token) => token !== null
+      );
+
+      return purchasedTokens;
+    } catch (error) {
+      console.error("Error getting purchased tokens:", error);
+      return [];
+    }
+  }, [walletClient, testGetTokens]);
+
+  const testGetEthBalance = useCallback(async (): Promise<bigint> => {
+    if (!walletClient) {
+      console.warn("Wallet client not found");
+      return BigInt(0);
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+      const balance = await provider.getBalance(userAddress);
+      return balance;
+    } catch (error) {
+      console.error("Error getting ETH balance:", error);
+      return BigInt(0);
+    }
+  }, [walletClient]);
+
+  const testGetTokenBalance = useCallback(async (tokenAddress: string): Promise<bigint> => {
+    if (!walletClient) {
+      console.warn("Wallet client not found");
+      return BigInt(0);
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+
+      const tokenContract = new ethers.Contract(
+        tokenAddress,
+        Token,
+        signer
+      );
+
+      const balance = await tokenContract.balanceOf(userAddress);
+      return balance;
+    } catch (error) {
+      console.error("Error getting token balance:", error);
+      return BigInt(0);
+    }
+  }, [walletClient]);
+
+  const testGetEstimatedTokensForEth = useCallback(async (
+    tokenSale: TokenSale,
+    ethAmount: bigint
+  ) => {
+    if (!walletClient) {
+      console.warn("Wallet client not found");
+      return BigInt(0);
+    }
+
+    try {
+      if (tokenSale.isOpen === true) {
+        return BigInt(0);
+      }
+
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
+      const liquidityPoolAddress = config[chainId as keyof typeof config]?.nativeLiquidityPool?.address;
+
+      const liquidityPool = new ethers.Contract(
+        liquidityPoolAddress,
+        NativeLiquidityPool,
+        signer
+      );
+
+      const ethAmountEthers = ethers.parseUnits(ethAmount.toString(), 18);
+      const tokens = await liquidityPool.getEstimatedTokensForEth(
+        tokenSale.token,
+        ethAmountEthers
+      );
+
+      return tokens;
+    } catch (error) {
+      console.error("Error getting estimated tokens for ETH:", error);
+      return BigInt(0);
+    }
+  }, [walletClient]);
+
+  const testGetEstimatedEthForTokens = useCallback(async (
+    tokenSale: TokenSale,
+    tokenAmount: bigint
+  ) => {
+    if (!walletClient) {
+      console.warn("Wallet client not found");
+      return BigInt(0);
+    }
+
+    try {
+      if (tokenSale.isOpen === true) {
+        return BigInt(0);
+      }
+
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
+      const liquidityPoolAddress = config[chainId as keyof typeof config]?.nativeLiquidityPool?.address;
+
+      const liquidityPool = new ethers.Contract(
+        liquidityPoolAddress,
+        NativeLiquidityPool,
+        signer
+      );
+
+      const tokenAmountEthers = ethers.parseUnits(tokenAmount.toString(), 18);
+      const eth = await liquidityPool.getEstimatedEthForTokens(
+        tokenSale.token,
+        tokenAmountEthers
+      );
+
+      return eth;
+    } catch (error) {
+      console.error("Error getting estimated ETH for tokens:", error);
+      return BigInt(0);
+    }
+  }, [walletClient]);
+
+  const testGetPriceForTokens = useCallback(async (tokenSale: TokenSale, amount: bigint) => {
+    if (!walletClient) {
+      console.warn("Wallet client not found");
+      return BigInt(0);
+    }
+
+    try {
+      const CAP_AMOUNT = ethers.parseUnits("10000", 18);
+      const MIN_AMOUNT = ethers.parseUnits("1", 18);
+      const amountInWei = ethers.parseUnits(amount.toString(), 18);
+
+      if (!tokenSale.isOpen || amountInWei < MIN_AMOUNT || amountInWei > CAP_AMOUNT) {
+        return BigInt(0);
+      }
+
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const contractAddress = getContractAddress();
+
+      const factory = new ethers.Contract(
+        contractAddress,
+        Factory,
+        signer
+      ) as unknown as FactoryContract;
+
+      const cost = await factory.getPriceForTokens(tokenSale.token, amountInWei);
+      return cost;
+    } catch (error) {
+      console.error("Error getting price for tokens:", error);
+      return BigInt(0);
+    }
+  }, [walletClient, getContractAddress]);
+
   return {
     testCreateToken,
     testBuyToken,
     testGetTokens,
+    testGetPurchasedTokens,
+    testGetEthBalance,
+    testGetTokenBalance,
+    testGetEstimatedTokensForEth,
+    testGetEstimatedEthForTokens,
+    testGetPriceForTokens,
   };
 }; 

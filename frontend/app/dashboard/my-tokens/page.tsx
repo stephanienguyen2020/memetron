@@ -64,12 +64,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTokenStore } from "../../store/tokenStore";
-import {
-  getTokens,
-  getPriceForTokens,
-  getPurchasedTokens,
-  getTokenBalance,
-} from "@/services/memecoin-launchpad";
 import { useTestTokenService } from "@/services/TestTokenService";
 
 export default function TokensPage() {
@@ -112,7 +106,7 @@ export default function TokensPage() {
                 metadataURI: token.image || "", // Use image URL as metadataURI
               };
 
-              const price = await getPriceForTokens(tokenSaleData, BigInt(1));
+              const price = await testTokenService.testGetPriceForTokens(tokenSaleData, BigInt(1));
               tokenPrice = ethers.formatEther(price);
               console.log(`Token price for ${token.name}:`, tokenPrice);
             } catch (error) {
@@ -153,14 +147,14 @@ export default function TokensPage() {
     };
 
     fetchCreatedTokens();
-  }, [testTokenService.testGetTokens]);
+  }, [testTokenService]);
 
   // Fetch purchased tokens
   useEffect(() => {
     const fetchPurchasedTokens = async () => {
       try {
         setIsLoading(true);
-        const tokens = await testTokenService.testGetTokens();
+        const tokens = await testTokenService.testGetPurchasedTokens();
         console.log("Purchased tokens:", tokens);
 
         // Process tokens and get prices
@@ -180,7 +174,7 @@ export default function TokensPage() {
                 metadataURI: token.image || "",
               };
 
-              const price = await getPriceForTokens(tokenSaleData, BigInt(1));
+              const price = await testTokenService.testGetPriceForTokens(tokenSaleData, BigInt(1));
               tokenPrice = ethers.formatEther(price);
               console.log(`Token price for ${token.name}:`, tokenPrice);
             } catch (error) {
@@ -207,7 +201,7 @@ export default function TokensPage() {
             holders: (Math.random() * 1000).toFixed(0).toString(),
             launchDate: new Date().toISOString().split("T")[0],
             status: token.isOpen ? "active" : "locked",
-            balance: "0", // You'll need to implement balance fetching
+            balance: token.balance ? ethers.formatEther(token.balance) : "0",
             type: "purchased",
           };
         });
@@ -222,7 +216,7 @@ export default function TokensPage() {
     };
 
     fetchPurchasedTokens();
-  }, [testTokenService.testGetTokens]);
+  }, [testTokenService]);
 
   // Get tokens based on the selected tab
   const tokens = tokenTypeTab === "created" ? createdTokens : purchasedTokens;

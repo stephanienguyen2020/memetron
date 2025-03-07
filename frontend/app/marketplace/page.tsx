@@ -484,7 +484,7 @@ export default function MarketplacePage() {
                 metadataURI: token.image || "", // Use image URL as metadataURI
               };
 
-              const price = await getPriceForTokens(tokenSaleData, BigInt(1));
+              const price = await testTokenService.testGetPriceForTokens(tokenSaleData, BigInt(1));
               tokenPrice = ethers.formatEther(price);
               console.log(`Token price for ${token.name}:`, tokenPrice);
             } catch (error) {
@@ -527,7 +527,7 @@ export default function MarketplacePage() {
       }
     };
     fetchTokens();
-  }, [testTokenService.testGetTokens]);
+  }, [testTokenService]);
 
   // Combine mock tokens with store tokens and real tokens
   const allTokens = useMemo(() => {
@@ -552,7 +552,7 @@ export default function MarketplacePage() {
 
     // Prioritize real tokens, then store tokens, then mock tokens as fallback
     // Combine and remove duplicates based on symbol
-    const combined = [...realTokens, ...convertedMockTokens];
+    const combined = [...realTokens];
 
     // If we have real tokens, don't use mock tokens
     const filteredTokens = realTokens.length > 0 ? [...realTokens] : combined;

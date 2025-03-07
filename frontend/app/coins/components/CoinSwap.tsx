@@ -50,6 +50,7 @@ import {
 import { ethers } from "ethers";
 import { useAccount, useWalletClient } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 // Define the Token interface to match what's returned by getTokens
 interface Token {
@@ -121,14 +122,12 @@ const CoinSwap = ({
   handleTradeAction,
   marketplaceTokens = [],
 }: CoinSwapProps) => {
-  // Replace isAuthenticated prop with wagmi hooks
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const testTokenService = useTestTokenService();
 
   // State for token balances
-  const [tokenBalances, setTokenBalances] = useState<Record<string, string>>(
-    {}
-  );
+  const [tokenBalances, setTokenBalances] = useState<Record<string, string>>({});
   const [ethBalance, setEthBalance] = useState<string>("0");
   const [isLoadingBalances, setIsLoadingBalances] = useState<boolean>(false);
 
@@ -187,7 +186,7 @@ const CoinSwap = ({
   const [gasCost, setGasCost] = useState("0.0 BNB");
   const [estimatedTime, setEstimatedTime] = useState("0 min");
 
-  // Update wallet connection check
+  // Update wallet connection check and balance fetching
   useEffect(() => {
     const fetchBalances = async () => {
       if (!isConnected || !walletClient) {
@@ -197,8 +196,8 @@ const CoinSwap = ({
 
       setIsLoadingBalances(true);
       try {
-        // Fetch ETH balance
-        const ethBalanceWei = await getEthBalance();
+        // Fetch ETH balance using new test function
+        const ethBalanceWei = await testTokenService.testGetEthBalance();
         const formattedEthBalance = ethers.formatEther(ethBalanceWei);
         setEthBalance(formattedEthBalance);
 
@@ -208,12 +207,12 @@ const CoinSwap = ({
           ethToken.balance = parseFloat(formattedEthBalance);
         }
 
-        // Fetch token balances for marketplace tokens
+        // Fetch token balances for marketplace tokens using new test function
         const balancePromises = marketplaceTokensFormatted.map(
           async (token) => {
             if (token.tokenData) {
               try {
-                const balance = await getTokenBalance(token.tokenData.token);
+                const balance = await testTokenService.testGetTokenBalance(token.tokenData.token);
                 const formattedBalance = ethers.formatEther(balance);
                 return {
                   tokenAddress: token.tokenData.token,
@@ -257,7 +256,7 @@ const CoinSwap = ({
     };
 
     fetchBalances();
-  }, [isConnected, walletClient, marketplaceTokens]);
+  }, [isConnected, walletClient, marketplaceTokens, testTokenService]);
 
   // Get the current balance of the selected token
   const getSelectedTokenBalance = (token: UIToken): string => {
@@ -317,7 +316,7 @@ const CoinSwap = ({
     }
   }, [fromToken, toToken, tokens]);
 
-  // Calculate price in real-time when amount changes
+  // Update price calculation
   useEffect(() => {
     const calculatePrice = async () => {
       if (
@@ -352,7 +351,7 @@ const CoinSwap = ({
             metadataURI: "", // This might need to be fetched if required
           };
 
-          const estimatedTokens = await getEstimatedTokensForEth(
+          const estimatedTokens = await testTokenService.testGetEstimatedTokensForEth(
             tokenSale,
             amount
           );
@@ -374,7 +373,7 @@ const CoinSwap = ({
             metadataURI: "", // This might need to be fetched if required
           };
 
-          const estimatedEth = await getEstimatedEthForTokens(
+          const estimatedEth = await testTokenService.testGetEstimatedEthForTokens(
             tokenSale,
             amount
           );
@@ -389,7 +388,7 @@ const CoinSwap = ({
     };
 
     calculatePrice();
-  }, [fromAmount, fromToken, toToken, swapDirection]);
+  }, [fromAmount, fromToken, toToken, swapDirection, testTokenService]);
 
   const handleFromAmountChange = (value: string) => {
     setFromAmount(value);
@@ -555,7 +554,7 @@ const CoinSwap = ({
 
     try {
       // Fetch updated balances
-      const ethBalanceWei = await getEthBalance();
+      const ethBalanceWei = await testTokenService.testGetEthBalance();
       const formattedEthBalance = ethers.formatEther(ethBalanceWei);
       setEthBalance(formattedEthBalance);
 
@@ -567,7 +566,7 @@ const CoinSwap = ({
 
       // If we swapped a token, update its balance
       if (swapDirection === "tokenToEth" && fromToken.tokenData) {
-        const tokenBalance = await getTokenBalance(fromToken.tokenData.token);
+        const tokenBalance = await testTokenService.testGetTokenBalance(fromToken.tokenData.token);
         const formattedBalance = ethers.formatEther(tokenBalance);
 
         // Update the balance in our state
@@ -584,7 +583,7 @@ const CoinSwap = ({
           token.balance = parseFloat(formattedBalance);
         }
       } else if (swapDirection === "ethToToken" && toToken.tokenData) {
-        const tokenBalance = await getTokenBalance(toToken.tokenData.token);
+        const tokenBalance = await testTokenService.testGetTokenBalance(toToken.tokenData.token);
         const formattedBalance = ethers.formatEther(tokenBalance);
 
         // Update the balance in our state

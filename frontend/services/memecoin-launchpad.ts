@@ -282,22 +282,6 @@ export async function getTokens(options?: {
 }
 
 /**
- * Helper function to get all tokens (no filters)
- * @returns All tokens
- */
-export async function getAllTokens(): Promise<Token[]> {
-  return getTokens();
-}
-
-/**
- * Helper function to get tokens created by the current user
- * @returns Tokens created by the current user
- */
-export async function getUserTokens(): Promise<Token[]> {
-  return getTokens({ isCreator: true });
-}
-
-/**
  * Fetch metadata from IPFS.
  */
 async function fetchMetadata(

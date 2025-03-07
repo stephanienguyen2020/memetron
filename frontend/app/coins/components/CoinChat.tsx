@@ -102,7 +102,7 @@ function CoinChatContent({ symbol }: { symbol: string }) {
       : undefined;
 
     const userMessage = {
-      text: input + "about " + symbol,
+      text: input + " about " + symbol,
       user: "user",
       createdAt: Date.now(),
       attachments,
@@ -117,7 +117,7 @@ function CoinChatContent({ symbol }: { symbol: string }) {
 
     queryClient.setQueryData(
       ["messages", agentId],
-      (old: ContentWithUser[] = []) => [...old, userMessage, thinkingMessage]
+      (old: ContentWithUser[] = []) => [...old, userMessage]
     );
 
     sendMessageMutation.mutate({

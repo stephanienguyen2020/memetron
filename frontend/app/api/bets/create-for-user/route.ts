@@ -15,7 +15,7 @@ async function generateImage(prompt: string): Promise<string> {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_NEBULA_API_KEY}`,
       },
       body: JSON.stringify({
-        model_name: "stabilityai/stable-diffusion-xl-base-1.0",
+        model_name: "black-forest-labs/FLUX.1-schnell",
         prompt: prompt,
         num_steps: 25,
         guidance_scale: 9,

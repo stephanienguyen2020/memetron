@@ -85,7 +85,8 @@ export const apiClient = {
   sendMessage: (
     agentId: string,
     message: string,
-    selectedFile?: File | null
+    selectedFile?: File | null,
+    userWalletId?: string | null
   ) => {
     const formData = new FormData();
     formData.append("text", message);
@@ -93,6 +94,10 @@ export const apiClient = {
 
     if (selectedFile) {
       formData.append("file", selectedFile);
+    }
+
+    if (userWalletId) {
+      formData.append("userWalletId", userWalletId);
     }
 
     // Check if we're in development mode and the API server is not available

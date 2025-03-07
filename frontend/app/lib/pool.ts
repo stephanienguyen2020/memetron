@@ -21,7 +21,7 @@ export async function fetchPoolInfo(
   token_address: string
 ): Promise<PoolInfoResponse> {
   const url =
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/coins/find_pool?network=aurora&token_address=` +
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/coins/find_pool?network=sonic&token_address=` +
     token_address;
 
   // Fetch the API data

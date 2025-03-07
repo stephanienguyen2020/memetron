@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import GridBackground from "@/app/components/GridBackground";
 import { title } from "process";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 const DEFAULT_TOKEN_IMAGE = "/placeholder.svg";
 
@@ -58,6 +59,8 @@ export default function TokenDetailPage() {
   const [estimatedPrice, setEstimatedPrice] = useState<string>("0");
   const [isPriceLoading, setIsPriceLoading] = useState(false);
   const [isTokenClosed, setIsTokenClosed] = useState(false);
+
+  const testTokenService = useTestTokenService();
 
   // Check if amount exceeds maximum allowed
   const isAmountExceedingLimit = useMemo(() => {
@@ -182,7 +185,7 @@ export default function TokenDetailPage() {
             description: foundToken.description || "No description available",
             imageUrl: imageUrl,
             price: tokenPrice, // Set the actual price from the contract
-            marketCap: (Number(foundToken.raised) / 1e18).toFixed(2) + " ETH",
+            marketCap: (Number(foundToken.raised) / 1e18).toFixed(2) + " ETN",
             priceChange: Math.random() * 20 - 10, // Random price change for now
             fundingRaised: foundToken.raised.toString(),
             chain: "ethereum", // Default to ethereum, should be determined from the chain ID
@@ -273,7 +276,7 @@ export default function TokenDetailPage() {
     return () => clearTimeout(debounceTimer);
   }, [buyAmount, token]);
 
-  // Handle buy token
+  // Update handleBuyToken function
   const handleBuyToken = async () => {
     if (!token || !buyAmount) return;
 
@@ -282,8 +285,7 @@ export default function TokenDetailPage() {
       if (isTokenClosed) {
         toast({
           title: "Token Closed",
-          description:
-            "This token has graduated and is no longer available for purchase.",
+          description: "This token has graduated and is no longer available for purchase.",
           variant: "destructive",
         });
         return;
@@ -315,8 +317,8 @@ export default function TokenDetailPage() {
         metadataURI: token.rawToken.image || "", // Use image URL as metadataURI
       };
 
-      // Call the buyToken function
-      const result = await buyToken(tokenSaleData, amount);
+      // Call the testBuyToken function
+      const result = await testTokenService.testBuyToken(tokenSaleData, amount);
 
       if (result.success) {
         toast({
@@ -334,7 +336,7 @@ export default function TokenDetailPage() {
         setTimeout(() => {
           // Reload the page to reflect updated data
           window.location.reload();
-        }, 3000); // 3 second delay
+        }, 3000);
       } else {
         toast({
           title: "Transaction Failed",
@@ -722,7 +724,7 @@ export default function TokenDetailPage() {
                 <CardHeader>
                   <CardTitle>Buy {token?.symbol}</CardTitle>
                   <CardDescription>
-                    Purchase tokens directly with ETH
+                    Purchase tokens directly with ETN
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -781,7 +783,7 @@ export default function TokenDetailPage() {
                             <span>Calculating...</span>
                           </div>
                         ) : (
-                          <>{estimatedPrice} ETH</>
+                          <>{estimatedPrice} ETN</>
                         )}
                       </div>
                     </div>
@@ -840,7 +842,7 @@ export default function TokenDetailPage() {
                     <span>
                       {isTokenClosed
                         ? "This token is no longer available for purchase."
-                        : `Base cost: ${token?.baseCost} ETH per token. Gas fees may apply.`}
+                        : `Base cost: ${token?.baseCost} ETN per token. Gas fees may apply.`}
                     </span>
                   </div>
                 </CardFooter>

@@ -70,6 +70,7 @@ import {
   getPurchasedTokens,
   getTokenBalance,
 } from "@/services/memecoin-launchpad";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 export default function TokensPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,13 +85,14 @@ export default function TokensPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [createdTokens, setCreatedTokens] = useState<any[]>([]);
   const [purchasedTokens, setPurchasedTokens] = useState<any[]>([]);
+  const testTokenService = useTestTokenService();
 
   // Fetch user created tokens from blockchain
   useEffect(() => {
     const fetchCreatedTokens = async () => {
       try {
         setIsLoading(true);
-        const tokens = await getTokens({ isCreator: true });
+        const tokens = await testTokenService.testGetTokens({ isCreator: true });
         console.log("Created tokens:", tokens);
 
         // Process tokens and get prices
@@ -118,7 +120,6 @@ export default function TokensPage() {
                 `Error fetching price for token ${token.name}:`,
                 error
               );
-              // Set price to 0 on error
               tokenPrice = "0";
             }
           }
@@ -129,11 +130,11 @@ export default function TokensPage() {
             symbol: token.name.substring(0, 4).toUpperCase(),
             description: token.description || "No description available",
             imageUrl: token.image || "/placeholder.svg",
-            price: tokenPrice, // Use the actual price from the contract
+            price: tokenPrice,
             marketCap: (Number(token.raised) / 1e18).toFixed(2),
-            priceChange: Math.random() * 20 - 10, // Random price change for now
+            priceChange: Math.random() * 20 - 10,
             fundingRaised: token.raised.toString(),
-            chain: "NEAR", // Default to ethereum, should be determined from the chain ID
+            chain: "Electroneum",
             volume24h: "$" + (Math.random() * 100000).toFixed(2),
             holders: (Math.random() * 1000).toFixed(0).toString(),
             launchDate: new Date().toISOString().split("T")[0],
@@ -142,7 +143,6 @@ export default function TokensPage() {
           };
         });
 
-        // Wait for all price fetching to complete
         const formattedTokens = await Promise.all(formattedTokensPromises);
         setCreatedTokens(formattedTokens);
       } catch (error) {
@@ -153,14 +153,14 @@ export default function TokensPage() {
     };
 
     fetchCreatedTokens();
-  }, []);
+  }, [testTokenService.testGetTokens]);
 
   // Fetch purchased tokens
   useEffect(() => {
     const fetchPurchasedTokens = async () => {
       try {
         setIsLoading(true);
-        const tokens = await getPurchasedTokens();
+        const tokens = await testTokenService.testGetTokens();
         console.log("Purchased tokens:", tokens);
 
         // Process tokens and get prices
@@ -177,7 +177,7 @@ export default function TokensPage() {
                 sold: token.sold,
                 raised: token.raised,
                 isOpen: token.isOpen,
-                metadataURI: token.image || "", // Use image URL as metadataURI
+                metadataURI: token.image || "",
               };
 
               const price = await getPriceForTokens(tokenSaleData, BigInt(1));
@@ -188,16 +188,9 @@ export default function TokensPage() {
                 `Error fetching price for token ${token.name}:`,
                 error
               );
-              // Set price to 0 on error
               tokenPrice = "0";
             }
           }
-
-          // Format the balance
-          const balance =
-            "balance" in token && token.balance !== undefined
-              ? ethers.formatEther(token.balance as bigint)
-              : "0";
 
           return {
             id: token.token,
@@ -205,21 +198,20 @@ export default function TokensPage() {
             symbol: token.name.substring(0, 4).toUpperCase(),
             description: token.description || "No description available",
             imageUrl: token.image || "/placeholder.svg",
-            price: tokenPrice, // Use the actual price from the contract
+            price: tokenPrice,
             marketCap: (Number(token.raised) / 1e18).toFixed(2),
-            priceChange: Math.random() * 20 - 10, // Random price change for now
+            priceChange: Math.random() * 20 - 10,
             fundingRaised: token.raised.toString(),
-            chain: "NEAR", // Default to ethereum, should be determined from the chain ID
+            chain: "NEAR",
             volume24h: "$" + (Math.random() * 100000).toFixed(2),
             holders: (Math.random() * 1000).toFixed(0).toString(),
             launchDate: new Date().toISOString().split("T")[0],
             status: token.isOpen ? "active" : "locked",
-            balance: balance,
+            balance: "0", // You'll need to implement balance fetching
             type: "purchased",
           };
         });
 
-        // Wait for all price fetching to complete
         const formattedTokens = await Promise.all(formattedTokensPromises);
         setPurchasedTokens(formattedTokens);
       } catch (error) {
@@ -230,7 +222,7 @@ export default function TokensPage() {
     };
 
     fetchPurchasedTokens();
-  }, []);
+  }, [testTokenService.testGetTokens]);
 
   // Get tokens based on the selected tab
   const tokens = tokenTypeTab === "created" ? createdTokens : purchasedTokens;

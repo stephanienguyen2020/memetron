@@ -41,6 +41,7 @@ import { getTokens, getPriceForTokens } from "@/services/memecoin-launchpad";
 import { ethers, id } from "ethers";
 import { error } from "console";
 import page from "../page";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 const DEFAULT_TOKEN_IMAGE = "/placeholder.svg";
 const DEFAULT_CHAIN_LOGO = "/chain-placeholder.svg";
@@ -456,6 +457,7 @@ export default function MarketplacePage() {
 
   // Get tokens from store
   const storeTokens = useTokenStore((state) => state.tokens);
+  const testTokenService = useTestTokenService();
 
   // Fetch real tokens from the blockchain
   useEffect(() => {
@@ -463,9 +465,7 @@ export default function MarketplacePage() {
       try {
         setIsLoading(true);
         // Get tokens that are open for sale (isOpen = true)
-        const tokens = await getTokens({ isOpen: true });
-
-        // console.log("Fetched tokens from blockchain:", tokens);
+        const tokens = await testTokenService.testGetTokens({ isOpen: true });
 
         // Process tokens and get prices
         const formattedTokensPromises = tokens.map(async (token) => {
@@ -501,14 +501,14 @@ export default function MarketplacePage() {
             id: token.token,
             token: token.token,
             name: token.name,
-            symbol: token.name.substring(0, 4).toUpperCase(), // Generate a symbol if not available
+            symbol: token.name.substring(0, 4).toUpperCase(),
             description: token.description || "No description available",
             imageUrl: token.image || DEFAULT_TOKEN_IMAGE,
-            price: tokenPrice, // Use the actual price from the contract
-            marketCap: (Number(token.raised) / 1e18).toFixed(2) + "k", // Convert wei to ETH and format
-            priceChange: Math.random() * 20 - 10, // Random price change for now
+            price: tokenPrice,
+            marketCap: (Number(token.raised) / 1e18).toFixed(2) + "k",
+            priceChange: Math.random() * 20 - 10,
             fundingRaised: token.raised.toString(),
-            chain: "ethereum", // Default to ethereum, should be determined from the chain ID
+            chain: "ethereum",
             volume24h: "$" + (Math.random() * 100000).toFixed(2),
             holders: (Math.random() * 1000).toFixed(0),
             launchDate: new Date().toISOString().split("T")[0],
@@ -517,19 +517,17 @@ export default function MarketplacePage() {
           };
         });
 
-        // Wait for all price fetching to complete
         const formattedTokens = await Promise.all(formattedTokensPromises);
         console.log("Formatted tokens:", formattedTokens);
         setRealTokens(formattedTokens);
       } catch (error) {
         console.error("Error fetching tokens:", error);
-        // If there's an error, we'll fall back to mock data
       } finally {
         setIsLoading(false);
       }
     };
     fetchTokens();
-  }, []);
+  }, [testTokenService.testGetTokens]);
 
   // Combine mock tokens with store tokens and real tokens
   const allTokens = useMemo(() => {

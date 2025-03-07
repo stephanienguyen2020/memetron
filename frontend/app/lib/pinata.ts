@@ -17,8 +17,6 @@ export const pinata = new PinataSDK({
 });
 
 export const pinFileToIPFS = async (file: File) => {
-    console.log(process.env.NEXT_PUBLIC_PINATA_JWT)
-    console.log(process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL)
     try {
         const uploadData = await pinata.upload.file(file);
         if (!uploadData?.IpfsHash) {

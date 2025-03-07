@@ -1,4 +1,4 @@
-MemeTron is an **AI-driven platform** for meme coin trading, research, and creation. Whether you're betting on trends, launching tokens, or analyzing market data, MemeTron provides the tools to stay ahead.
+MemeTron solves key challenges in the meme coin space by automating creation, trading, speculation, and marketing through AI-powered tools and fair launch mechanics. It eliminates the need for coding by allowing users to describe their meme idea, with AI handling everything from naming to deployment. Unlike traditional meme coins prone to rug pulls, MemeTron enforces liquidity locking, fair launch mechanisms, and a 10-day vesting period to protect investors. Its multi-agent AI system provides real-time market insights, tracks social sentiment, monitors whale movements, and identifies new token opportunities. The platform also features an on-chain betting marketplace for predicting meme coin trends and an Auto Shill Agent that automates token promotion across social media. Additionally, users can launch tokens simply by chatting with a bot or tagging it on Twitter, making the entire process seamless and accessible.
 
 ## 🚀 Features
 
@@ -12,7 +12,7 @@ Monitor holdings in real-time, track profits/losses, and get AI-driven price pre
 
 ### **🛠 Betting Marketplace**
 
-Bet on meme coin trends directly via Twitter by tagging **@MemeTron**. Smart contracts ensure secure escrow and instant payouts.
+Bet on meme coin trends directly via Twitter by tagging **@sousa_emil22786**. Smart contracts ensure secure escrow and instant payouts.
 
 ### **🚀 Meme Coin Launch Pad**
 
@@ -22,12 +22,15 @@ Launch your own token with an AI-powered branding assistant, instant deployment,
 - Once a meme token reaches its funding goal, liquidity creation is triggered through the Native Liquidity Pool. Early contributors receive rewards, allowing them to mint additional tokens on Electroneum.
 - A Marketplace where users can create, buy, and trade all launched meme tokens.
 
-### **📊 AI Research & Trading Tools**
+### **📊 Multi-Agent Framework**
+- Our News Agent monitors live news, social media, and major outlets to deliver instant alerts on market-moving events, ensuring you’re always informed.
+- Our Twitter Agent parses tweets and launches tokens, shill coins, and creates prediction markets automatically. 
+- Our Token Analysis Agent analyzes real-time market trends, Google search volumes, and CoinMarketCap data to detect emerging opportunities before they gain traction.
+- The Social Sentiment Agent tracks social engagement across Twitter, Reddit, and Telegram, providing AI-driven sentiment analysis to gauge community hype and investor mood.
+- Our Search Agent scans platforms like Pump.fun and other launchpads to detect newly minted tokens with high breakout potential, giving you early access to trending projects.
+- Our Swap Agent identifies the best liquidity pools and price points across multiple blockchains to ensure trades at optimal rates. 
+- Our Whale Watch Agent tracks whale and influencer wallet activity, providing deep insights into holder percentages, big-money movements, and market impact—helping you spot trends before they make headlines.
 
-- **Market Insights:** Track trends, social engagement, and whale movements.
-- **Swap Agent:** Find the best liquidity pools and trade efficiently.
-- **News Agent:** Get real-time alerts on market-moving events.
-- **Sentiment Analysis & Predictions:** AI forecasts price trends based on historical data.
 
 ---
 
@@ -135,34 +138,3 @@ If you encounter any issues:
 - Backend uses FastAPI with Python 3.8+
 - Eliza agent requires Node.js 18+ and pnpm
 - Make sure to run all three components (frontend, backend, and Eliza agent) for full functionality
-
-## 💻 Technology Stack
-
-### 🎨 Frontend & UI
-
-![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-
-### 🔧 Backend & API
-
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![ElizaOS](https://img.shields.io/badge/ElizaOS-FF6B6B?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PC9zdmc+&logoColor=white)
-
-### ⛓️ Blockchain & Smart Contracts
-
-![Solidity](https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white)
-![Hardhat](https://img.shields.io/badge/Hardhat-FFD700?style=for-the-badge&logo=hardhat&logoColor=black)
-![NebulaBlock](https://img.shields.io/badge/NebulaBlock-6F4BB2?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PC9zdmc+&logoColor=white)
-
-### 📦 Storage & IPFS
-
-![Pinata](https://img.shields.io/badge/Pinata-E4405F?style=for-the-badge&logo=pinata&logoColor=white)
-
-### 📊 AI & Integration
-
-![OpenAI](https://img.shields.io/badge/GPT--4-412991?style=for-the-badge&logo=openai&logoColor=white)
-![Twitter API](https://img.shields.io/badge/Twitter%20API-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.

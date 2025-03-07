@@ -51,11 +51,6 @@ const DEFAULT_CHAIN_LOGO = "/chain-placeholder.svg";
 
 const chains: Chain[] = [
   {
-    id: "ethereum",
-    name: "Ethereum",
-    logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
-  },
-  {
     id: "bsc",
     name: "BSC",
     logo: "https://cryptologos.cc/logos/bnb-bnb-logo.png",
@@ -295,32 +290,6 @@ const TokenCard = ({
                 style={{ maxWidth: "100%" }}
               />
             )}
-
-            {/* Network Badge */}
-            <div className="absolute z-20 top-4 left-4">
-              <div className="flex items-center gap-1.5 bg-black/90 rounded-full px-2.5 py-1 border border-white/10">
-                {chains.map(
-                  (chain) =>
-                    chain.id === token.chain && (
-                      <div key={chain.id} className="flex items-center gap-1.5">
-                        <div className="w-3.5 h-3.5 rounded-full bg-gray-700 overflow-hidden">
-                          <Image
-                            src={DEFAULT_CHAIN_LOGO}
-                            alt={chain.name}
-                            width={14}
-                            height={14}
-                            className="rounded-full"
-                            unoptimized
-                          />
-                        </div>
-                        <span className="text-[11px] font-medium text-white">
-                          {chain.name}
-                        </span>
-                      </div>
-                    )
-                )}
-              </div>
-            </div>
 
             {/* Price Change Badge */}
             <div className="absolute z-20 top-4 right-4">

@@ -524,8 +524,8 @@ const CoinSwap = ({
           metadataURI: toToken.tokenData.image || "", // Use image URL as metadataURI
         };
 
-        // Call the swap function
-        result = await swapEthForToken(tokenSale, amount);
+        // Call the test swap function
+        result = await testTokenService.testSwapEthForToken(tokenSale, amount);
       } else if (swapDirection === "tokenToEth" && fromToken.tokenData) {
         // Token to ETH swap
         const tokenSale = {
@@ -538,8 +538,8 @@ const CoinSwap = ({
           metadataURI: fromToken.tokenData.image || "", // Use image URL as metadataURI
         };
 
-        // Call the swap function
-        result = await swapTokenForEth(tokenSale, amount);
+        // Call the test swap function
+        result = await testTokenService.testSwapTokenForEth(tokenSale, amount);
       } else {
         alert("Invalid swap configuration");
         return;
@@ -547,7 +547,7 @@ const CoinSwap = ({
 
       // Check if the swap was successful
       if (!result.success) {
-        alert("Swap failed. Please try again.");
+        alert(result.error || "Swap failed. Please try again.");
         return;
       }
 

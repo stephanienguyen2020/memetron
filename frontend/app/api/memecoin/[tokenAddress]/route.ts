@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenDetails } from "@/services/memecoin-launchpad";
 
+// Helper function to make BigInt serializable
+function serializeBigInt(obj: any): any {
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    )
+  );
+}
+
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { tokenAddress: string } }
-) {
+  request: NextRequest,
+  context: { params: { tokenAddress: string } }
+): Promise<NextResponse> {
   try {
-    const { tokenAddress } = params;
+    // Get the tokenAddress from the URL pattern
+    const tokenAddress = context.params.tokenAddress;
 
     if (!tokenAddress) {
       return NextResponse.json(
@@ -24,9 +34,12 @@ export async function GET(
       );
     }
 
+    // Serialize the response to handle BigInt values
+    const serializedData = serializeBigInt(tokenDetails);
+
     return NextResponse.json({
       success: true,
-      data: tokenDetails,
+      data: serializedData,
     });
   } catch (error: any) {
     console.error("Error fetching token details:", error);

@@ -557,67 +557,68 @@ export async function getTokenDetails(tokenAddress: string): Promise<{
     marketCap: string;
     volume24h: string;
     holders: number;
-    liquidityPool: string;
-  };
-  contractData: {
-    totalSupply: string;
-    circulatingSupply: string;
-    owner: string;
-    creator: string;
-    metadataURI: string;
-    name: string;
-    symbol: string;
-    decimals: number;
+ // liquidityPool: string;
   };
 } | null> {
   try {
-    const { factory, liquidityPool } = await loadFactoryContract();
+    // Connect to the provider
+    const provider = new ethers.JsonRpcProvider(
+      process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545"
+    );
+    
+    const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
+    const chainConfig = config[chainId as keyof typeof config];
+
+    if (!chainConfig) {
+      console.error(`Contract addresses not found for chain ID ${chainId}`);
+      return null;
+    }
+
+    // Create contract instances
+    const factoryContract = new ethers.Contract(
+      chainConfig.factory.address,
+      Factory,
+      provider
+    );
+
 
     // Create token contract instance with full ABI
     const tokenContract = new ethers.Contract(
       tokenAddress,
       TokenABI,
-      factory.runner
+      provider
     );
 
     // Get all token data in parallel
     const [
       totalSupply,
-      lpBalance,
-      owner,
+    //lpBalance,
       creator,
       metadataURI,
       name,
-      symbol,
-      decimals
+      tokenSale
     ] = await Promise.all([
       tokenContract.totalSupply(),
-      tokenContract.balanceOf(await liquidityPool.getAddress()),
-      tokenContract.owner(),
+      //tokenContract.balanceOf(chainConfig.nativeLiquidityPool.address),
       tokenContract.creator(),
       tokenContract.metadataURI(),
       tokenContract.name(),
-      tokenContract.symbol(),
-      tokenContract.decimals(),
+      factoryContract.tokenToSale(tokenAddress)
     ]);
 
     // Fetch metadata
     const metadata = await fetchMetadata(metadataURI);
-
-    // Get token sale info from factory if needed for price calculation
-    const tokenSale = await factory.getTokenSale(tokenAddress);
     
     // Calculate market data
-    const price = tokenSale.raised.toString() / tokenSale.sold.toString();
-    const marketCap = price * Number(ethers.formatEther(totalSupply));
-
+    const price = await factoryContract.getPriceForTokens(tokenAddress, ethers.parseUnits("1", 18)); // in wei
+    const marketCap = ethers.formatUnits(tokenSale.raised, 18)
     return {
       token: {
         token: tokenAddress,
         name: name,
         creator: creator,
         sold: tokenSale.sold,
-        raised: tokenSale.raised,
+        raised: Number(tokenSale.raised),
         isOpen: tokenSale.isOpen,
         image: metadata.imageURI,
         description: metadata.description,
@@ -628,18 +629,8 @@ export async function getTokenDetails(tokenAddress: string): Promise<{
         marketCap: marketCap.toString(),
         volume24h: "0", // You might want to track this separately
         holders: 0, // You might want to track this separately
-        liquidityPool: ethers.formatEther(lpBalance),
-      },
-      contractData: {
-        totalSupply: ethers.formatEther(totalSupply),
-        circulatingSupply: ethers.formatEther(totalSupply - lpBalance),
-        owner: owner,
-        creator: creator,
-        metadataURI: metadataURI,
-        name: name,
-        symbol: symbol,
-        decimals: decimals,
-      },
+       //liquidityPool: ethers.formatEther(lpBalance),
+      }
     };
   } catch (error) {
     console.error("Error getting token details:", error);

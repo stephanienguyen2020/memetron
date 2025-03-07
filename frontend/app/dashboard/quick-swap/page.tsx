@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import CoinSwap from "@/app/coins/components/CoinSwap";
 import { AppLayout } from "@/app/components/app-layout";
 import { getTokens } from "@/services/memecoin-launchpad";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 // Define the Token interface to match what's returned by getTokens
 interface Token {
@@ -21,6 +22,7 @@ export default function QuickSwapPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [marketplaceTokens, setMarketplaceTokens] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const testTokenService = useTestTokenService();
 
   // Check authentication status
   useEffect(() => {
@@ -66,7 +68,7 @@ export default function QuickSwapPage() {
       try {
         setIsLoading(true);
         // Get tokens that are graduated (isOpen = false)
-        const tokens = await getTokens({ isOpen: false });
+        const tokens = await testTokenService.testGetTokens({ isOpen: false });
         setMarketplaceTokens(tokens);
       } catch (error) {
         console.error("Error fetching marketplace tokens:", error);
@@ -76,7 +78,7 @@ export default function QuickSwapPage() {
     };
 
     fetchMarketplaceTokens();
-  }, []);
+  }, [testTokenService.testGetTokens]);
 
   const handleTradeAction = () => {
     // This function would handle trade actions

@@ -21,6 +21,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createToken } from "@/services/memecoin-launchpad";
 import { generateTokenConcept } from "@/app/lib/nebula";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 interface TokenDetails {
   name: string;
@@ -64,6 +65,7 @@ export default function LaunchPage() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [createdToken, setCreatedToken] = useState<Token | null>(null);
   const addToken = useTokenStore((state) => state.addToken);
+  const testTokenService = useTestTokenService();
 
   const handleImageSelect = (file: File) => {
     setError("");
@@ -208,9 +210,8 @@ export default function LaunchPage() {
   };
 
   const handleSubmit = async (data: Record<string, string>) => {
-    console.log("Submitting data:", data); // Debug log
+    console.log("Submitting data:", data);
     console.log("Image file:", imageFile);
-    // ========= Thong added this ================
     try {
       if (!imageFile) {
         setError("Please upload an image or generate one using AI");
@@ -225,10 +226,13 @@ export default function LaunchPage() {
         ticker: data.symbol.trim(),
         description: data.description || "",
       };
-      const result = await createToken(metaData, imageFile);
+
+      // Use testCreateToken instead of createToken
+      const result = await testTokenService.testCreateToken(metaData, imageFile);
 
       if (!result.success) {
         setError("Failed to create token");
+        return false;
       }
 
       // Create a new token object
@@ -236,7 +240,7 @@ export default function LaunchPage() {
         id: result.imageURL?.split("ipfs/")[1] || Date.now().toString(),
         name: data.name,
         symbol: data.symbol,
-        imageUrl, // Ensure imageUrl is set
+        imageUrl: result.imageURL || "", // Use the returned IPFS URL
         description: data.description || "",
         price: "$0.00",
         priceChange: 0,
@@ -249,16 +253,17 @@ export default function LaunchPage() {
         fundingRaised: "0",
       };
 
-      console.log("New token created:", newToken); // Debug log
+      console.log("New token created:", newToken);
 
       // Add token to store
       addToken(newToken);
       setCreatedToken(newToken);
       setShowSuccessDialog(true);
-      return result.success;
+      return true;
     } catch (error) {
       console.error("Error creating token:", error);
       setError("Failed to create token. Please try again.");
+      return false;
     } finally {
       setIsLoading(false);
     }

@@ -18,11 +18,11 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ethers } from "ethers";
-import {
-  getTokens,
-  buyToken,
-  getPriceForTokens,
-} from "@/services/memecoin-launchpad";
+// import {
+//   getTokens,
+//   buyToken,
+//   getPriceForTokens,
+// } from "@/services/memecoin-launchpad";
 import { useToast } from "@/components/ui/use-toast";
 import {
   TrendingUp,
@@ -41,8 +41,32 @@ import {
 } from "lucide-react";
 import GridBackground from "@/app/components/GridBackground";
 import { title } from "process";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 const DEFAULT_TOKEN_IMAGE = "/placeholder.svg";
+
+interface TokenApiResponse {
+  success: boolean;
+  data: {
+    token: {
+      token: string;
+      name: string;
+      creator: string;
+      sold: string;
+      raised: number;
+      isOpen: boolean;
+      image: string;
+      description: string;
+      symbol: string;
+    };
+    marketData: {
+      price: string;
+      marketCap: string;
+      volume24h: string;
+      holders: number;
+    };
+  };
+}
 
 export default function TokenDetailPage() {
   const params = useParams();
@@ -59,6 +83,8 @@ export default function TokenDetailPage() {
   const [isPriceLoading, setIsPriceLoading] = useState(false);
   const [isTokenClosed, setIsTokenClosed] = useState(false);
 
+  const testTokenService = useTestTokenService();
+
   // Check if amount exceeds maximum allowed
   const isAmountExceedingLimit = useMemo(() => {
     const amount = Number.parseFloat(buyAmount);
@@ -72,142 +98,87 @@ export default function TokenDetailPage() {
         setIsLoading(true);
         setNotFoundError(false);
 
-        // Get all tokens without filtering
-        const tokens = await getTokens();
-
-        console.log("Available tokens:", tokens);
+        // First get all tokens to find the token address
+        const tokens = await testTokenService.testGetTokens();
         console.log("Looking for token with identifier:", symbol);
 
-        // For debugging, log all token names and symbols
-        console.log("Available token names and symbols:");
-        tokens.forEach((t) => {
-          console.log(
-            `Name: ${t.name}, Symbol: ${t.name
-              .substring(0, 4)
-              .toUpperCase()}, Address: ${t.token}`
-          );
-        });
+        // Try to find the token address using different matching strategies
+        let tokenAddress = null;
 
-        // Try to find the token using different matching strategies
-        let foundToken = null;
-
-        // 1. Try exact match on token address
-        foundToken = tokens.find(
-          (t) => t.token.toLowerCase() === symbol.toLowerCase()
-        );
-        if (foundToken) {
-          console.log("Found token by address match");
-        }
-
-        // 2. If not found, try exact match on symbol (first 4 chars of name)
-        if (!foundToken) {
-          foundToken = tokens.find(
-            (t) => t.name.substring(0, 4).toUpperCase() === symbol.toUpperCase()
-          );
-          if (foundToken) {
-            console.log("Found token by symbol match");
-          }
-        }
-
-        // 3. If still not found, try partial match on name
-        if (!foundToken) {
-          foundToken = tokens.find((t) =>
-            t.name.toUpperCase().includes(symbol.toUpperCase())
-          );
-          if (foundToken) {
-            console.log("Found token by name partial match");
-          }
-        }
-
-        // 4. If still not found, try to use a mock token for testing
-        if (!foundToken && symbol.toLowerCase() === "sam") {
-          console.log("Using mock token for 'sam'");
-          // Create a mock token for testing
-          foundToken = {
-            token: "0x1234567890123456789012345678901234567890",
-            name: "Sample Token",
-            creator: "0xabcdef1234567890abcdef1234567890abcdef12",
-            sold: "1000000000000000000",
-            raised: "1000000000000000000",
-            isOpen: true,
-            image: "https://via.placeholder.com/400x400.png?text=SAM", // Use a placeholder image URL
-            description: "This is a sample token for testing",
-          };
-        }
-
-        console.log("Final found token:", foundToken);
-
-        if (foundToken) {
-          // Format token data for display
-          const imageUrl = foundToken.image || DEFAULT_TOKEN_IMAGE;
-          console.log("Token image URL:", imageUrl);
-
-          // Check if token is closed
-          const isOpen = foundToken.isOpen;
-          setIsTokenClosed(!isOpen);
-
-          // Get the actual price from the contract for 1 token
-          let tokenPrice = "0";
-          if (isOpen) {
-            try {
-              // Get price for 1 token
-              // We need to ensure the token has all the required properties of TokenSale
-              const tokenSaleData = {
-                token: foundToken.token,
-                name: foundToken.name,
-                creator: foundToken.creator,
-                sold: foundToken.sold,
-                raised: foundToken.raised,
-                isOpen: foundToken.isOpen,
-                metadataURI: foundToken.image || "", // Use image URL as metadataURI
-              };
-
-              const price = await getPriceForTokens(tokenSaleData, BigInt(1));
-              tokenPrice = ethers.formatEther(price);
-              console.log("Token price from contract:", tokenPrice);
-            } catch (error) {
-              console.error("Error fetching token price:", error);
-              // Set price to 0 instead of using a hardcoded fallback
-              tokenPrice = "0";
-            }
-          } else {
-            // If token is locked, price is 0
-            tokenPrice = "0";
-          }
-
-          setToken({
-            id: foundToken.token,
-            name: foundToken.name,
-            symbol: foundToken.name.substring(0, 4).toUpperCase(),
-            description: foundToken.description || "No description available",
-            imageUrl: imageUrl,
-            price: tokenPrice, // Set the actual price from the contract
-            marketCap: (Number(foundToken.raised) / 1e18).toFixed(2) + " ETH",
-            priceChange: Math.random() * 20 - 10, // Random price change for now
-            fundingRaised: foundToken.raised.toString(),
-            chain: "ethereum", // Default to ethereum, should be determined from the chain ID
-            volume24h: "0$",
-            holders: 0,
-            launchDate: new Date().toISOString().split("T")[0],
-            status: isOpen ? "active" : "locked",
-            creator: foundToken.creator,
-            baseCost: tokenPrice, // Use the actual price from the contract
-            rawToken: foundToken, // Keep the original token data for buy function
-            isOpen: isOpen, // Add isOpen property from the token data
-          });
+        // 1. Check if the symbol is already a valid address
+        if (symbol.startsWith("0x") && symbol.length === 42) {
+          tokenAddress = symbol;
+          console.log("Using provided address:", tokenAddress);
         } else {
-          console.error("Token not found with identifier:", symbol);
-          console.log(
-            "Please check that you're using a valid token identifier (address, symbol, or name)"
+          // 2. Try to find the token address from the tokens list
+          const foundToken = tokens.find(
+            (t) => 
+              t.name.substring(0, 4).toUpperCase() === symbol.toUpperCase() || // Match by symbol
+              t.name.toUpperCase().includes(symbol.toUpperCase()) // Match by name
           );
+
+          if (foundToken) {
+            tokenAddress = foundToken.token;
+            console.log("Found token address:", tokenAddress);
+          }
+        }
+
+        if (!tokenAddress) {
+          console.error("Token address not found for symbol:", symbol);
           setNotFoundError(true);
           toast({
             title: "Token Not Found",
-            description:
-              "The token you're looking for doesn't exist or is not available.",
+            description: "The token you're looking for doesn't exist or is not available.",
             variant: "destructive",
           });
+          return;
         }
+
+        // Fetch token details from the API
+        const response = await fetch(`/api/memecoin/${tokenAddress}`);
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const apiResponse: TokenApiResponse = await response.json();
+        console.log("Token data from API:", apiResponse);
+
+        if (!apiResponse.success || !apiResponse.data) {
+          setNotFoundError(true);
+          return;
+        }
+
+        const { token: tokenData, marketData } = apiResponse.data;
+
+        // Check if token is closed
+        const isOpen = tokenData.isOpen;
+        setIsTokenClosed(!isOpen);
+
+        // Get the actual price from the contract for 1 token
+        let tokenPrice = ethers.formatEther(marketData.price || "0");
+
+        // Format token data for display
+        setToken({
+          id: tokenData.token,
+          name: tokenData.name,
+          symbol: tokenData.symbol || tokenData.name.substring(0, 4).toUpperCase(),
+          description: tokenData.description || "No description available",
+          imageUrl: tokenData.image || DEFAULT_TOKEN_IMAGE,
+          price: tokenPrice,
+          marketCap: marketData.marketCap + " ETN",
+          priceChange: Math.random() * 20 - 10, // Random price change for now
+          fundingRaised: tokenData.raised.toString(),
+          chain: "ethereum",
+          volume24h: marketData.volume24h + "$",
+          holders: marketData.holders,
+          launchDate: new Date().toISOString().split("T")[0],
+          status: isOpen ? "active" : "locked",
+          creator: tokenData.creator,
+          baseCost: tokenPrice,
+          rawToken: tokenData,
+          isOpen: isOpen,
+        });
+
       } catch (error) {
         console.error("Error fetching token:", error);
         setNotFoundError(true);
@@ -251,7 +222,10 @@ export default function TokenDetailPage() {
         };
 
         // Get the estimated price
-        const price = await getPriceForTokens(tokenSaleData, amount);
+        const price = await testTokenService.testGetPriceForTokens(
+          tokenSaleData,
+          amount
+        );
 
         // Convert from wei to ETH and format
         const priceInEth = ethers.formatEther(price);
@@ -273,7 +247,7 @@ export default function TokenDetailPage() {
     return () => clearTimeout(debounceTimer);
   }, [buyAmount, token]);
 
-  // Handle buy token
+  // Update handleBuyToken function
   const handleBuyToken = async () => {
     if (!token || !buyAmount) return;
 
@@ -315,8 +289,8 @@ export default function TokenDetailPage() {
         metadataURI: token.rawToken.image || "", // Use image URL as metadataURI
       };
 
-      // Call the buyToken function
-      const result = await buyToken(tokenSaleData, amount);
+      // Call the testBuyToken function
+      const result = await testTokenService.testBuyToken(tokenSaleData, amount);
 
       if (result.success) {
         toast({
@@ -334,7 +308,7 @@ export default function TokenDetailPage() {
         setTimeout(() => {
           // Reload the page to reflect updated data
           window.location.reload();
-        }, 3000); // 3 second delay
+        }, 3000);
       } else {
         toast({
           title: "Transaction Failed",
@@ -722,7 +696,7 @@ export default function TokenDetailPage() {
                 <CardHeader>
                   <CardTitle>Buy {token?.symbol}</CardTitle>
                   <CardDescription>
-                    Purchase tokens directly with ETH
+                    Purchase tokens directly with ETN
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -781,7 +755,7 @@ export default function TokenDetailPage() {
                             <span>Calculating...</span>
                           </div>
                         ) : (
-                          <>{estimatedPrice} ETH</>
+                          <>{estimatedPrice} ETN</>
                         )}
                       </div>
                     </div>
@@ -840,7 +814,7 @@ export default function TokenDetailPage() {
                     <span>
                       {isTokenClosed
                         ? "This token is no longer available for purchase."
-                        : `Base cost: ${token?.baseCost} ETH per token. Gas fees may apply.`}
+                        : `Base cost: ${token?.baseCost} ETN per token. Gas fees may apply.`}
                     </span>
                   </div>
                 </CardFooter>

@@ -16,7 +16,7 @@ export async function GET(
 ): Promise<NextResponse> {
   try {
     // Get the tokenAddress from the URL pattern
-    const tokenAddress = context.params.tokenAddress;
+    const { tokenAddress } = await context.params;
 
     if (!tokenAddress) {
       return NextResponse.json(

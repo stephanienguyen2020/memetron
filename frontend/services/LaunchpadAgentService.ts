@@ -131,11 +131,80 @@ export const useLaunchpadAgentService = () => {
     return receipt;
   };
 
+  const getTwitterHandleByAddress = async (userAddress: string) => {
+    if (!walletClient) {
+      console.warn("Wallet client not found, using read-only provider...");
+      try {
+        const provider = new ethers.JsonRpcProvider(
+          process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545"
+        );
+        const contractAddress = getContractAddress();
+        const launchpadAgent = new ethers.Contract(
+          contractAddress,
+          LaunchpadAgentABI,
+          provider
+        );
+        
+        // Get all TwitterHandleRegistered events for this address
+        const filter = launchpadAgent.filters.TwitterHandleRegistered();
+        const events = await launchpadAgent.queryFilter(filter);
+        
+        // Find the most recent event where the registered address matches our target
+        const matchingEvent = events
+          .reverse()
+          .find(event => {
+            const eventLog = event as ethers.EventLog;
+            return eventLog.args && 
+                   eventLog.args[1] && // userAddress is the second parameter
+                   eventLog.args[1].toLowerCase() === userAddress.toLowerCase();
+          });
+
+        if (matchingEvent) {
+          const eventLog = matchingEvent as ethers.EventLog;
+          return eventLog.args?.[0] as string; // twitterHandle is the first parameter
+        }
+        return null;
+      } catch (error) {
+        console.error("Failed to use read-only provider:", error);
+        return null;
+      }
+    }
+
+    const provider = new ethers.BrowserProvider(walletClient);
+    const contractAddress = getContractAddress();
+    const launchpadAgent = new ethers.Contract(
+      contractAddress,
+      LaunchpadAgentABI,
+      provider
+    );
+    
+    // Get all TwitterHandleRegistered events
+    const filter = launchpadAgent.filters.TwitterHandleRegistered();
+    const events = await launchpadAgent.queryFilter(filter);
+    
+    // Find the most recent event where the registered address matches our target
+    const matchingEvent = events
+      .reverse()
+      .find(event => {
+        const eventLog = event as ethers.EventLog;
+        return eventLog.args && 
+               eventLog.args[1] && // userAddress is the second parameter
+               eventLog.args[1].toLowerCase() === userAddress.toLowerCase();
+      });
+
+    if (matchingEvent) {
+      const eventLog = matchingEvent as ethers.EventLog;
+      return eventLog.args?.[0] as string; // twitterHandle is the first parameter
+    }
+    return null;
+  };
+
   return {
     registerTwitterHandle,
     buyTokenCredits,
     getUserTokenCredits,
     getTwitterHandleAddress,
     withdrawCredits,
+    getTwitterHandleByAddress,
   };
 }; 

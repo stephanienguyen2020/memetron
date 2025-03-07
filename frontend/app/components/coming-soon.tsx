@@ -64,7 +64,7 @@ export default function ComingSoonPage({
             {/* Main Content */}
             <div className="space-y-6">
               <RocketLaunch className="h-16 w-16 mx-auto text-sky-400" />
-              <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-blue-500">
+              <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-[#00ff00]">
                 Coming Soon
               </h1>
               <div className="relative w-80 h-80 mx-auto">
@@ -89,7 +89,7 @@ export default function ComingSoonPage({
             <div className="max-w-md mx-auto">
               <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-sky-400 to-blue-500"
+                  className="h-full bg-gradient-to-r from-green-400 to-[#00ff00]"
                   animate={{ width: `${progressWidth}%` }}
                   transition={{ duration: 1, ease: "easeInOut" }}
                 />
@@ -112,7 +112,7 @@ export default function ComingSoonPage({
                   placeholder="Enter your email"
                   className="flex-1"
                 />
-                <Button className="gap-2 bg-gradient-to-r from-sky-400 to-blue-500">
+                <Button className="gap-2 bg-gradient-to-r from-green-400 to-[#00ff00]">
                   <Bell className="h-4 w-4" />
                   Notify Me
                 </Button>

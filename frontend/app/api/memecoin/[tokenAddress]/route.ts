@@ -6,7 +6,8 @@ export async function GET(
   { params }: { params: { tokenAddress: string } }
 ) {
   try {
-    const tokenAddress = params.tokenAddress;
+    const { tokenAddress } = params;
+
     if (!tokenAddress) {
       return NextResponse.json(
         { error: "Token address is required" },
@@ -15,6 +16,7 @@ export async function GET(
     }
 
     const tokenDetails = await getTokenDetails(tokenAddress);
+
     if (!tokenDetails) {
       return NextResponse.json(
         { error: "Token not found" },
@@ -24,7 +26,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      ...tokenDetails,
+      data: tokenDetails,
     });
   } catch (error: any) {
     console.error("Error fetching token details:", error);

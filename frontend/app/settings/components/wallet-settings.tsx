@@ -21,6 +21,7 @@ export function WalletSettings() {
   const [tokenWithdrawAmount, setTokenWithdrawAmount] = useState("");
   const [twitterHandle, setTwitterHandle] = useState("");
   const [tokenTwitterHandle, setTokenTwitterHandle] = useState("");
+  const [tokenTwitterPlaceholder, setTokenTwitterPlaceholder] = useState("@username");
   const [isDepositing, setIsDepositing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [isTokenDepositing, setIsTokenDepositing] = useState(false);
@@ -70,6 +71,31 @@ export function WalletSettings() {
       mounted = false;
     };
   }, [address, isMounted, bettingService, launchpadAgentService]);
+
+  // Add new useEffect to fetch Twitter handle
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchTwitterHandle = async () => {
+      if (!isMounted || !address) return;
+
+      try {
+        const handle = await launchpadAgentService.getTwitterHandleByAddress(address);
+        if (mounted && handle) {
+          setTokenTwitterPlaceholder(handle);
+          setTokenTwitterHandle(handle);
+        }
+      } catch (error) {
+        console.error("Error fetching twitter handle:", error);
+      }
+    };
+
+    fetchTwitterHandle();
+
+    return () => {
+      mounted = false;
+    };
+  }, [address, isMounted, launchpadAgentService]);
 
   // Show loading state during initial hydration or connection
   if (!isMounted || isConnecting) {
@@ -270,7 +296,7 @@ export function WalletSettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wallet className="h-5 w-5" />
-              Wallet & Bet Credits
+              Bet Credits
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -477,7 +503,7 @@ export function WalletSettings() {
                       value={tokenTwitterHandle}
                       onChange={(e) => setTokenTwitterHandle(e.target.value)}
                       className="flex-1"
-                      placeholder="@username"
+                      placeholder={tokenTwitterPlaceholder}
                     />
                     <Button
                       onClick={handleRegisterTokenTwitter}

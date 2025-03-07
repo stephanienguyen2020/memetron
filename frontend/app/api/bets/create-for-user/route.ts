@@ -17,9 +17,9 @@ async function generateImage(prompt: string): Promise<string> {
       body: JSON.stringify({
         model_name: "black-forest-labs/FLUX.1-schnell",
         prompt: prompt,
-        num_steps: 25,
-        guidance_scale: 9,
-        negative_prompt: null,
+        num_steps: 4,
+        guidance_scale: 3.5,
+        seed: -1,
         width: 1024,
         height: 1024,
       }),

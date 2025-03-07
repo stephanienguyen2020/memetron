@@ -82,8 +82,9 @@ function CoinChatContent({ symbol }: { symbol: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
-  const messages =
-    queryClient.getQueryData<ContentWithUser[]>(["messages", agentId]) || [];
+  const messages: ContentWithUser[] = [];
+
+  const userWalletId = window.localStorage.getItem("userAddress");
 
   const handleSendMessage = (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
@@ -117,7 +118,7 @@ function CoinChatContent({ symbol }: { symbol: string }) {
 
     queryClient.setQueryData(
       ["messages", agentId],
-      (old: ContentWithUser[] = []) => [...old, userMessage]
+      (old: ContentWithUser[] = []) => [...old, userMessage, thinkingMessage]
     );
 
     sendMessageMutation.mutate({
@@ -165,7 +166,7 @@ function CoinChatContent({ symbol }: { symbol: string }) {
     }: {
       message: string;
       selectedFile?: File | null;
-    }) => apiClient.sendMessage(agentId, message, selectedFile),
+    }) => apiClient.sendMessage(agentId, message, selectedFile, userWalletId),
     onSuccess: (newMessages: ContentWithUser[]) => {
       queryClient.setQueryData(
         ["messages", agentId],

@@ -83,7 +83,7 @@ export default function LaunchPage() {
 
   const generateImageWithPromptInput = async (inputPrompt: string) => {
     if (!inputPrompt.trim()) return;
-    console.log("generating image");
+    console.log("generating image", inputPrompt);
     try {
       setError("");
       setLoadingAI(true);
@@ -101,9 +101,9 @@ export default function LaunchPage() {
         body: JSON.stringify({
           model_name: "black-forest-labs/FLUX.1-schnell",
           prompt: inputPrompt,
-          num_steps: 25,
-          guidance_scale: 9,
-          negative_prompt: null,
+          num_steps: 4,
+          guidance_scale: 3.5,
+          seed: -1,
           width: 1024,
           height: 1024,
         }),
@@ -112,6 +112,7 @@ export default function LaunchPage() {
       if (!response.ok) throw new Error("Failed to generate image");
 
       const { data } = await response.json();
+      console.log("data", data);
       const imageBase64 = data.image_file;
 
       // Convert base64 to binary
@@ -165,9 +166,9 @@ export default function LaunchPage() {
         body: JSON.stringify({
           model_name: "black-forest-labs/FLUX.1-schnell",
           prompt: prompt,
-          num_steps: 25,
-          guidance_scale: 9,
-          negative_prompt: null,
+          num_steps: 4,
+          guidance_scale: 3.5,
+          seed: -1,
           width: 1024,
           height: 1024,
         }),
@@ -176,6 +177,7 @@ export default function LaunchPage() {
       if (!response.ok) throw new Error("Failed to generate image");
 
       const { data } = await response.json();
+      console.log("data", data);
       const imageBase64 = data.image_file;
 
       // Convert base64 to binary

@@ -16,9 +16,7 @@ export const useTokenGeneratingService = () => {
     if (!prompt.trim()) {
       throw new Error("Prompt is required");
     }
-
-    console.log("Prompt", prompt);
-
+    
     try {
       const url = "https://api.nebulablock.com/api/v1/images/generation";
 

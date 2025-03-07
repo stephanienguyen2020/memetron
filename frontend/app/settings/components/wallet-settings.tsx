@@ -21,7 +21,8 @@ export function WalletSettings() {
   const [tokenWithdrawAmount, setTokenWithdrawAmount] = useState("");
   const [twitterHandle, setTwitterHandle] = useState("");
   const [tokenTwitterHandle, setTokenTwitterHandle] = useState("");
-  const [tokenTwitterPlaceholder, setTokenTwitterPlaceholder] = useState("@username");
+  const [tokenTwitterPlaceholder, setTokenTwitterPlaceholder] =
+    useState("@username");
   const [isDepositing, setIsDepositing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [isTokenDepositing, setIsTokenDepositing] = useState(false);
@@ -80,10 +81,16 @@ export function WalletSettings() {
       if (!isMounted || !address) return;
 
       try {
-        const handle = await launchpadAgentService.getTwitterHandleByAddress(address);
+        const handle = await launchpadAgentService.getTwitterHandleByAddress(
+          address
+        );
+        const bettingHandle = await bettingService.getTwitterHandleByAddress(
+          address
+        );
         if (mounted && handle) {
-          setTokenTwitterPlaceholder(handle);
-          setTokenTwitterHandle(handle);
+          setTokenTwitterPlaceholder(handle ?? "@username");
+          setTokenTwitterHandle(handle ?? "");
+          setTwitterHandle(bettingHandle ?? "@username");
         }
       } catch (error) {
         console.error("Error fetching twitter handle:", error);

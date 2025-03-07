@@ -257,6 +257,33 @@ export const useBettingService = () => {
     return receipt;
   };
 
+  const getTwitterHandleByAddress = async (userAddress: string) => {
+    if (!walletClient) {
+      throw new Error("Wallet client not found");
+    }
+    const provider = new ethers.BrowserProvider(walletClient);
+    const bettingContract = new ethers.Contract(
+      contractAddress,
+      BettingABI,
+      provider
+    );
+    const filter = bettingContract.filters.TwitterHandleRegistered();
+    const events = await bettingContract.queryFilter(filter);
+    const matchingEvent = events.reverse().find((event) => {
+      const eventLog = event as ethers.EventLog;
+      return (
+        eventLog.args &&
+        eventLog.args[1] && // userAddress is the second parameter
+        eventLog.args[1].toLowerCase() === userAddress.toLowerCase()
+      );
+    });
+    if (matchingEvent) {
+      const eventLog = matchingEvent as ethers.EventLog;
+      return eventLog.args?.[0] as string; // twitterHandle is the first parameter
+    }
+    return null;
+  };
+
   return {
     createBet,
     joinBet,
@@ -268,5 +295,6 @@ export const useBettingService = () => {
     getUserBetCredits,
     getTwitterHandleAddress,
     withdrawCredits,
+    getTwitterHandleByAddress,
   };
 };

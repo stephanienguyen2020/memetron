@@ -18,11 +18,11 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ethers } from "ethers";
-import {
-  getTokens,
-  buyToken,
-  getPriceForTokens,
-} from "@/services/memecoin-launchpad";
+// import {
+//   getTokens,
+//   buyToken,
+//   getPriceForTokens,
+// } from "@/services/memecoin-launchpad";
 import { useToast } from "@/components/ui/use-toast";
 import {
   TrendingUp,
@@ -76,7 +76,7 @@ export default function TokenDetailPage() {
         setNotFoundError(false);
 
         // Get all tokens without filtering
-        const tokens = await getTokens();
+        const tokens = await testTokenService.testGetTokens();
 
         console.log("Available tokens:", tokens);
         console.log("Looking for token with identifier:", symbol);
@@ -165,7 +165,10 @@ export default function TokenDetailPage() {
                 metadataURI: foundToken.image || "", // Use image URL as metadataURI
               };
 
-              const price = await getPriceForTokens(tokenSaleData, BigInt(1));
+              const price = await testTokenService.testGetPriceForTokens(
+                tokenSaleData,
+                BigInt(1)
+              );
               tokenPrice = ethers.formatEther(price);
               console.log("Token price from contract:", tokenPrice);
             } catch (error) {
@@ -254,7 +257,10 @@ export default function TokenDetailPage() {
         };
 
         // Get the estimated price
-        const price = await getPriceForTokens(tokenSaleData, amount);
+        const price = await testTokenService.testGetPriceForTokens(
+          tokenSaleData,
+          amount
+        );
 
         // Convert from wei to ETH and format
         const priceInEth = ethers.formatEther(price);
@@ -285,7 +291,8 @@ export default function TokenDetailPage() {
       if (isTokenClosed) {
         toast({
           title: "Token Closed",
-          description: "This token has graduated and is no longer available for purchase.",
+          description:
+            "This token has graduated and is no longer available for purchase.",
           variant: "destructive",
         });
         return;

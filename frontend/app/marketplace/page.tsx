@@ -731,7 +731,7 @@ export default function MarketplacePage() {
                   ))
               ) : currentTokens.length > 0 ? (
                 currentTokens.map((token, index) => (
-                  <TokenCard key={token.symbol} token={token} index={index} />
+                  <TokenCard key={token.token} token={token} index={index} />
                 ))
               ) : (
                 <div className="py-12 text-center col-span-full">

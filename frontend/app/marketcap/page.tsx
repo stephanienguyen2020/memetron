@@ -50,11 +50,17 @@ export default function MarketcapPage(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchTrendingTokensData = async () => {
+      if (!mounted) return;
+
       try {
         setIsLoading(true);
         const tokens = await fetchTrendingTokens();
-        console.log("returned", tokens);
+
+        if (!mounted) return;
+
         const updatedCoins: TrendingCoin[] = tokens.map((token) => ({
           name: token.name,
           price: token.price,
@@ -72,24 +78,27 @@ export default function MarketcapPage(): JSX.Element {
           holders: `${token.active_users_24h}`,
           transactions: `${token.transactions_24h}`,
         }));
-        setTrendingCoins(updatedCoins);
-        console.log("data", updatedCoins);
+
+        if (mounted) {
+          setTrendingCoins(updatedCoins);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error("Error fetching trending tokens:", error);
-        // setTrendingCoins(exampleTrendingCoins);
-      } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    // Fetch immediately on mount
     fetchTrendingTokensData();
 
-    // Set up interval to fetch every minute
     const interval = setInterval(fetchTrendingTokensData, 60000);
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (

@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Filter,
   ArrowUpDown,
+  Wallet,
 } from "lucide-react";
 import {
   Pagination,
@@ -28,7 +29,7 @@ import {
 import GridBackground from "../components/GridBackground";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { MarketFilters } from "../components/MarketFilters";
 import type { Chain, FilterOption, MemeToken } from "../components/types";
@@ -42,6 +43,8 @@ import { ethers, id } from "ethers";
 import { error } from "console";
 import page from "../page";
 import { useTestTokenService } from "@/services/TestTokenService";
+import { useAccount, useWalletClient } from "wagmi";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const DEFAULT_TOKEN_IMAGE = "/placeholder.svg";
 const DEFAULT_CHAIN_LOGO = "/chain-placeholder.svg";
@@ -455,25 +458,55 @@ export default function MarketplacePage() {
   const [realTokens, setRealTokens] = useState<ExtendedMemeToken[]>([]);
   const itemsPerPage = 8;
 
-  // Get tokens from store
+  // Get tokens from store and wallet connection state
   const storeTokens = useTokenStore((state) => state.tokens);
   const testTokenService = useTestTokenService();
+  const { data: walletClient } = useWalletClient();
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
 
-  // Fetch real tokens from the blockchain
+  // Track if data has been fetched to prevent refetching
+  const dataFetched = useRef(false);
+
+  // Update wallet connection status and trigger fetch
   useEffect(() => {
-    const fetchTokens = async () => {
+    const isConnected = !!walletClient;
+    setIsWalletConnected(isConnected);
+
+    if (isConnected) {
+      // Reset dataFetched when wallet connects
+      dataFetched.current = false;
+      handleRefresh();
+    }
+  }, [walletClient]);
+
+  // Manual refresh function
+  const handleRefresh = useCallback(() => {
+    dataFetched.current = false;
+    setIsLoading(true);
+  }, []);
+
+  // Fetch tokens from the blockchain
+  useEffect(() => {
+    if (!isWalletConnected || dataFetched.current) return;
+
+    async function fetchTokens() {
       try {
         setIsLoading(true);
-        // Get tokens that are open for sale (isOpen = true)
+        dataFetched.current = true;
+
         const tokens = await testTokenService.testGetTokens({ isOpen: true });
+
+        if (!tokens || tokens.length === 0) {
+          setRealTokens([]);
+          setIsLoading(false);
+          return;
+        }
 
         // Process tokens and get prices
         const formattedTokensPromises = tokens.map(async (token) => {
-          // Get the actual price from the contract for 1 token
           let tokenPrice = "0";
           if (token.isOpen) {
             try {
-              // Create a TokenSale object with all required properties
               const tokenSaleData = {
                 token: token.token,
                 name: token.name,
@@ -481,18 +514,19 @@ export default function MarketplacePage() {
                 sold: token.sold,
                 raised: token.raised,
                 isOpen: token.isOpen,
-                metadataURI: token.image || "", // Use image URL as metadataURI
+                metadataURI: token.image || "",
               };
 
-              const price = await testTokenService.testGetPriceForTokens(tokenSaleData, BigInt(1));
+              const price = await testTokenService.testGetPriceForTokens(
+                tokenSaleData,
+                BigInt(1)
+              );
               tokenPrice = ethers.formatEther(price);
-              console.log(`Token price for ${token.name}:`, tokenPrice);
             } catch (error) {
               console.error(
                 `Error fetching price for token ${token.name}:`,
                 error
               );
-              // Set price to 0 on error
               tokenPrice = "0";
             }
           }
@@ -518,21 +552,42 @@ export default function MarketplacePage() {
         });
 
         const formattedTokens = await Promise.all(formattedTokensPromises);
-        console.log("Formatted tokens:", formattedTokens);
-        setRealTokens(formattedTokens);
+        setRealTokens(formattedTokens.filter(Boolean) as ExtendedMemeToken[]);
       } catch (error) {
         console.error("Error fetching tokens:", error);
+        setRealTokens([]);
       } finally {
         setIsLoading(false);
       }
-    };
+    }
+
     fetchTokens();
-  }, [testTokenService]);
+  }, [isWalletConnected, testTokenService]);
 
   // Combine mock tokens with store tokens and real tokens
   const allTokens = useMemo(() => {
-    // Convert mock tokens to match Token interface
-    const convertedMockTokens = mockTokens.map((token) => ({
+    // If not connected, show mock tokens
+    if (!isWalletConnected) {
+      return mockTokens.map((token) => ({
+        ...token,
+        id: token.symbol,
+        token: token.symbol,
+        volume24h: "$" + (Math.random() * 100000).toFixed(2),
+        holders: (Math.random() * 1000).toFixed(0),
+        launchDate: new Date().toISOString().split("T")[0],
+        status: "active" as const,
+        fundingRaised: "0",
+        imageUrl: token.imageUrl || DEFAULT_TOKEN_IMAGE,
+      })) as ExtendedMemeToken[];
+    }
+
+    // If connected and we have real tokens, show them
+    if (realTokens.length > 0) {
+      return realTokens;
+    }
+
+    // If connected but no real tokens yet, show mock tokens
+    return mockTokens.map((token) => ({
       ...token,
       id: token.symbol,
       token: token.symbol,
@@ -541,28 +596,9 @@ export default function MarketplacePage() {
       launchDate: new Date().toISOString().split("T")[0],
       status: "active" as const,
       fundingRaised: "0",
-      imageUrl: token.imageUrl || DEFAULT_TOKEN_IMAGE, // Use default placeholder
-    })) as ExtendedMemeToken[];
-
-    // Ensure store tokens have valid imageUrl
-    const validatedStoreTokens = storeTokens.map((token) => ({
-      ...token,
       imageUrl: token.imageUrl || DEFAULT_TOKEN_IMAGE,
     })) as ExtendedMemeToken[];
-
-    // Prioritize real tokens, then store tokens, then mock tokens as fallback
-    // Combine and remove duplicates based on symbol
-    const combined = [...realTokens];
-
-    // If we have real tokens, don't use mock tokens
-    const filteredTokens = realTokens.length > 0 ? [...realTokens] : combined;
-
-    const uniqueTokens = Array.from(
-      new Map(filteredTokens.map((token) => [token.symbol, token])).values()
-    );
-
-    return uniqueTokens;
-  }, [storeTokens, realTokens]);
+  }, [isWalletConnected, realTokens]);
 
   const filteredTokens = useMemo(() => {
     let filtered = allTokens.filter(
@@ -655,6 +691,23 @@ export default function MarketplacePage() {
               onFilterSelect={setActiveFilter}
             />
           </div>
+
+          {/* Wallet Warning - show when wallet is not connected */}
+          {!isWalletConnected && !isLoading && (
+            <div className="mb-8">
+              <Alert
+                variant="default"
+                className="bg-yellow-500/10 border-yellow-500/20"
+              >
+                <Wallet className="h-5 w-5 text-yellow-500" />
+                <AlertTitle>Wallet Not Connected</AlertTitle>
+                <AlertDescription>
+                  Connect your wallet to see real tokens from the blockchain.
+                  Currently showing mock data.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
 
           <div className="overflow-x-auto">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">

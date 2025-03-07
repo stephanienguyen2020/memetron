@@ -87,10 +87,15 @@ export function WalletSettings() {
         const bettingHandle = await bettingService.getTwitterHandleByAddress(
           address
         );
-        if (mounted && handle) {
-          setTokenTwitterPlaceholder(handle ?? "@username");
-          setTokenTwitterHandle(handle ?? "");
-          setTwitterHandle(bettingHandle ?? "@username");
+        if (mounted) {
+          setTokenTwitterPlaceholder("@username");
+          if (handle) {
+            setTokenTwitterHandle(handle);
+            setTokenTwitterPlaceholder(handle);
+          }
+          if (bettingHandle) {
+            setTwitterHandle(bettingHandle);
+          }
         }
       } catch (error) {
         console.error("Error fetching twitter handle:", error);

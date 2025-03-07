@@ -23,7 +23,7 @@ export function NewsTickerWidget({ news }: NewsTickerWidgetProps) {
     <div className="mt-6 space-y-6">
       <h1 className="text-4xl font-bold">
         Latest{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-[#00ff00]">
           Updates
         </span>
       </h1>

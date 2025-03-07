@@ -110,11 +110,16 @@ const hardhatTestnet = {
 
 // Create wagmi config
 const config = createConfig({
-  chains: [auroraTestnet, sonicBlazeTestnet, electroneumTestnet, hardhatTestnet],
+  chains: [
+    electroneumTestnet,
+    sonicBlazeTestnet,
+    auroraTestnet,
+    hardhatTestnet,
+  ],
   transports: {
-    [auroraTestnet.id]: http(),
-    [sonicBlazeTestnet.id]: http(),
     [electroneumTestnet.id]: http(),
+    [sonicBlazeTestnet.id]: http(),
+    [auroraTestnet.id]: http(),
     [hardhatTestnet.id]: http(),
   },
 });

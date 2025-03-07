@@ -614,7 +614,7 @@ export default function BetsPage() {
 
               <div className="text-center py-10">
                 <Link href="/bets/create">
-                  <Button className="bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-400/90 hover:to-blue-500/90">
+                  <Button className="bg-gradient-to-r from-green-400 to-[#00ff00] hover:from-green-400/90 hover:to-[#00ff00]/90">
                     <Rocket className="mr-2 h-4 w-4" />
                     Create the First Bet
                   </Button>

@@ -12,7 +12,7 @@ Monitor holdings in real-time, track profits/losses, and get AI-driven price pre
 
 ### **🛠 Betting Marketplace**
 
-Bet on meme coin trends directly via Twitter by tagging **@sousa_emil22786**. Smart contracts ensure secure escrow and instant payouts.
+Bet on meme coin trends directly via Twitter by tagging **@memetronSage**. Smart contracts ensure secure escrow and instant payouts.
 
 ### **🚀 Meme Coin Launch Pad**
 

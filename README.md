@@ -1,7 +1,14 @@
+# MEMETRON - BEST MEME COIN PLAYGOUND ON ELECTRONEUM  
+
 MemeTron solves key challenges in the meme coin space by automating creation, trading, speculation, and marketing through AI-powered tools and fair launch mechanics. It eliminates the need for coding by allowing users to describe their meme idea, with AI handling everything from naming to deployment. Unlike traditional meme coins prone to rug pulls, MemeTron enforces liquidity locking, fair launch mechanisms, and a 10-day vesting period to protect investors. Its multi-agent AI system provides real-time market insights, tracks social sentiment, monitors whale movements, and identifies new token opportunities. The platform also features an on-chain betting marketplace for predicting meme coin trends and an Auto Shill Agent that automates token promotion across social media. Additionally, users can launch tokens simply by chatting with a bot or tagging it on Twitter, making the entire process seamless and accessible.
 
 ## 🚀 Contract Address
 
+Electroneum Mainnet
+- **Block Explorer:** blockexplorer.electroneum.com
+- **RPC URL**: 
+
+Contracts: 
 - **Factory**: 0xD4B453A5F41092f69C736ad64c9a7d8E6989dc53
 - **Launchpad Agent**: 0x43f02972D8D238A6748A6a2270D860cf703838b7
 - **Native Liquidity Pool**: 0x897eC4aF77346F8Ae3E707527220BDcC4782230E

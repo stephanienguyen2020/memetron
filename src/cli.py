@@ -396,14 +396,16 @@ class ZerePyCLI:
             logger.info("Please specify both a connection and an action.")
             logger.info("Format: agent-action {connection} {action}")
             return
-
-        try:
+        # attach system prompt to the end of the input list
+        # so that connection can use it
+        input_list.append(self.agent._construct_system_prompt())
+        try:    
             result = self.agent.perform_action(
                 connection=input_list[1],
                 action=input_list[2],
                 params=input_list[3:]
             )
-            logger.info(f"Result: {result}")
+            logger.info(f"Result here?: {result}")
         except Exception as e:
             logger.error(f"Error running action: {e}")
 

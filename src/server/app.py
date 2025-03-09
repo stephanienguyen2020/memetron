@@ -9,7 +9,7 @@ import threading
 from pathlib import Path
 from src.cli import ZerePyCLI
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("server/app")
 
 class ActionRequest(BaseModel):

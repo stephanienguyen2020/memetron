@@ -4,6 +4,8 @@ from typing import Dict, Any, List, Tuple, Iterator
 from requests_oauthlib import OAuth1Session
 from dotenv import set_key, load_dotenv
 from src.connections.base_connection import BaseConnection, Action, ActionParameter
+from src.connections.openai_connection import OpenAIConnection
+from src.prompts import SHILL_COIN_PROMPT
 from src.helpers import print_h_bar
 import json,requests
 
@@ -99,8 +101,30 @@ class TwitterConnection(BaseConnection):
                     ActionParameter("filter_string", True, str, "Filter string for rules of the stream , e.g @username")
                 ],
                 description="Stream tweets based on filter rule"
+            ),
+            "shill-coin": Action(
+                name="shill-coin",
+                parameters=[
+                    ActionParameter("coin_symbol", True, str, "Symbol of the coin to shill"),
+                    ActionParameter("system_prompt", True, str, "System prompt for the LLM")
+                ],
+                description="Shill a coin on Twitter"
             )
         }
+
+    def shill_coin(self, coin_symbol: str, system_prompt: str, **kwargs) -> dict:
+        """Shill a coin on Twitter"""
+        logger.info(f"Shilling coin with LLM {coin_symbol}")
+        logger.info(f"Coin symbol: {coin_symbol}")
+        logger.info(f"System prompt: {system_prompt}")
+        prompt = SHILL_COIN_PROMPT.format(coin_symbol=coin_symbol)
+        openai = OpenAIConnection({"model": "gpt-4o"})
+        if not openai.is_configured():  
+            logger.error("OpenAI is not configured")
+            return False    
+        tweet_text = openai.generate_text(prompt, system_prompt)
+        logger.info(f"Generated tweet: {tweet_text}")
+        return self.post_tweet(tweet_text)
 
     def _get_credentials(self) -> Dict[str, str]:
         """Get Twitter credentials from environment with validation"""

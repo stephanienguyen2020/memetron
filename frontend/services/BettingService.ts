@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { useWalletClient } from "wagmi";
 import BettingABI from "@/abi/Betting.json";
-const contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+let contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
 
 export const useBettingService = () => {
   const { data: walletClient } = useWalletClient();
@@ -18,6 +18,13 @@ export const useBettingService = () => {
   ) => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
     console.log("Creating bet with parameters:", {
       title,
@@ -64,6 +71,13 @@ export const useBettingService = () => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
     }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
+    }
     console.log("Joining bet with parameters:", {
       betId,
       support,
@@ -89,6 +103,14 @@ export const useBettingService = () => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
     }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
+    }
+
     const provider = new ethers.BrowserProvider(walletClient);
     const signer = await provider.getSigner();
     const bettingContract = new ethers.Contract(
@@ -104,6 +126,13 @@ export const useBettingService = () => {
   const withdraw = async () => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
     const provider = new ethers.BrowserProvider(walletClient);
     const signer = await provider.getSigner();
@@ -121,6 +150,13 @@ export const useBettingService = () => {
     if (!walletClient) {
       console.warn("Wallet client not found, waiting for connection...");
       return []; // Return empty array if wallet is not connected
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
 
     try {
@@ -164,6 +200,13 @@ export const useBettingService = () => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
     }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
+    }
     console.log("Registering Twitter handle:", twitterHandle);
     const provider = new ethers.BrowserProvider(walletClient);
     const signer = await provider.getSigner();
@@ -180,6 +223,13 @@ export const useBettingService = () => {
   const buyBetCredits = async (amount: string) => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
     if (parseFloat(amount) <= 0) {
       throw new Error("Must send some ether");
@@ -204,7 +254,13 @@ export const useBettingService = () => {
       console.warn("Wallet client not found, waiting for connection...");
       return BigInt(0); // Return 0 credits if wallet is not connected
     }
-
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
+    }
     console.log("Getting bet credits for user:", user);
     const provider = new ethers.BrowserProvider(walletClient);
     const bettingContract = new ethers.Contract(
@@ -220,6 +276,13 @@ export const useBettingService = () => {
   const getTwitterHandleAddress = async (twitterHandle: string) => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
     console.log("Getting address for Twitter handle:", twitterHandle);
     const provider = new ethers.BrowserProvider(walletClient);
@@ -237,6 +300,13 @@ export const useBettingService = () => {
   const withdrawCredits = async (amount: string) => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
     const userBetCredits = await getUserBetCredits(
       walletClient.account.address
@@ -260,6 +330,13 @@ export const useBettingService = () => {
   const getTwitterHandleByAddress = async (userAddress: string) => {
     if (!walletClient) {
       throw new Error("Wallet client not found");
+    }
+    const chainId = await walletClient.getChainId();
+    console.log("Chain ID:", chainId);
+    if (chainId === 5201420) {
+      contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
+    } else if (chainId === 52014) {
+      contractAddress = "0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0";
     }
     const provider = new ethers.BrowserProvider(walletClient);
     const bettingContract = new ethers.Contract(

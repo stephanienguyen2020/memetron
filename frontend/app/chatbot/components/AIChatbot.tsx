@@ -117,6 +117,7 @@ type ExtraContentFields = {
   data?: {
     articles: News[];
   };
+  walletId?: string;
 };
 
 type ContentWithUser = Content & ExtraContentFields;
@@ -140,6 +141,10 @@ function AIChatbotContent() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const userWalletId = window.localStorage.getItem("userAddress");
+
+  console.log("user wallet ID", userWalletId);
 
   // Type guard for SwapMessageContent
   const isSwapContent = (content: any): content is SwapMessageContent =>
@@ -172,6 +177,7 @@ function AIChatbotContent() {
       user: "user",
       createdAt: Date.now(),
       attachments,
+      userWalletId,
     };
 
     const thinkingMessage = {
@@ -210,7 +216,7 @@ function AIChatbotContent() {
     }: {
       message: string;
       selectedFile?: File | null;
-    }) => apiClient.sendMessage(agentId, message, selectedFile),
+    }) => apiClient.sendMessage(agentId, message, selectedFile, userWalletId),
     onSuccess: (newMessages: ContentWithUser[]) => {
       queryClient.setQueryData(
         ["messages", agentId],

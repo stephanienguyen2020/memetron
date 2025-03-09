@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ethers } from "ethers";
 import { AppLayout } from "../../components/app-layout";
@@ -74,11 +74,13 @@ import {
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/app/providers/WalletProvider";
 import { toast } from "@/components/ui/use-toast";
+import { useAccount, useWalletClient } from "wagmi";
 
 export default function TokensPage() {
+  // All hooks at the top level
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [tokenTypeTab, setTokenTypeTab] = useState("created"); // "created" or "purchased"
+  const [tokenTypeTab, setTokenTypeTab] = useState("created");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
@@ -88,200 +90,241 @@ export default function TokensPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [createdTokens, setCreatedTokens] = useState<any[]>([]);
   const [purchasedTokens, setPurchasedTokens] = useState<any[]>([]);
+  const [showConnectPrompt, setShowConnectPrompt] = useState(false);
+
   const testTokenService = useTestTokenService();
   const router = useRouter();
-  const { networkName } = useWallet();
+  const { networkName, isMetaMaskInstalled, connect } = useWallet();
+  const { isConnected } = useAccount();
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const dataFetched = useRef(false);
+  const { data: walletClient } = useWalletClient();
 
-  // Fetch user created tokens from blockchain
+  // Handle connect wallet
+  const handleConnectWallet = useCallback(async () => {
+    try {
+      await connect();
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
+      toast({
+        title: "Error",
+        description: "Failed to connect wallet. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [connect]);
+
+  // Update wallet connection status and trigger fetch
   useEffect(() => {
-    const fetchCreatedTokens = async () => {
+    const isConnected = !!walletClient;
+    setIsWalletConnected(isConnected);
+
+    if (isConnected) {
+      // Reset dataFetched when wallet connects
+      dataFetched.current = false;
+      handleRefresh();
+    }
+  }, [walletClient]);
+
+  // Manual refresh function
+  const handleRefresh = useCallback(() => {
+    dataFetched.current = false;
+    setIsLoading(true);
+  }, []);
+
+  // Fetch tokens effect
+  useEffect(() => {
+    if (!isWalletConnected || dataFetched.current) return;
+
+    async function fetchAllTokens() {
       try {
         setIsLoading(true);
-        const tokens = await testTokenService.testGetTokens({ isCreator: true });
-        console.log("Created tokens:", tokens);
+        dataFetched.current = true;
 
-        // Process tokens and get prices
-        const formattedTokensPromises = tokens.map(async (token) => {
-          // Get the actual price from the contract for 1 token
-          let tokenPrice = "0";
-          if (token.isOpen) {
+        const [createdTokensData, purchasedTokensData] = await Promise.all([
+          testTokenService.testGetTokens({ isCreator: true }).catch((error) => {
+            console.error("Error fetching created tokens:", error);
+            return [];
+          }),
+          testTokenService.testGetPurchasedTokens().catch((error) => {
+            console.error("Error fetching purchased tokens:", error);
+            return [];
+          }),
+        ]);
+
+        // Process created tokens
+        const processedCreatedTokens = await Promise.all(
+          (createdTokensData || []).map(async (token) => {
             try {
-              // Create a TokenSale object with all required properties
-              const tokenSaleData = {
+              let tokenPrice = "0";
+              if (token.isOpen) {
+                try {
+                  const tokenSaleData = {
+                    token: token.token,
+                    name: token.name || "Unknown Token",
+                    creator: token.creator,
+                    sold: token.sold || "0",
+                    raised: token.raised || "0",
+                    isOpen: token.isOpen,
+                    metadataURI: token.image || "",
+                  };
+
+                  const price = await testTokenService
+                    .testGetPriceForTokens(tokenSaleData, BigInt(1))
+                    .catch(() => BigInt(0));
+                  tokenPrice = ethers.formatEther(price);
+                } catch (error) {
+                  console.error(
+                    `Error fetching price for token ${token.name}:`,
+                    error
+                  );
+                }
+              }
+
+              return {
+                id: token.token,
                 token: token.token,
-                name: token.name,
+                name: token.name || "Unknown Token",
+                symbol: (token.name || "UNKN").substring(0, 4).toUpperCase(),
+                description: token.description || "No description available",
+                imageUrl: token.image || "/placeholder.svg",
+                price: tokenPrice,
+                marketCap:
+                  (Number(token.raised || "0") / 1e18).toFixed(2) + "k",
+                priceChange: 5.0,
+                fundingRaised: token.raised?.toString() || "0",
+                chain: "Electroneum",
+                volume24h: "$100,000.00",
+                holders: "1000",
+                launchDate: "2023-01-01",
+                status: token.isOpen ? "active" : "locked",
                 creator: token.creator,
-                sold: token.sold,
-                raised: token.raised,
-                isOpen: token.isOpen,
-                metadataURI: token.image || "", // Use image URL as metadataURI
+                type: "created",
               };
-
-              const price = await testTokenService.testGetPriceForTokens(tokenSaleData, BigInt(1));
-              tokenPrice = ethers.formatEther(price);
-              console.log(`Token price for ${token.name}:`, tokenPrice);
             } catch (error) {
-              console.error(
-                `Error fetching price for token ${token.name}:`,
-                error
-              );
-              tokenPrice = "0";
+              console.error("Error processing created token:", error);
+              return null;
             }
-          }
+          })
+        );
 
-          return {
-            id: token.token,
-            name: token.name,
-            symbol: token.name.substring(0, 4).toUpperCase(),
-            description: token.description || "No description available",
-            imageUrl: token.image || "/placeholder.svg",
-            price: tokenPrice,
-            marketCap: (Number(token.raised) / 1e18).toFixed(2),
-            priceChange: Math.random() * 20 - 10,
-            fundingRaised: token.raised.toString(),
-            chain: "Electroneum", // Use Electroneum as the default chain
-            volume24h: "$" + (Math.random() * 100000).toFixed(2),
-            holders: (Math.random() * 1000).toFixed(0).toString(),
-            launchDate: new Date().toISOString().split("T")[0],
-            status: token.isOpen ? "active" : "locked",
-            type: "created",
-          };
-        });
+        // Process purchased tokens
+        const processedPurchasedTokens = await Promise.all(
+          (purchasedTokensData || []).map(async (token) => {
+            try {
+              let tokenPrice = "0";
+              if (token.isOpen) {
+                try {
+                  const tokenSaleData = {
+                    token: token.token,
+                    name: token.name || "Unknown Token",
+                    creator: token.creator,
+                    sold: token.sold || "0",
+                    raised: token.raised || "0",
+                    isOpen: token.isOpen,
+                    metadataURI: token.image || "",
+                  };
 
-        const formattedTokens = await Promise.all(formattedTokensPromises);
-        setCreatedTokens(formattedTokens);
+                  const price = await testTokenService
+                    .testGetPriceForTokens(tokenSaleData, BigInt(1))
+                    .catch(() => BigInt(0));
+                  tokenPrice = ethers.formatEther(price);
+                } catch (error) {
+                  console.error(
+                    `Error fetching price for token ${token.name}:`,
+                    error
+                  );
+                }
+              }
+
+              return {
+                id: token.token,
+                token: token.token,
+                name: token.name || "Unknown Token",
+                symbol: (token.name || "UNKN").substring(0, 4).toUpperCase(),
+                description: token.description || "No description available",
+                imageUrl: token.image || "/placeholder.svg",
+                price: tokenPrice,
+                marketCap:
+                  (Number(token.raised || "0") / 1e18).toFixed(2) + "k",
+                priceChange: 5.0,
+                fundingRaised: token.raised?.toString() || "0",
+                chain: "Electroneum",
+                volume24h: "$100,000.00",
+                holders: "1000",
+                launchDate: "2023-01-01",
+                status: token.isOpen ? "active" : "locked",
+                balance: token.balance
+                  ? ethers.formatEther(token.balance)
+                  : "0",
+                type: "purchased",
+              };
+            } catch (error) {
+              console.error("Error processing purchased token:", error);
+              return null;
+            }
+          })
+        );
+
+        // Update state with filtered results
+        setCreatedTokens(processedCreatedTokens.filter(Boolean));
+        setPurchasedTokens(processedPurchasedTokens.filter(Boolean));
       } catch (error) {
-        console.error("Error fetching created tokens:", error);
+        console.error("Error fetching tokens:", error);
         toast({
           title: "Error",
-          description: "Failed to load your created tokens.",
+          description:
+            error instanceof Error ? error.message : "Failed to load tokens.",
           variant: "destructive",
         });
+        // Reset data fetched flag on error to allow retrying
+        dataFetched.current = false;
       } finally {
         setIsLoading(false);
       }
-    };
-
-    fetchCreatedTokens();
-  }, [testTokenService]);
-
-  // Fetch purchased tokens
-  useEffect(() => {
-    const fetchPurchasedTokens = async () => {
-      try {
-        setIsLoading(true);
-        const tokens = await testTokenService.testGetPurchasedTokens();
-        console.log("Purchased tokens:", tokens);
-
-        // Process tokens and get prices
-        const formattedTokensPromises = tokens.map(async (token) => {
-          // Get the actual price from the contract for 1 token
-          let tokenPrice = "0";
-          if (token.isOpen) {
-            try {
-              // Create a TokenSale object with all required properties
-              const tokenSaleData = {
-                token: token.token,
-                name: token.name,
-                creator: token.creator,
-                sold: token.sold,
-                raised: token.raised,
-                isOpen: token.isOpen,
-                metadataURI: token.image || "",
-              };
-
-              const price = await testTokenService.testGetPriceForTokens(tokenSaleData, BigInt(1));
-              tokenPrice = ethers.formatEther(price);
-              console.log(`Token price for ${token.name}:`, tokenPrice);
-            } catch (error) {
-              console.error(
-                `Error fetching price for token ${token.name}:`,
-                error
-              );
-              tokenPrice = "0";
-            }
-          }
-
-          return {
-            id: token.token,
-            name: token.name,
-            symbol: token.name.substring(0, 4).toUpperCase(),
-            description: token.description || "No description available",
-            imageUrl: token.image || "/placeholder.svg",
-            price: tokenPrice,
-            marketCap: (Number(token.raised) / 1e18).toFixed(2),
-            priceChange: Math.random() * 20 - 10,
-            fundingRaised: token.raised.toString(),
-            chain: "Electroneum", // Use Electroneum as the default chain
-            volume24h: "$" + (Math.random() * 100000).toFixed(2),
-            holders: (Math.random() * 1000).toFixed(0).toString(),
-            launchDate: new Date().toISOString().split("T")[0],
-            status: token.isOpen ? "active" : "locked",
-            balance: token.balance ? ethers.formatEther(token.balance) : "0",
-            type: "purchased",
-          };
-        });
-
-        const formattedTokens = await Promise.all(formattedTokensPromises);
-        setPurchasedTokens(formattedTokens);
-      } catch (error) {
-        console.error("Error fetching purchased tokens:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load your purchased tokens.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPurchasedTokens();
-  }, [testTokenService]);
-
-  // Get tokens based on the selected tab
-  const tokens = tokenTypeTab === "created" ? createdTokens : purchasedTokens;
-
-  // Filter tokens based on search query and active tab
-  const filteredTokens = tokens.filter((token) => {
-    const matchesSearch =
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.symbol.toLowerCase().includes(searchQuery.toLowerCase());
-
-    if (activeTab === "all") return matchesSearch;
-    if (activeTab === "active")
-      return matchesSearch && token.status === "active";
-    if (activeTab === "locked")
-      return matchesSearch && token.status === "locked";
-
-    return matchesSearch;
-  });
-
-  // Sort tokens based on sort config
-  const sortedTokens = [...filteredTokens].sort((a, b) => {
-    if (
-      a[sortConfig.key as keyof typeof a] < b[sortConfig.key as keyof typeof b]
-    ) {
-      return sortConfig.direction === "asc" ? -1 : 1;
     }
-    if (
-      a[sortConfig.key as keyof typeof a] > b[sortConfig.key as keyof typeof b]
-    ) {
-      return sortConfig.direction === "asc" ? 1 : -1;
-    }
-    return 0;
-  });
 
-  // Handle sort
-  const handleSort = (key: string) => {
-    setSortConfig({
-      key,
-      direction:
-        sortConfig.key === key && sortConfig.direction === "asc"
-          ? "desc"
-          : "asc",
+    fetchAllTokens();
+  }, [isWalletConnected, testTokenService]);
+
+  // Memoized values
+  const tokens = useMemo(() => {
+    return tokenTypeTab === "created" ? createdTokens : purchasedTokens;
+  }, [tokenTypeTab, createdTokens, purchasedTokens]);
+
+  const filteredTokens = useMemo(() => {
+    return tokens.filter((token) => {
+      const matchesSearch =
+        token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        token.symbol.toLowerCase().includes(searchQuery.toLowerCase());
+
+      if (activeTab === "all") return matchesSearch;
+      if (activeTab === "active")
+        return matchesSearch && token.status === "active";
+      if (activeTab === "locked")
+        return matchesSearch && token.status === "locked";
+
+      return matchesSearch;
     });
-  };
+  }, [tokens, searchQuery, activeTab]);
+
+  const sortedTokens = useMemo(() => {
+    return [...filteredTokens].sort((a, b) => {
+      if (
+        a[sortConfig.key as keyof typeof a] <
+        b[sortConfig.key as keyof typeof b]
+      ) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (
+        a[sortConfig.key as keyof typeof a] >
+        b[sortConfig.key as keyof typeof b]
+      ) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [filteredTokens, sortConfig]);
 
   // Find best and worst performers
   const bestPerformer =
@@ -316,6 +359,57 @@ export default function TokensPage() {
     return "Electroneum"; // Fallback to Electroneum
   };
 
+  // Render functions
+  const renderMetaMaskPrompt = () => (
+    <AppLayout>
+      <div className="container py-8">
+        <Card className="border-white/10">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Wallet className="h-12 w-12 text-gray-400 mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Wallet Not Available</h2>
+            <p className="text-muted-foreground mb-6">
+              Please install MetaMask to view your tokens
+            </p>
+            <Button
+              onClick={() =>
+                window.open("https://metamask.io/download/", "_blank")
+              }
+            >
+              Install MetaMask
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
+  );
+
+  const renderConnectPrompt = () => (
+    <AppLayout>
+      <div className="container py-8">
+        <Card className="border-white/10">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Wallet className="h-12 w-12 text-gray-400 mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Connect Your Wallet</h2>
+            <p className="text-muted-foreground mb-6">
+              Please connect your wallet to view your tokens
+            </p>
+            <Button onClick={handleConnectWallet}>Connect Wallet</Button>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
+  );
+
+  // Early returns using memoized conditions
+  if (!isMetaMaskInstalled) {
+    return renderMetaMaskPrompt();
+  }
+
+  if (showConnectPrompt) {
+    return renderConnectPrompt();
+  }
+
+  // Main render
   return (
     <AppLayout>
       <div className="min-h-screen bg-gradient-to-b from-black to-gray-900">
@@ -610,7 +704,7 @@ export default function TokensPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTokens.map((token) => (
+                    {sortedTokens.map((token) => (
                       <TableRow
                         key={token.id}
                         className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"

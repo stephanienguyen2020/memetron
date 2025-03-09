@@ -6,6 +6,7 @@ import NativeLiquidityPool from "../abi/NativeLiquidityPool.json";
 import { config } from "../app/config/contract_addresses";
 import { pinFileToIPFS, pinJSONToIPFS, unPinFromIPFS } from "@/app/lib/pinata";
 import { useCallback } from "react";
+import { Contract, ContractInterface } from "ethers";
 
 interface TokenSale {
   token: string;
@@ -23,7 +24,13 @@ interface GetTokensOptions {
 }
 
 interface FactoryContract extends ethers.BaseContract {
-  create(name: string, ticker: string, metadataURI: string, creator: string, overrides?: any): Promise<any>;
+  create(
+    name: string,
+    ticker: string,
+    metadataURI: string,
+    creator: string,
+    overrides?: any
+  ): Promise<any>;
   fee(): Promise<bigint>;
   getTokenSale(index: number): Promise<TokenSale>;
   totalTokens(): Promise<number>;
@@ -31,8 +38,18 @@ interface FactoryContract extends ethers.BaseContract {
   buy(token: string, amount: bigint, overrides?: any): Promise<any>;
 }
 
+type ConfigType = {
+  [key: number]: {
+    factory: { address: string };
+    nativeLiquidityPool: { address: string };
+    LaunchpadAgent: { address: string };
+  };
+};
+
+const typedConfig = config as ConfigType;
+
 export const useTestTokenService = () => {
-  const { data: walletClient } = useWalletClient();
+  const { data: walletClient, isError: walletError } = useWalletClient();
 
   const getContractAddress = useCallback(() => {
     const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
@@ -46,18 +63,30 @@ export const useTestTokenService = () => {
     return contractAddress;
   }, []);
 
+  const initializeProvider = useCallback(async () => {
+    if (!walletClient) {
+      throw new Error("Wallet client not found. Please connect your wallet.");
+    }
+
+    if (walletError) {
+      throw new Error("Error connecting to wallet. Please try again.");
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      return { provider, signer };
+    } catch (error) {
+      console.error("Error initializing provider:", error);
+      throw new Error("Failed to initialize wallet provider.");
+    }
+  }, [walletClient, walletError]);
+
   const testGetTokens = useCallback(
     async (options: GetTokensOptions = {}) => {
       try {
-        if (!walletClient) {
-          console.warn("Wallet client not found");
-          return [];
-        }
-
-        const provider = new ethers.BrowserProvider(walletClient);
-        const signer = await provider.getSigner();
+        const { provider, signer } = await initializeProvider();
         const contractAddress = getContractAddress();
-
         const factory = new ethers.Contract(contractAddress, Factory, signer);
 
         // Get total number of tokens
@@ -126,10 +155,10 @@ export const useTestTokenService = () => {
         return tokensWithMetadata.reverse();
       } catch (error) {
         console.error("Error in testGetTokens:", error);
-        return [];
+        throw error;
       }
     },
-    [walletClient, getContractAddress]
+    [walletClient, getContractAddress, initializeProvider]
   );
 
   const testBuyToken = useCallback(
@@ -285,11 +314,7 @@ export const useTestTokenService = () => {
 
       // Check balance for each token
       const purchasedTokensPromises = allTokens.map(async (token) => {
-        const tokenContract = new ethers.Contract(
-          token.token,
-          Token,
-          signer
-        );
+        const tokenContract = new ethers.Contract(token.token, Token, signer);
 
         const balance = await tokenContract.balanceOf(userAddress);
 
@@ -302,9 +327,9 @@ export const useTestTokenService = () => {
         return null;
       });
 
-      const purchasedTokens = (await Promise.all(purchasedTokensPromises)).filter(
-        (token) => token !== null
-      );
+      const purchasedTokens = (
+        await Promise.all(purchasedTokensPromises)
+      ).filter((token) => token !== null);
 
       return purchasedTokens;
     } catch (error) {
@@ -331,107 +356,215 @@ export const useTestTokenService = () => {
     }
   }, [walletClient]);
 
-  const testGetTokenBalance = useCallback(async (tokenAddress: string): Promise<bigint> => {
-    if (!walletClient) {
-      console.warn("Wallet client not found");
-      return BigInt(0);
-    }
-
-    try {
-      const provider = new ethers.BrowserProvider(walletClient);
-      const signer = await provider.getSigner();
-      const userAddress = await signer.getAddress();
-
-      const tokenContract = new ethers.Contract(
-        tokenAddress,
-        Token,
-        signer
-      );
-
-      const balance = await tokenContract.balanceOf(userAddress);
-      return balance;
-    } catch (error) {
-      console.error("Error getting token balance:", error);
-      return BigInt(0);
-    }
-  }, [walletClient]);
-
-  const testGetEstimatedTokensForEth = useCallback(async (
-    tokenSale: TokenSale,
-    ethAmount: bigint
-  ) => {
-    if (!walletClient) {
-      console.warn("Wallet client not found");
-      return BigInt(0);
-    }
-
-    try {
-      if (tokenSale.isOpen === true) {
+  const testGetTokenBalance = useCallback(
+    async (tokenAddress: string): Promise<bigint> => {
+      if (!walletClient) {
+        console.warn("Wallet client not found");
         return BigInt(0);
       }
 
-      const provider = new ethers.BrowserProvider(walletClient);
-      const signer = await provider.getSigner();
-      const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
-      const liquidityPoolAddress = config[chainId as keyof typeof config]?.nativeLiquidityPool?.address;
+      try {
+        const provider = new ethers.BrowserProvider(walletClient);
+        const signer = await provider.getSigner();
+        const userAddress = await signer.getAddress();
 
-      const liquidityPool = new ethers.Contract(
-        liquidityPoolAddress,
-        NativeLiquidityPool,
-        signer
-      );
+        const tokenContract = new ethers.Contract(tokenAddress, Token, signer);
 
-      const ethAmountEthers = ethers.parseUnits(ethAmount.toString(), 18);
-      const tokens = await liquidityPool.getEstimatedTokensForEth(
-        tokenSale.token,
-        ethAmountEthers
-      );
+        const balance = await tokenContract.balanceOf(userAddress);
+        return balance;
+      } catch (error) {
+        console.error("Error getting token balance:", error);
+        return BigInt(0);
+      }
+    },
+    [walletClient]
+  );
 
-      return tokens;
-    } catch (error) {
-      console.error("Error getting estimated tokens for ETH:", error);
-      return BigInt(0);
-    }
-  }, [walletClient]);
-
-  const testGetEstimatedEthForTokens = useCallback(async (
-    tokenSale: TokenSale,
-    tokenAmount: bigint
-  ) => {
-    if (!walletClient) {
-      console.warn("Wallet client not found");
-      return BigInt(0);
-    }
-
-    try {
-      if (tokenSale.isOpen === true) {
+  const testGetEstimatedTokensForEth = useCallback(
+    async (tokenSale: TokenSale, ethAmount: bigint) => {
+      if (!walletClient) {
+        console.warn("Wallet client not found");
         return BigInt(0);
       }
 
-      const provider = new ethers.BrowserProvider(walletClient);
-      const signer = await provider.getSigner();
-      const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
-      const liquidityPoolAddress = config[chainId as keyof typeof config]?.nativeLiquidityPool?.address;
+      try {
+        if (tokenSale.isOpen === true) {
+          return BigInt(0);
+        }
 
-      const liquidityPool = new ethers.Contract(
-        liquidityPoolAddress,
-        NativeLiquidityPool,
-        signer
-      );
+        const provider = new ethers.BrowserProvider(walletClient);
+        const signer = await provider.getSigner();
+        const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
+        const liquidityPoolAddress =
+          config[chainId as keyof typeof config]?.nativeLiquidityPool?.address;
 
-      const tokenAmountEthers = ethers.parseUnits(tokenAmount.toString(), 18);
-      const eth = await liquidityPool.getEstimatedEthForTokens(
-        tokenSale.token,
-        tokenAmountEthers
-      );
+        const liquidityPool = new Contract(
+          liquidityPoolAddress,
+          NativeLiquidityPool,
+          signer
+        );
 
-      return eth;
-    } catch (error) {
-      console.error("Error getting estimated ETH for tokens:", error);
-      return BigInt(0);
-    }
-  }, [walletClient]);
+        const ethAmountEthers = ethers.parseUnits(ethAmount.toString(), 18);
+        const tokens = await liquidityPool.getEstimatedTokensForEth(
+          tokenSale.token,
+          ethAmountEthers
+        );
 
+        return tokens;
+      } catch (error) {
+        console.error("Error getting estimated tokens for ETH:", error);
+        return BigInt(0);
+      }
+    },
+    [walletClient]
+  );
+
+  const testGetEstimatedEthForTokens = useCallback(
+    async (tokenSale: TokenSale, tokenAmount: bigint) => {
+      if (!walletClient) {
+        console.warn("Wallet client not found");
+        return BigInt(0);
+      }
+
+      try {
+        if (tokenSale.isOpen === true) {
+          return BigInt(0);
+        }
+
+        const provider = new ethers.BrowserProvider(walletClient);
+        const signer = await provider.getSigner();
+        const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31337;
+        const liquidityPoolAddress =
+          config[chainId as keyof typeof config]?.nativeLiquidityPool?.address;
+
+        const liquidityPool = new Contract(
+          liquidityPoolAddress,
+          NativeLiquidityPool,
+          signer
+        );
+
+        const tokenAmountEthers = ethers.parseUnits(tokenAmount.toString(), 18);
+        const eth = await liquidityPool.getEstimatedEthForTokens(
+          tokenSale.token,
+          tokenAmountEthers
+        );
+
+        return eth;
+      } catch (error) {
+        console.error("Error getting estimated ETH for tokens:", error);
+        return BigInt(0);
+      }
+    },
+    [walletClient]
+  );
+
+  const testSwapEthForToken = useCallback(
+    async (
+      token: TokenSale,
+      amount: Number
+    ): Promise<{ success: boolean; error?: string }> => {
+      if (!walletClient) {
+        console.error("Wallet client not found");
+        return { success: false, error: "Wallet not connected" };
+      }
+
+      try {
+        const provider = new ethers.BrowserProvider(walletClient.transport);
+        const signer = await provider.getSigner();
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId);
+
+        if (!typedConfig[chainId]) {
+          throw new Error("Unsupported network");
+        }
+
+        const liquidityPool = new Contract(
+          typedConfig[chainId].nativeLiquidityPool.address,
+          NativeLiquidityPool,
+          signer
+        );
+
+        const ethAmountEthers = ethers.parseUnits(amount.toString(), 18);
+        console.log("ethAmountEthers", ethAmountEthers);
+        console.log("token.isOpen", token.isOpen);
+
+        if (token.isOpen === true) {
+          return { success: false, error: "Token is not graduated" };
+        }
+
+        const transaction = await liquidityPool.swapEthForToken(token.token, {
+          value: ethAmountEthers,
+        });
+        const receipt = await transaction.wait();
+        return { success: receipt.status === 1 };
+      } catch (error: any) {
+        console.error("Error swapping ETH for token:", error);
+        return {
+          success: false,
+          error: error.message || "Unknown error occurred",
+        };
+      }
+    },
+    [walletClient]
+  );
+
+  const testSwapTokenForEth = useCallback(
+    async (
+      tokenSale: TokenSale,
+      tokenAmount: Number
+    ): Promise<{ success: boolean; error?: string }> => {
+      if (!walletClient) {
+        console.error("Wallet client not found");
+        return { success: false, error: "Wallet not connected" };
+      }
+
+      try {
+        const provider = new ethers.BrowserProvider(walletClient.transport);
+        const signer = await provider.getSigner();
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId);
+
+        if (!typedConfig[chainId]) {
+          throw new Error("Unsupported network");
+        }
+
+        const liquidityPool = new Contract(
+          typedConfig[chainId].nativeLiquidityPool.address,
+          NativeLiquidityPool,
+          signer
+        );
+
+        const tokenAmountEthers = ethers.parseUnits(tokenAmount.toString(), 18);
+        if (tokenSale.isOpen === true) {
+          return { success: false, error: "Token is not graduated" };
+        }
+
+        const tokenContract = new Contract(tokenSale.token, Token, signer);
+
+        // Approve the liquidity pool to spend tokens
+        await tokenContract.approve(
+          await liquidityPool.getAddress(),
+          tokenAmountEthers
+        );
+        console.log("tokenAmountEthers", tokenAmountEthers);
+        console.log("token.isOpen", tokenSale.isOpen);
+
+        const transaction = await liquidityPool.swapTokenForEth(
+          tokenSale.token,
+          tokenAmountEthers
+        );
+        const receipt = await transaction.wait();
+        return { success: receipt.status === 1 };
+      } catch (error: any) {
+        console.error("Error swapping token for ETH:", error);
+        return {
+          success: false,
+          error: error.message || "Unknown error occurred",
+        };
+      }
+    },
+    [walletClient]
+  );
 
   return {
     testCreateToken,
@@ -443,5 +576,7 @@ export const useTestTokenService = () => {
     testGetEstimatedTokensForEth,
     testGetEstimatedEthForTokens,
     testGetPriceForTokens,
+    testSwapEthForToken,
+    testSwapTokenForEth,
   };
 };

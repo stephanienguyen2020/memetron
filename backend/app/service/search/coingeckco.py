@@ -15,7 +15,7 @@ async def get_sorted_trending_pools(include: str = "base_token,quote_token", pag
         JSON response containing trending pools sorted by `pool_created_at`.
     """
     
-    url = f"{BASE_URL}/networks/aurora/trending_pools"
+    url = f"{BASE_URL}/networks/sonic/trending_pools"
     params = {
         "include": include,
         "page": page,

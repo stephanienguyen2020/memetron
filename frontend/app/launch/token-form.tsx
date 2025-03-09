@@ -30,7 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { createToken } from "@/services/memecoin-launchpad";
+import { useTestTokenService } from "@/services/TestTokenService";
 
 const tokenInfoFields = [
   {
@@ -108,6 +108,8 @@ export function TokenFormSection({
   onSubmit,
   onConfigChange,
 }: TokenFormSectionProps) {
+  const testTokenService = useTestTokenService();
+
   const renderLaunchConfiguration = () => (
     <div>
       <h3 className="text-lg font-semibold mb-4">Launch Configuration</h3>
@@ -247,7 +249,6 @@ export function TokenFormSection({
     </div>
   );
 
-  // Add this function inside the TokenFormSection component
   const validateAndSubmitForm = async () => {
     const form = document.querySelector("form") as HTMLFormElement;
 
@@ -293,7 +294,7 @@ export function TokenFormSection({
           description: descriptionInput?.value || "",
         };
 
-        const result = await createToken(metaData, imageFile);
+        const result = await testTokenService.testCreateToken(metaData, imageFile);
 
         if (result.success) {
           alert("Token created successfully!");

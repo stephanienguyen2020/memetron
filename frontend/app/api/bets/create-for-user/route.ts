@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 import BettingABI from "@/abi/Betting.json";
+import { pinFileToIPFS } from "@/app/lib/pinata"; // Import your IPFS upload function
 
 // Contract address from the BettingService
 const contractAddress = "0xe1C31E56De989192946f096eBA8Ed709C2Ec9003";
@@ -15,18 +16,17 @@ async function generateImage(prompt: string): Promise<string> {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_NEBULA_API_KEY}`,
       },
       body: JSON.stringify({
-        model_name: "stabilityai/stable-diffusion-xl-base-1.0",
+        model_name: "black-forest-labs/FLUX.1-schnell",
         prompt: prompt,
-        num_steps: 25,
-        guidance_scale: 9,
-        negative_prompt: null,
+        num_steps: 4,
+        guidance_scale: 3.5,
+        seed: -1,
         width: 1024,
         height: 1024,
       }),
     });
 
     if (!response.ok) throw new Error("Failed to generate image");
-
     const { data } = await response.json();
     const imageBase64 = data.image_file;
 
@@ -38,13 +38,15 @@ async function generateImage(prompt: string): Promise<string> {
     }
     const byteArray = new Uint8Array(byteNumbers);
 
-    // Create a Blob from the binary data
-    const blob = new Blob([byteArray], { type: "image/png" });
+    // Create a File from the binary data
+    const file = new File([byteArray], "generated-image.png", {
+      type: "image/png",
+    });
 
-    // Here you would typically upload this blob to your storage service
-    // For now, we'll return a data URL as a placeholder
-    const dataUrl = `data:image/png;base64,${imageBase64}`;
-    return dataUrl;
+    // Upload the image to IPFS
+    const imageURI = await pinFileToIPFS(file);
+    console.log("Image URI", imageURI);
+    return imageURI;
   } catch (error) {
     console.error("Error generating image:", error);
     return "/placeholder.svg";
@@ -88,7 +90,7 @@ export async function POST(req: NextRequest) {
       const prompt = `${title} - ${description}`;
       finalImageURL = await generateImage(prompt);
     }
-
+    console.log("Final image URL", finalImageURL);
     // Connect to the provider - use environment variable for RPC URL
     const provider = new ethers.JsonRpcProvider(
       "https://rpc.ankr.com/electroneum_testnet/a37dd6e77e11f999c0ca58d263db0f160cd081bb788feecd4c256902084993b9"

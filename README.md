@@ -6,7 +6,8 @@ MemeTron solves key challenges in the meme coin space by automating creation, tr
 
 Electroneum Mainnet
 - **Block Explorer:** blockexplorer.electroneum.com
-- **RPC URL**: 
+- **RPC URL**: https://rpc.ankr.com/electroneum
+- **CHAINID**: 52014
 
 Contracts: 
 - **Factory**: 0xD4B453A5F41092f69C736ad64c9a7d8E6989dc53

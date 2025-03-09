@@ -1,5 +1,12 @@
 MemeTron is an **AI-driven platform** for meme coin trading, research, and creation. Whether you're betting on trends, launching tokens, or analyzing market data, MemeTron provides the tools to stay ahead.
 
+## 🚀 Contract Address
+
+- **Factory**: 0xD4B453A5F41092f69C736ad64c9a7d8E6989dc53
+- **Launchpad Agent**: 0x43f02972D8D238A6748A6a2270D860cf703838b7
+- **Native Liquidity Pool**: 0x897eC4aF77346F8Ae3E707527220BDcC4782230E
+- **Bookie Bet**: 0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0
+
 ## 🚀 Features
 
 ### **Seamless Wallet Integration**
@@ -12,7 +19,8 @@ Monitor holdings in real-time, track profits/losses, and get AI-driven price pre
 
 ### **🛠 Betting Marketplace**
 
-Bet on meme coin trends directly via Twitter by tagging **@MemeTron**. Smart contracts ensure secure escrow and instant payouts.
+- Bet on meme coin trends directly via Twitter by tagging **@MemeTron**. Smart contracts ensure secure escrow and instant payouts.
+- Creating bet easily by tagging our agent on Twitter 
 
 ### **🚀 Meme Coin Launch Pad**
 

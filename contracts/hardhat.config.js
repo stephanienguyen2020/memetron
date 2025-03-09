@@ -36,7 +36,12 @@ module.exports = {
       url: "https://rpc.ankr.com/electroneum_testnet/a37dd6e77e11f999c0ca58d263db0f160cd081bb788feecd4c256902084993b9",
       chainId: 5201420,
       accounts: ["0c6aaedebed8f32db344a74f5fda724c42a1b7053450ebfecd29ba0e0922dd6b"] // Use environment variables instead for security
-    }
+    },
+    electroneum: {
+      url: "https://rpc.ankr.com/electroneum",
+      chainId: 52014,
+      accounts: [""] // Use environment variables instead for security
+    },
   }
 };
 

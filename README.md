@@ -9,10 +9,16 @@ Electroneum Mainnet
 - **RPC URL**: https://rpc.ankr.com/electroneum
 - **CHAINID**: 52014
 
-Contracts: 
+Contracts on mainnet: 
 - **Factory**: 0xD4B453A5F41092f69C736ad64c9a7d8E6989dc53
 - **Launchpad Agent**: 0x43f02972D8D238A6748A6a2270D860cf703838b7
 - **Native Liquidity Pool**: 0x897eC4aF77346F8Ae3E707527220BDcC4782230E
+- **Bookie Bet**: 0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0
+
+Contracts on testnet:
+- **Factory**: 0xC699def0dB413Bff70192Fd986a20d4bFFa02641
+- **Launchpad Agent**: 0xaC348bAB58b649a41DC23D108e90d949A8852fa0
+- **Native Liquidity Pool**: 0x2e4c31F33080462dc3f658D283397B532d9C6182
 - **Bookie Bet**: 0x6E0CC7eAb0672dEbFe84f49401325B3ad16125A0
 
 ## 🚀 Features
